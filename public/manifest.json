@@ -1,15 +1,20 @@
 {
-  "short_name": "Finder",
-  "name": "Terra Finder",
+  "short_name": "Burrito",
+  "name": "Burrito Finder",
   "icons": [
     {
       "src": "apple-touch-icon.png",
       "type": "image/png",
       "sizes": "180x180"
+    },
+    {
+      "src": "burrito-favicon.png",
+      "type": "image/png",
+      "sizes": "64x64"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0c1411",
+  "background_color": "#0c1411"
 }

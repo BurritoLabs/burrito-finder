@@ -1,15 +1,15 @@
-# Terra Finder
+# Burrito Finder
 
-![banner](./terra-finder.png)
+![banner](./burrito-finder.png)
 
-Terra Finder is a tool to search through blocks, transactions, and accounts on the Terra blockchain.
+Burrito Finder is a tool to search through blocks, transactions, and accounts on Terra Classic (and Phoenix) blockchain.
 
 Finder is derived from the [Cosmos Explorer](https://github.com/cosmos/explorer).
 
 ## Project setup
 
 ```
-** NOTE: Make sure you are using Node 16 **
+**NOTE: Make sure you are using Node 16**
 ```
 ```
 npm install
