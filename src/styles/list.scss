@@ -31,6 +31,7 @@
       @media (max-width: $breakpoint) {
         background: none;
         padding-left: 0px;
+        min-width: unset;
       }
     }
     .body {

@@ -15,7 +15,11 @@ const useRequest = <T>({ url, params, enabled }: Props) => {
       const { data } = await apiClient.get<T>(url, { params });
       return data;
     },
-    { enabled }
+    {
+      enabled,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 5
+    }
   );
 
   return result;

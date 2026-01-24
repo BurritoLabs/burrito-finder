@@ -6,10 +6,10 @@ $padding: 25px;
 $padding-small: 20px;
 
 .card {
-  background: white;
+  background: rgba(255, 255, 255, 0.04);
 
   @media (max-width: $breakpoint - 1) {
-    box-shadow: 0 1px 5px 0 $box-shadow;
+    box-shadow: 0 8px 24px 0 $box-shadow;
     border: $border;
     border-radius: $radius;
 
@@ -22,7 +22,7 @@ $padding-small: 20px;
   @media (min-width: $breakpoint) {
     border: $border;
     border-radius: $radius;
-    box-shadow: 0 1px 1px 0 $box-shadow;
+    box-shadow: 0 8px 24px 0 $box-shadow;
   }
 
   & & {

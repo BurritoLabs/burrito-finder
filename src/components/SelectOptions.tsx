@@ -1,14 +1,15 @@
-import { useIsClassic } from "../contexts/ChainsContext";
-import SelectCurrency from "./SelectCurrency";
 import SelectNetworks from "./SelectNetworks";
 import s from "./SelectOptions.module.scss";
 
-const SelectOptions = () => {
-  const isClassic = useIsClassic();
+type Props = {
+  variant?: "header" | "home";
+};
+
+const SelectOptions = ({ variant = "header" }: Props) => {
+  const rightClass = variant === "home" ? s.rightHome : s.rightHeader;
   return (
     <>
-      <SelectNetworks className={isClassic ? s.left : s.right} />
-      {isClassic ? <SelectCurrency className={s.right} /> : null}
+      <SelectNetworks className={rightClass} />
     </>
   );
 };

@@ -3,7 +3,7 @@ import s from "./Header.module.scss";
 import Search from "../components/Search";
 
 import { Link } from "react-router-dom";
-import logo from "../images/logo.svg";
+import FinderLogo from "../components/FinderLogo";
 import SelectOptions from "../components/SelectOptions";
 
 const Header = () => (
@@ -11,11 +11,11 @@ const Header = () => (
     <div className={s.inner}>
       <div className={s.logo}>
         <Link to="/">
-          <img src={logo} alt="logo" />
+          <FinderLogo />
         </Link>
       </div>
       <Search className={s.search} />
-      <SelectOptions />
+      <SelectOptions variant="header" />
     </div>
   </div>
 );

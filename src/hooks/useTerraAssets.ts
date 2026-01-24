@@ -28,24 +28,44 @@ export const useIBCWhitelist = (): IBCTokenList => {
   return data?.data?.[chainID.name];
 };
 
+const pickChainAssets = <T>(
+  data: Dictionary<T> | undefined,
+  name: string,
+  chainID: string
+) => {
+  if (!data) return undefined;
+  if (data[name]) return data[name];
+  if (data[chainID]) return data[chainID];
+  const loweredName = name.toLowerCase();
+  const loweredChain = chainID.toLowerCase();
+  const match = Object.keys(data).find(
+    key =>
+      key.toLowerCase() === loweredName || key.toLowerCase() === loweredChain
+  );
+  if (match) return data[match];
+  return (
+    data.classic ?? data["columbus-5"] ?? data.mainnet ?? data["phoenix-1"]
+  );
+};
+
 export const useWhitelist = () => {
-  const { name } = useCurrentChain();
+  const { name, chainID } = useCurrentChain();
   const { data } = useTerraAssets<Dictionary<TokenList>>("cw20/tokens.json");
-  return data?.[name];
+  return pickChainAssets(data, name, chainID);
 };
 
 export const useContracts = () => {
-  const { name } = useCurrentChain();
+  const { name, chainID } = useCurrentChain();
   const { data } = useTerraAssets<Dictionary<ContractList>>(
     "cw20/contracts.json"
   );
-  return data?.[name];
+  return pickChainAssets(data, name, chainID);
 };
 
 export const useNFTContracts = () => {
-  const { name } = useCurrentChain();
+  const { name, chainID } = useCurrentChain();
   const { data } = useTerraAssets<Dictionary<NFTContractList>>(
     "cw721/contracts.json"
   );
-  return data?.[name];
+  return pickChainAssets(data, name, chainID);
 };

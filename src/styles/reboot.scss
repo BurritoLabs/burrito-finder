@@ -4,14 +4,37 @@
   box-sizing: border-box;
 }
 
+html {
+  @media (max-width: $breakpoint - 1) {
+    overflow-x: hidden;
+  }
+}
+
 body {
   line-height: 1.5;
   margin: 0;
-  font-family: Gotham, Helvetica Neue, Arial, sans-serif;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   letter-spacing: -0.2px;
+  color: $app-fg;
+  background: radial-gradient(
+      1600px 900px at 12% -20%,
+      rgba(255, 255, 255, 0.045),
+      transparent 70%
+    ),
+    radial-gradient(
+      1400px 800px at 88% -10%,
+      rgba(82, 196, 26, 0.035),
+      transparent 72%
+    ),
+    linear-gradient(180deg, #0e1714 0%, #0c1411 55%, #08110f 100%);
+  background-color: #0c1411;
   -webkit-tap-highlight-color: transparent;
   word-break: break-word;
+
+  @media (max-width: $breakpoint - 1) {
+    overflow-x: hidden;
+  }
 }
 
 hr {

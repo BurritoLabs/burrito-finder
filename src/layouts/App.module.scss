@@ -1,14 +1,29 @@
 @import "../styles/variables";
 
+.main {
+  min-height: 100vh;
+}
+
 .content {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
   padding: 40px;
-  color: $brand !important;
+  color: $app-fg !important;
   -webkit-text-size-adjust: 100%;
   @media (max-width: $breakpoint) {
     padding: 50px 15px;
     padding-top: 85px;
   }
+}
+
+.loadingOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(12, 20, 17, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }

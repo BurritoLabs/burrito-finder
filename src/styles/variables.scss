@@ -1,18 +1,18 @@
-$app-fg: #11152c;
-$app-bg: #2043b5;
-$brand: #2043b5;
-$link: #2845ae;
-$link-bg: #5493f7;
-$line: #d8ddf0;
-$bg-hover: fade-out($brand, 0.98);
-$a-bg: #edf4fe;
+$app-fg: #eaf5eb;
+$app-bg: #52c41a;
+$brand: #52c41a;
+$link: #7fe35a;
+$link-bg: #52c41a;
+$line: rgba(234, 245, 235, 0.12);
+$bg-hover: rgba(255, 255, 255, 0.04);
+$a-bg: rgba(82, 196, 26, 0.12);
 
-$green: #1daa8e;
+$green: #52c41a;
 $red: #ff5561;
 $orange: #fd9a02;
-$navy: #0c3694;
-$sky: #5493f7;
-$table-head: rgba(84, 147, 247, 0.1);
+$navy: #0c1411;
+$sky: #7fe35a;
+$table-head: rgba(82, 196, 26, 0.08);
 /* Sizes */
 $breakpoint: 960px;
 $breakpoint-large: 1024px;

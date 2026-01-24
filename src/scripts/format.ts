@@ -19,7 +19,7 @@ const formatDenom = (denom: string, isClassic?: boolean): string => {
     const f = denom.slice(1);
 
     if (f.length > 3) {
-      return f === "luna" ? (isClassic ? "Lunc" : "Luna") : f.toUpperCase();
+      return f === "luna" ? (isClassic ? "LUNC" : "Luna") : f.toUpperCase();
     }
 
     return f.slice(0, 2).toUpperCase() + `T${isClassic ? "C" : ""}`;
