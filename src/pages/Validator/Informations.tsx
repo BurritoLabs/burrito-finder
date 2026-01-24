@@ -3,30 +3,30 @@ import { percent } from "../../scripts/math";
 import Finder from "../../components/Finder";
 import format from "../../scripts/format";
 import s from "./Informations.module.scss";
-import { useTerraValidator } from "../../queries/TerraAPI";
 import { useValidator } from "../../queries/staking";
 
 const Informations = ({ address }: { address: string }) => {
-  const { data: terraValidator } = useTerraValidator(address);
   const { data: validator } = useValidator(address);
 
   if (!validator) return null;
 
-  const validatorInfo = terraValidator
+  const validatorInfo = validator?.commission
     ? [
         {
           label: "Max commission rate",
-          value: percent(terraValidator.commission.commission_rates.max_rate)
+          value: percent(
+            validator.commission.commission_rates.max_rate.toString()
+          )
         },
         {
           label: "Max daily commission change",
           value: percent(
-            terraValidator.commission.commission_rates.max_change_rate
+            validator.commission.commission_rates.max_change_rate.toString()
           )
         },
         {
           label: "Last commission change",
-          value: `${format.date(terraValidator.commission.update_time)}`
+          value: `${format.date(validator.commission.update_time)}`
         }
       ]
     : [];

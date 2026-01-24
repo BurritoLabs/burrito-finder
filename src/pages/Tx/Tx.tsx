@@ -181,7 +181,7 @@ const Tx = () => {
 export default Tx;
 
 /* hooks */
-const INTERVAL = 1000;
+const INTERVAL = 3000;
 
 const usePollTxHash = (txhash: string) => {
   const { chainID } = useCurrentChain();

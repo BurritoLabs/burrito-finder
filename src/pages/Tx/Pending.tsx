@@ -9,7 +9,8 @@ const Pending = ({ timestamp }: { timestamp: string }) => {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    setInterval(() => setNow(new Date()), 1000);
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   const { minutes, seconds } = intervalToDuration({

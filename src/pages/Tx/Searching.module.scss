@@ -1,7 +1,17 @@
+@import "../../styles/variables.scss";
+
+.page {
+  background-color: #0c1411;
+  border: 1px solid $line;
+  border-radius: $radius;
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
+  padding: 80px 0 60px;
+  margin: 20px auto;
+  max-width: 520px;
+}
+
 .wrapper {
-  padding-top: 100px;
-  padding-bottom: 10px;
-  margin: auto;
+  margin: 0 auto;
   width: 300px;
   text-align: center;
 }
@@ -14,14 +24,14 @@
   margin-top: 20px;
   font-size: 14px;
 }
-.timer{
+.timer {
   display: block;
   font-size: 12px;
   margin-top: 5px;
   font-weight: 500;
 }
 .progress {
-  background-color: #d2d9f0;
+  background-color: $a-bg;
   border-radius: 5px;
   box-shadow: none;
   height: 10px;
@@ -29,7 +39,7 @@
 }
 .progressBar {
   margin-top: 20px;
-  background-color: #2043b5;
+  background-color: $brand;
   border-radius: 5px;
   box-shadow: none;
   height: 10px;

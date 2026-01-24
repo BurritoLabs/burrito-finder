@@ -27,6 +27,10 @@
 
 .article {
   white-space: nowrap;
+
+  @media (max-width: $breakpoint - 1) {
+    white-space: normal;
+  }
 }
 
 .header {
@@ -78,6 +82,16 @@
 
 .token_wrapper {
   display: flex;
+
+  @media (max-width: $breakpoint - 1) {
+    flex-wrap: wrap;
+  }
+}
+
+.tokenLink {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
 }
 
 .icon {

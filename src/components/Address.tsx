@@ -26,6 +26,8 @@ const formatAccAddress = (
   truncate?: boolean,
   className?: string
 ) => {
+  const cwFallbackIcon =
+    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
   const token = whitelist?.[address];
   const contract = contracts?.[address];
   const renderAddress = truncate ? format.truncate(address, [8, 8]) : address;
@@ -40,6 +42,7 @@ const formatAccAddress = (
   const names = token?.symbol || contractName;
   const showProtocolName = !token?.symbol && !isLPtoken && contractName;
   const icon = !hideIcon ? token?.icon || contract?.icon : undefined;
+  const iconCandidates = [icon, cwFallbackIcon].filter(Boolean) as string[];
 
   return (
     <div className={c(s.wrapper, className)}>
@@ -49,7 +52,7 @@ const formatAccAddress = (
             <span className={s.protocol}>{contract?.protocol}</span>
           )}
           <Finder q="address" v={address} children={names} />
-          <Image url={icon} className={s.icon} />
+          {!hideIcon && <Image urls={iconCandidates} className={s.icon} />}
         </>
       ) : (
         <Finder q="address" v={address} children={renderAddress} />

@@ -3,20 +3,19 @@ import { useParams } from "react-router-dom";
 import "ace-builds";
 import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-tomorrow_night";
 import AceEditor from "react-ace";
 import c from "classnames";
 import apiClient from "../../apiClient";
 import { isJson } from "../../scripts/utility";
 import Copy from "../../components/Copy";
 import Icon from "../../components/Icon";
-import { useIsClassic } from "../../contexts/ChainsContext";
 import useLCDClient from "../../hooks/useLCD";
 import s from "./Query.module.scss";
 
 const ACE_PROPS = {
   mode: "json",
-  theme: "github",
+  theme: "tomorrow_night",
   name: "JSON",
   width: "100%",
   height: "160px",
@@ -34,8 +33,6 @@ const Query = () => {
   const [error, setError] = useState<Error>();
 
   const lcd = useLCDClient();
-  const isClassic = useIsClassic();
-
   const reset = () => {
     setError(undefined);
     setData(undefined);
@@ -45,15 +42,15 @@ const Query = () => {
     e.preventDefault();
 
     try {
-      const url = isClassic
-        ? `${lcd.config.URL}/wasm/contracts/${address}/store`
-        : `${lcd.config.URL}/cosmwasm/wasm/v1/contract/${address}/smart/${btoa(
-            query ?? ""
-          )}`;
-      const params = query && isClassic && { query_msg: JSON.parse(query) };
+      const encoded = btoa(query ?? "");
+      const url = `${lcd.config.URL}/cosmwasm/wasm/v1/contract/${address}/smart/${encoded}`;
 
-      const { data } = await apiClient.get<{ result: any }>(url, { params });
-      const result = JSON.stringify(isClassic ? data.result : data, null, 2);
+      const { data } = await apiClient.get<{ data?: any; result?: any }>(url);
+      const result = JSON.stringify(
+        data?.data ?? data?.result ?? data,
+        null,
+        2
+      );
 
       setData(result);
     } catch (error) {

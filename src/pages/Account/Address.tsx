@@ -5,12 +5,25 @@ import { getEndpointByKeyword } from "../../scripts/utility";
 import { useCurrentChain } from "../../contexts/ChainsContext";
 import Loading from "../../components/Loading";
 import useContractInfo from "../../queries/wasm";
+import {
+  useContracts,
+  useNFTContracts,
+  useWhitelist
+} from "../../hooks/useTerraAssets";
 import Account from "./Account";
 import Contract from "./Contract";
 
 const Address = () => {
   const { address = "" } = useParams();
-  const { data: contractInfo, isLoading } = useContractInfo(address);
+  const whitelist = useWhitelist();
+  const contracts = useContracts();
+  const nfts = useNFTContracts();
+  const isKnownContract =
+    !!whitelist?.[address] || !!contracts?.[address] || !!nfts?.[address];
+  const { data: contractInfo, isLoading } = useContractInfo(
+    address,
+    isKnownContract
+  );
   const [resolvedAddress, setResolvedAddress] = useState("");
   const { name } = useCurrentChain();
   const navigate = useNavigate();

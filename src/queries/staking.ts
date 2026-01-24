@@ -2,6 +2,7 @@ import { useQuery } from "react-query";
 import { path, uniqBy } from "ramda";
 /* TODO: Fix terra.js */
 import { BondStatus } from "@terra-money/terra.proto/cosmos/staking/v1beta1/staking";
+import { AccAddress } from "@terra-money/terra.js";
 import useLCDClient from "../hooks/useLCD";
 import { Pagination, RefetchOptions } from "./query";
 
@@ -41,6 +42,31 @@ export const useUndelegations = (address: string) => {
       return undelegations;
     },
     { ...RefetchOptions.DEFAULT }
+  );
+};
+
+export const useStakingPool = () => {
+  const lcd = useLCDClient();
+  return useQuery(
+    [lcd.config, "stakingPool"],
+    async () => await lcd.staking.pool(),
+    { ...RefetchOptions.INFINITY }
+  );
+};
+
+export const useSelfDelegationAmount = (validatorAddress: string) => {
+  const lcd = useLCDClient();
+  return useQuery(
+    [lcd.config, validatorAddress, "selfDelegation"],
+    async () => {
+      const delegator = AccAddress.fromValAddress(validatorAddress);
+      const { balance } = await lcd.staking.delegation(
+        delegator,
+        validatorAddress
+      );
+      return balance?.amount;
+    },
+    { ...RefetchOptions.INFINITY, enabled: !!validatorAddress }
   );
 };
 

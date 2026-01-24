@@ -15,10 +15,15 @@ const ContractInfo = ({ address }: { address: string }) => {
 
   const whitelist = token || contract || nft;
   const icon = whitelist?.icon;
+  const cwFallbackIcon =
+    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
+  const iconCandidates = [icon, cwFallbackIcon].filter(Boolean) as string[];
+
+  const tokenInfoQuery = btoa(JSON.stringify({ token_info: {} }));
 
   return whitelist ? (
     <section className={s.wrapper}>
-      <Image url={icon} className={s.icon} />
+      <Image urls={iconCandidates} className={s.icon} />
       {token ? (
         <span className={s.name}>
           {`${token.protocol} ${token.symbol} Token `}
@@ -33,17 +38,18 @@ const ContractInfo = ({ address }: { address: string }) => {
     </section>
   ) : (
     <WithFetch
-      url={`/wasm/contracts/${address}/store?query_msg={"token_info":{}}`}
+      url={`/cosmwasm/wasm/v1/contract/${address}/smart/${tokenInfoQuery}`}
       loading={<Loading />}
       renderError={() => null}
       lcd
     >
-      {({ result: { name, symbol } }) => (
+      {({ data }) => (
         <section className={s.wrapper}>
+          <Image urls={[cwFallbackIcon]} className={s.icon} />
           <span className={s.name}>
-            {name}
+            {data?.name}
             <span className={s.vertical} />
-            <span className={s.symbol}>{symbol}</span>
+            <span className={s.symbol}>{data?.symbol}</span>
           </span>
         </section>
       )}
