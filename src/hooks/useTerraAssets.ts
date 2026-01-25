@@ -2,15 +2,14 @@ import { useQuery } from "react-query";
 import axios from "axios";
 import { Dictionary } from "lodash";
 import { useCurrentChain } from "../contexts/ChainsContext";
-import { ASSET_URL } from "../scripts/utility";
 
-const config = { baseURL: "https://assets.terra.dev" };
+const fetchAsset = async <T>(path: string) => {
+  const { data } = await axios.get<T>(`https://assets.terra.dev/${path}`);
+  return data;
+};
 
 const useTerraAssets = <T = any>(path: string) =>
-  useQuery([path, config, "terraAssets"], async () => {
-    const { data: result } = await axios.get<T>(path, config);
-    return result;
-  });
+  useQuery([path, "terraAssets"], () => fetchAsset<T>(path));
 
 export default useTerraAssets;
 
@@ -22,10 +21,10 @@ export type NFTContractList = Dictionary<NFTContracts>;
 export const useIBCWhitelist = (): IBCTokenList => {
   const chainID = useCurrentChain();
   const { data } = useQuery(["IBCWhitelist", chainID], () =>
-    axios.get(`${ASSET_URL}/ibc/tokens.json`)
+    fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
   );
 
-  return data?.data?.[chainID.name];
+  return data?.[chainID.name] ?? {};
 };
 
 const pickChainAssets = <T>(
