@@ -172,6 +172,18 @@ const renderCurreny = (
     ? find(data, obj => denom === format.denom(obj.denom, isClassic))
     : undefined;
 
+  if (isClassic && (rawDenom === "umnt" || rawDenom === "utwd")) {
+    if (!ustcPrice) return "";
+    const fxCode = rawDenom === "umnt" ? "MNT" : "TWD";
+    const fxUsd = fxRates?.[fxCode];
+    if (!fxUsd) return "";
+    const value = new BigNumber(amount)
+      .dividedBy(1e6)
+      .multipliedBy(fxUsd)
+      .multipliedBy(ustcPrice);
+    return `= ${value.toFormat(6)} USD`;
+  }
+
   if (isClassic && classicDenom.endsWith("TC")) {
     if (!ustcPrice) return "";
     if (rawDenom === "uusd") {
