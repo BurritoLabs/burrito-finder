@@ -11,6 +11,7 @@ type Props = {
   response?: Currency;
   ustcPrice?: number;
   lunaPrice?: number;
+  fxRates?: Record<string, number>;
 };
 
 const Available = ({
@@ -18,7 +19,8 @@ const Available = ({
   amount,
   response,
   ustcPrice,
-  lunaPrice
+  lunaPrice,
+  fxRates
 }: Props) => {
   const isClassic = useIsClassic();
   const cwFallbackIcon =
@@ -36,6 +38,7 @@ const Available = ({
       response={response}
       ustcPrice={ustcPrice}
       lunaPrice={lunaPrice}
+      fxRates={fxRates}
       fallbackIcon={cwFallbackIcon}
     />
   );

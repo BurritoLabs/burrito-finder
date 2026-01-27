@@ -27,6 +27,7 @@ type Props = {
   rawDenom?: string;
   ustcPrice?: number;
   lunaPrice?: number;
+  fxRates?: Record<string, number>;
 };
 
 const AmountCard = ({
@@ -47,6 +48,7 @@ const AmountCard = ({
     isClassic,
     ustcPrice,
     lunaPrice,
+    fxRates,
     fallbackIcon
   } = props;
   const isFactory = !!rawDenom && rawDenom.startsWith("factory/");
@@ -137,7 +139,8 @@ const AmountCard = ({
                   isClassic,
                   ustcPrice,
                   rawDenom,
-                  lunaPrice
+                  lunaPrice,
+                  fxRates
                 )}
             </span>
             <div className={s.button}>{button}</div>
@@ -159,7 +162,8 @@ const renderCurreny = (
   isClassic?: boolean,
   ustcPrice?: number,
   rawDenom?: string,
-  lunaPrice?: number
+  lunaPrice?: number,
+  fxRates?: Record<string, number>
 ) => {
   const { data, currency } = response;
   const currencyLabel = currency.substr(1).toUpperCase();
@@ -178,10 +182,21 @@ const renderCurreny = (
     }
 
     const rate = renderData?.swaprate;
-    if (!rate) return "";
+    if (rate) {
+      const value = new BigNumber(amount)
+        .dividedBy(rate)
+        .dividedBy(1e6)
+        .multipliedBy(ustcPrice);
+      return `= ${value.toFormat(6)} USD`;
+    }
+
+    const fxCode =
+      rawDenom === "umnt" ? "MNT" : rawDenom === "utwd" ? "TWD" : undefined;
+    const fxUsd = fxCode ? fxRates?.[fxCode] : undefined;
+    if (!fxUsd) return "";
     const value = new BigNumber(amount)
-      .dividedBy(rate)
       .dividedBy(1e6)
+      .multipliedBy(fxUsd)
       .multipliedBy(ustcPrice);
     return `= ${value.toFormat(6)} USD`;
   }

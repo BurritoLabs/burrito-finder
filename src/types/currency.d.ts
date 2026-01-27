@@ -2,6 +2,7 @@ interface Currency {
   data?: CurrencyData[];
   isLoading: boolean;
   currency: string;
+  fxRates?: Record<string, number>;
 }
 
 interface CurrencyData {

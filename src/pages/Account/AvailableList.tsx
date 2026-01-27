@@ -13,6 +13,7 @@ import Available from "./Available";
 import format from "../../scripts/format";
 
 const PRICE_TTL = 5 * 60 * 1000;
+const FX_TTL = 12 * 60 * 60 * 1000;
 
 const AvailableList = ({
   list,
@@ -161,6 +162,35 @@ const AvailableList = ({
     lunaPrice: resolvedLunaPrice
   };
 
+  const { data: fxRates } = useQuery(
+    ["fx-rates-usd"],
+    async () => {
+      const { data: result } = await axios.get<{
+        rates?: Record<string, number>;
+      }>("https://api.frankfurter.app/latest?from=USD&to=MNT,TWD");
+      return result?.rates;
+    },
+    {
+      staleTime: FX_TTL,
+      cacheTime: FX_TTL,
+      retry: false,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      enabled: pricesEnabled
+    }
+  );
+
+  const fxUsdRates = useMemo(() => {
+    if (!fxRates) return undefined;
+    const mnt = fxRates.MNT ? 1 / fxRates.MNT : undefined;
+    const twd = fxRates.TWD ? 1 / fxRates.TWD : undefined;
+    return {
+      ...(mnt ? { MNT: mnt } : {}),
+      ...(twd ? { TWD: twd } : {})
+    };
+  }, [fxRates]);
+
   const displayList = useMemo(() => {
     if (!pricesEnabled) return list;
     if (!showLowValueCoins && !isClassic) {
@@ -218,6 +248,7 @@ const AvailableList = ({
             response={props}
             ustcPrice={resolvedUstcPrice}
             lunaPrice={resolvedLunaPrice}
+            fxRates={fxUsdRates}
           />
         );
       })}
