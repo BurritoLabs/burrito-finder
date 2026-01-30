@@ -18,7 +18,7 @@ import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
 import {
   fromISOTime,
   sliceMsgType,
-  splitCoinData,
+  splitCoinData
 } from "../../scripts/utility";
 import format from "../../scripts/format";
 import { useLogfinderAmountRuleSet } from "../../hooks/useLogfinder";
@@ -29,6 +29,8 @@ import { transformTx } from "../Tx/transform";
 import TaxRateAmount from "../Tx/TaxRateAmount";
 import CsvExport from "./CSVExport";
 import s from "./Txs.module.scss";
+import { useQuery } from "react-query";
+import apiClient from "../../apiClient";
 
 type Fee = {
   denom: string;
@@ -86,16 +88,71 @@ const getAmount = (
 };
 
 const Txs = ({ address }: { address: string }) => {
-  const { chainID } = useCurrentChain();
+  const { chainID, lcd } = useCurrentChain();
   const [offset, setOffset] = useState<number>(0);
   const isClassic = useIsClassic();
+  const isPhoenix = chainID === "phoenix-1";
+  const limit = 50;
 
   const params = { offset, limit: 100, account: address };
   const url = useGetQueryURL("/v1/txs");
-  const { data, isLoading } = useRequest<{
+  const { data: fcdData, isLoading: fcdLoading } = useRequest<{
     next: number;
     txs: TxInfo[];
-  }>({ url, params });
+  }>({ url, params, enabled: !isPhoenix });
+
+  const { data: lcdData, isLoading: lcdLoading } = useQuery<{
+    next?: number;
+    txs: TxInfo[];
+  }>(
+    ["phoenix-txs", lcd, address, offset],
+    async () => {
+      const fetchByEvent = async (eventKey: string) => {
+        const search = new URLSearchParams();
+        search.set("pagination.limit", String(limit));
+        search.set("pagination.offset", String(offset));
+        search.append("events", `${eventKey}='${address}'`);
+        const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
+        const { data } = await apiClient.get(endpoint);
+        return data;
+      };
+
+      const [sender, recipient] = await Promise.all([
+        fetchByEvent("message.sender"),
+        fetchByEvent("transfer.recipient")
+      ]);
+
+      const toTxs = (payload: any) =>
+        (payload?.tx_responses ?? []).map((resp: any, index: number) => ({
+          ...resp,
+          tx: payload?.txs?.[index]
+        }));
+
+      const merged = [...toTxs(sender), ...toTxs(recipient)];
+      const unique = new Map<string, any>();
+      merged.forEach(tx => {
+        if (tx?.txhash) {
+          unique.set(tx.txhash, tx);
+        }
+      });
+
+      const txs = Array.from(unique.values()).sort(
+        (a, b) => Number(b.height) - Number(a.height)
+      );
+
+      const senderTotal = Number(sender?.pagination?.total ?? 0);
+      const recipientTotal = Number(recipient?.pagination?.total ?? 0);
+      const total = Math.max(senderTotal, recipientTotal);
+      const next = total > offset + limit ? offset + limit : undefined;
+
+      return { txs, next };
+    },
+    {
+      enabled: isPhoenix,
+      staleTime: 1000 * 60,
+      cacheTime: 1000 * 60
+    }
+  );
 
   const [txsRow, setTxsRow] = useState<JSX.Element[][]>([]);
 
@@ -104,6 +161,9 @@ const Txs = ({ address }: { address: string }) => {
     () => createLogMatcherForAmounts(ruleSet),
     [ruleSet]
   );
+
+  const data = isPhoenix ? lcdData : fcdData;
+  const isLoading = isPhoenix ? lcdLoading : fcdLoading;
 
   useEffect(() => {
     if (data?.txs) {
