@@ -104,10 +104,11 @@ const Txs = ({
   const [offset, setOffset] = useState<number>(0);
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
-  const limit = 50;
-  const contractLimit = 10;
+  const pageSize = 30;
+  const fcdLimit = 100;
+  const contractLimit = pageSize;
 
-  const params = { offset, limit: 100, account: address };
+  const params = { offset, limit: fcdLimit, account: address };
   const url = useGetQueryURL("/v1/txs");
   const { data: fcdData, isLoading: fcdLoading } = useRequest<{
     next: number;
@@ -173,7 +174,8 @@ const Txs = ({
       const senderTotal = Number(sender?.pagination?.total ?? 0);
       const recipientTotal = Number(recipient?.pagination?.total ?? 0);
       const total = Math.max(senderTotal, recipientTotal);
-      const next = total > offset + limit ? offset + limit : undefined;
+      const next =
+        total > offset + contractLimit ? offset + contractLimit : undefined;
 
       return { txs, next };
     },
@@ -192,7 +194,7 @@ const Txs = ({
       ["classic-contract-txs", lcd, address, offset],
       async () => {
         const search = new URLSearchParams();
-        search.set("pagination.limit", String(limit));
+        search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
         search.append("events", `wasm._contract_address='${address}'`);
         const endpoint = `/cosmos/tx/v1beta1/txs?${search.toString()}`;
@@ -224,6 +226,8 @@ const Txs = ({
       }
     );
 
+  const [allTxs, setAllTxs] = useState<TxInfo[]>([]);
+  const [visibleCount, setVisibleCount] = useState(pageSize);
   const [txsRow, setTxsRow] = useState<JSX.Element[][]>([]);
 
   const ruleSet = useLogfinderAmountRuleSet();
@@ -244,35 +248,81 @@ const Txs = ({
     : fcdLoading;
 
   useEffect(() => {
+    setOffset(0);
+    setAllTxs([]);
+    setVisibleCount(pageSize);
     setTxsRow([]);
-  }, [address, chainID]);
+  }, [address, chainID, pageSize]);
 
   useEffect(() => {
-    if (data?.txs) {
-      const orderedTxs = sortAscending
-        ? [...data.txs].sort(
-            (a: any, b: any) =>
-              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-          )
-        : shouldUseClassicContractLcd
-        ? [...data.txs].sort(
-            (a: any, b: any) =>
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          )
-        : data.txs;
-      const txRow = orderedTxs.map((tx: any) => {
-        const txData: TxResponse = transformTx(tx, chainID);
-        const matchedLogs = getTxAmounts(
-          JSON.stringify(txData),
-          logMatcher,
-          address
-        );
-        return getRow(txData, chainID, address, matchedLogs, isClassic);
+    if (!data?.txs) return;
+    setAllTxs(prev => {
+      const seen = new Set(prev.map(tx => tx?.txhash).filter(Boolean));
+      const merged = [...prev];
+      data.txs.forEach(tx => {
+        if (!tx?.txhash || !seen.has(tx.txhash)) {
+          merged.push(tx);
+          if (tx?.txhash) {
+            seen.add(tx.txhash);
+          }
+        }
       });
-      setTxsRow(stack => [...stack, ...txRow]);
+      return merged;
+    });
+  }, [data?.txs]);
+
+  const orderedTxs = useMemo(() => {
+    if (sortAscending) {
+      return [...allTxs].sort(
+        (a: any, b: any) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
     }
-    // eslint-disable-next-line
-  }, [data, chainID, address]);
+    if (shouldUseClassicContractLcd) {
+      return [...allTxs].sort(
+        (a: any, b: any) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+    }
+    return allTxs;
+  }, [allTxs, sortAscending, shouldUseClassicContractLcd]);
+
+  const visibleTxs = useMemo(
+    () => orderedTxs.slice(0, visibleCount),
+    [orderedTxs, visibleCount]
+  );
+
+  useEffect(() => {
+    if (!visibleTxs.length) {
+      setTxsRow([]);
+      return;
+    }
+    const txRow = visibleTxs.map((tx: any) => {
+      const txData: TxResponse = transformTx(tx, chainID);
+      const matchedLogs = getTxAmounts(
+        JSON.stringify(txData),
+        logMatcher,
+        address
+      );
+      return getRow(txData, chainID, address, matchedLogs, isClassic);
+    });
+    setTxsRow(txRow);
+  }, [visibleTxs, chainID, address, logMatcher, isClassic]);
+
+  const nextFromServer =
+    data?.next === 0 || data?.next ? Number(data.next) : undefined;
+  const hasMoreLocal = visibleCount < orderedTxs.length;
+  const nextToken = hasMoreLocal ? -1 : nextFromServer;
+  const handleLoadMore = (next?: number) => {
+    if (next === -1) {
+      setVisibleCount(count => count + pageSize);
+      return;
+    }
+    if (typeof next === "number" && Number.isFinite(next)) {
+      setOffset(next);
+      setVisibleCount(count => count + pageSize);
+    }
+  };
 
   const head = [
     `Tx hash`,
@@ -294,9 +344,9 @@ const Txs = ({
       ) : null}
 
       <Pagination
-        next={data?.next}
+        next={nextToken}
         title="transaction"
-        action={setOffset}
+        action={handleLoadMore}
         loading={isLoading}
       >
         <div className={s.cardBodyContainer}>

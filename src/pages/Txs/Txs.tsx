@@ -1,9 +1,11 @@
 import { get, isEmpty } from "lodash";
+import { useEffect, useState } from "react";
 import { TxInfo } from "@terra-money/terra.js";
 import FlexTable from "../../components/FlexTable";
 import Info from "../../components/Info";
 import Card from "../../components/Card";
 import Finder from "../../components/Finder";
+import PaginationButtons from "../../components/PaginationButtons";
 import { fromNow, sliceMsgType } from "../../scripts/utility";
 import TxAmount from "../Tx/TxAmount";
 import { transformTx } from "../Tx/transform";
@@ -37,6 +39,8 @@ const getRow = (response: TxInfo, chainID: string, isClassic?: boolean) => {
 };
 
 const Txs = ({ txs }: { txs: TxInfo[] }) => {
+  const pageSize = 30;
+  const [visibleCount, setVisibleCount] = useState(pageSize);
   const isClassic = useIsClassic();
   const head = [
     `TxHash`,
@@ -47,13 +51,26 @@ const Txs = ({ txs }: { txs: TxInfo[] }) => {
     `Time`
   ];
   const { chainID } = useCurrentChain();
+  useEffect(() => {
+    setVisibleCount(pageSize);
+  }, [txs, pageSize]);
+  const visibleTxs = txs.slice(0, visibleCount);
+  const hasMore = visibleCount < txs.length;
   return (
     <div className={s.tableContainer}>
       {txs.length ? (
-        <FlexTable
-          head={head}
-          body={txs.map(tx => getRow(tx, chainID, isClassic))}
-        />
+        <>
+          <FlexTable
+            head={head}
+            body={visibleTxs.map(tx => getRow(tx, chainID, isClassic))}
+          />
+          {hasMore ? (
+            <PaginationButtons
+              action={() => setVisibleCount(count => count + pageSize)}
+              offset={-1}
+            />
+          ) : null}
+        </>
       ) : (
         <Card>
           <Info icon="info_outline" title="">
