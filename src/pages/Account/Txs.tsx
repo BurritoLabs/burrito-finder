@@ -99,7 +99,10 @@ const Txs = ({ address }: { address: string }) => {
   const { data: fcdData, isLoading: fcdLoading } = useRequest<{
     next: number;
     txs: TxInfo[];
-  }>({ url, params, enabled: !isPhoenix });
+  }>({ url, params });
+
+  const shouldUseLcd =
+    isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0);
 
   const { data: lcdData, isLoading: lcdLoading } = useQuery<{
     next?: number;
@@ -161,7 +164,7 @@ const Txs = ({ address }: { address: string }) => {
       return { txs, next };
     },
     {
-      enabled: isPhoenix,
+      enabled: shouldUseLcd,
       staleTime: 1000 * 60,
       cacheTime: 1000 * 60
     }
@@ -175,8 +178,12 @@ const Txs = ({ address }: { address: string }) => {
     [ruleSet]
   );
 
-  const data = isPhoenix ? lcdData : fcdData;
-  const isLoading = isPhoenix ? lcdLoading : fcdLoading;
+  const data = shouldUseLcd ? lcdData : fcdData;
+  const isLoading = shouldUseLcd ? lcdLoading : fcdLoading;
+
+  useEffect(() => {
+    setTxsRow([]);
+  }, [address, chainID]);
 
   useEffect(() => {
     if (data?.txs) {
