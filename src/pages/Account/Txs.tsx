@@ -196,6 +196,7 @@ const Txs = ({
         const search = new URLSearchParams();
         search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
+        search.set("pagination.reverse", "true");
         search.append("events", `wasm._contract_address='${address}'`);
         const endpoint = `/cosmos/tx/v1beta1/txs?${search.toString()}`;
         let data: any;
