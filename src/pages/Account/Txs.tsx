@@ -111,16 +111,25 @@ const Txs = ({ address }: { address: string }) => {
         const search = new URLSearchParams();
         search.set("pagination.limit", String(limit));
         search.set("pagination.offset", String(offset));
-        search.append("events", `${eventKey}='${address}'`);
+        search.append("events", `${eventKey}=${address}`);
         const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
-        const { data } = await apiClient.get(endpoint);
-        return data;
+        try {
+          const { data } = await apiClient.get(endpoint);
+          return data;
+        } catch {
+          const quoted = new URLSearchParams(search);
+          quoted.set("events", `${eventKey}='${address}'`);
+          const fallbackEndpoint = `${lcd}/cosmos/tx/v1beta1/txs?${quoted.toString()}`;
+          const { data } = await apiClient.get(fallbackEndpoint);
+          return data;
+        }
       };
 
       const [sender, recipient] = await Promise.all([
         fetchByEvent("message.sender"),
         fetchByEvent("transfer.recipient")
       ]);
+      const messageRecipient = await fetchByEvent("message.recipient");
 
       const toTxs = (payload: any) =>
         (payload?.tx_responses ?? []).map((resp: any, index: number) => ({
@@ -128,7 +137,11 @@ const Txs = ({ address }: { address: string }) => {
           tx: payload?.txs?.[index]
         }));
 
-      const merged = [...toTxs(sender), ...toTxs(recipient)];
+      const merged = [
+        ...toTxs(sender),
+        ...toTxs(recipient),
+        ...toTxs(messageRecipient)
+      ];
       const unique = new Map<string, any>();
       merged.forEach(tx => {
         if (tx?.txhash) {
