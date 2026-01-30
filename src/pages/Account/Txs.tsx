@@ -198,7 +198,7 @@ const Txs = ({
         const hasTotal = contractTotal !== null && contractTotal >= 0;
         const fetchLimit = contractTotal === null ? 1 : contractLimit;
         const requestOffset = hasTotal
-          ? Math.max(contractTotal - contractLimit - offset, 0)
+          ? Math.max((contractTotal as number) - contractLimit - offset, 0)
           : 0;
         const search = new URLSearchParams();
         search.set("pagination.limit", String(fetchLimit));
