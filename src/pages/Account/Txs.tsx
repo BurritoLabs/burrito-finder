@@ -96,12 +96,14 @@ const Txs = ({
   isContract?: boolean;
   sortAscending?: boolean;
 }) => {
-  const { chainID, lcd, api } = useCurrentChain() as {
+  const { chainID, lcd, api, rpc } = useCurrentChain() as {
     chainID: string;
     lcd?: string;
     api?: string;
+    rpc?: string;
   };
   const [offset, setOffset] = useState<number>(0);
+  const [contractPage, setContractPage] = useState(1);
   const [contractTotal, setContractTotal] = useState<number | null>(null);
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
@@ -118,7 +120,7 @@ const Txs = ({
 
   const shouldUseLcd =
     isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0);
-  const shouldUseClassicContractLcd = isClassic && isContract && !!lcd;
+  const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
   const { data: lcdData, isLoading: lcdLoading } = useQuery<{
     next?: number;
@@ -193,42 +195,56 @@ const Txs = ({
       txs: TxInfo[];
       total?: number;
     }>(
-      ["classic-contract-txs", lcd, api, address, offset, contractTotal],
+      [
+        "classic-contract-txs",
+        rpc,
+        lcd,
+        api,
+        address,
+        contractPage,
+        contractTotal
+      ],
       async () => {
-        const hasTotal = contractTotal !== null && contractTotal >= 0;
-        const fetchLimit = contractTotal === null ? 1 : contractLimit;
-        const requestOffset = hasTotal
-          ? Math.max((contractTotal as number) - contractLimit - offset, 0)
-          : 0;
-        const search = new URLSearchParams();
-        search.set("pagination.limit", String(fetchLimit));
-        search.set("pagination.offset", String(requestOffset));
-        search.set("pagination.count_total", "true");
-        search.append("events", `wasm._contract_address='${address}'`);
-        const endpoint = `/cosmos/tx/v1beta1/txs?${search.toString()}`;
-        let data: any;
-        if (api && api !== lcd) {
-          try {
-            ({ data } = await apiClient.get(`${api}${endpoint}`));
-          } catch {
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "tx_search",
+          params: {
+            query: `wasm._contract_address='${address}'`,
+            prove: false,
+            page: String(contractPage),
+            per_page: String(contractLimit),
+            order_by: "desc"
+          }
+        };
+        const { data: rpcData } = await apiClient.post(rpc ?? "", payload);
+        const result = rpcData?.result;
+        const hashes = (result?.txs ?? []).map((tx: any) => tx.hash);
+        const total = Number(result?.total_count ?? 0);
+
+        const fetchTx = async (hash: string) => {
+          const endpoint = `/cosmos/tx/v1beta1/txs/${hash}`;
+          let data: any;
+          if (api && api !== lcd) {
+            try {
+              ({ data } = await apiClient.get(`${api}${endpoint}`));
+            } catch {
+              ({ data } = await apiClient.get(`${lcd}${endpoint}`));
+            }
+          } else {
             ({ data } = await apiClient.get(`${lcd}${endpoint}`));
           }
-        } else {
-          ({ data } = await apiClient.get(`${lcd}${endpoint}`));
-        }
-        const txs = (data?.tx_responses ?? []).map(
-          (resp: any, index: number) => ({
-            ...resp,
-            tx: data?.txs?.[index]
-          })
-        );
-        const total = Number(data?.pagination?.total ?? 0);
+          const resp = data?.tx_response ?? data?.txResponse ?? data;
+          return resp ? { ...resp, tx: data?.tx } : undefined;
+        };
+
+        const txs = (await Promise.all(hashes.map(fetchTx))).filter(Boolean);
         const next =
-          total > offset + contractLimit ? offset + contractLimit : undefined;
+          total > contractPage * contractLimit ? contractPage + 1 : undefined;
         return { txs, next, total };
       },
       {
-        enabled: shouldUseClassicContractLcd,
+        enabled: shouldUseClassicContractRpc,
         staleTime: 1000 * 60,
         cacheTime: 1000 * 60,
         onSuccess: result => {
@@ -252,12 +268,12 @@ const Txs = ({
     [ruleSet]
   );
 
-  const data = shouldUseClassicContractLcd
+  const data = shouldUseClassicContractRpc
     ? classicContractData
     : shouldUseLcd
     ? lcdData
     : fcdData;
-  const isLoading = shouldUseClassicContractLcd
+  const isLoading = shouldUseClassicContractRpc
     ? classicContractLoading || contractTotal === null
     : shouldUseLcd
     ? lcdLoading
@@ -265,6 +281,7 @@ const Txs = ({
 
   useEffect(() => {
     setOffset(0);
+    setContractPage(1);
     setContractTotal(null);
     setAllTxs([]);
     setVisibleCount(pageSize);
@@ -273,7 +290,7 @@ const Txs = ({
 
   useEffect(() => {
     if (!data?.txs) return;
-    if (shouldUseClassicContractLcd && contractTotal === null) return;
+    if (shouldUseClassicContractRpc && contractTotal === null) return;
     setAllTxs(prev => {
       const seen = new Set(prev.map(tx => tx?.txhash).filter(Boolean));
       const merged = [...prev];
@@ -296,14 +313,14 @@ const Txs = ({
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
     }
-    if (shouldUseClassicContractLcd) {
+    if (shouldUseClassicContractRpc) {
       return [...allTxs].sort(
         (a: any, b: any) =>
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
     }
     return allTxs;
-  }, [allTxs, sortAscending, shouldUseClassicContractLcd]);
+  }, [allTxs, sortAscending, shouldUseClassicContractRpc]);
 
   const visibleTxs = useMemo(
     () => orderedTxs.slice(0, visibleCount),
@@ -337,7 +354,11 @@ const Txs = ({
       return;
     }
     if (typeof next === "number" && Number.isFinite(next)) {
-      setOffset(next);
+      if (shouldUseClassicContractRpc) {
+        setContractPage(next);
+      } else {
+        setOffset(next);
+      }
       setVisibleCount(count => count + pageSize);
     }
   };
