@@ -87,12 +87,19 @@ const getAmount = (
   return [amountIn, amountOut];
 };
 
-const Txs = ({ address }: { address: string }) => {
+const Txs = ({
+  address,
+  isContract
+}: {
+  address: string;
+  isContract?: boolean;
+}) => {
   const { chainID, lcd } = useCurrentChain();
   const [offset, setOffset] = useState<number>(0);
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
   const limit = 50;
+  const contractLimit = 20;
 
   const params = { offset, limit: 100, account: address };
   const url = useGetQueryURL("/v1/txs");
@@ -103,6 +110,7 @@ const Txs = ({ address }: { address: string }) => {
 
   const shouldUseLcd =
     isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0);
+  const shouldUseClassicContractLcd = isClassic && isContract && !!lcd;
 
   const { data: lcdData, isLoading: lcdLoading } = useQuery<{
     next?: number;
@@ -112,7 +120,7 @@ const Txs = ({ address }: { address: string }) => {
     async () => {
       const fetchByEvent = async (eventKey: string) => {
         const search = new URLSearchParams();
-        search.set("pagination.limit", String(limit));
+        search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
         search.append("events", `${eventKey}=${address}`);
         const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
@@ -170,6 +178,37 @@ const Txs = ({ address }: { address: string }) => {
     }
   );
 
+  const { data: classicContractData, isLoading: classicContractLoading } =
+    useQuery<{
+      next?: number;
+      txs: TxInfo[];
+    }>(
+      ["classic-contract-txs", lcd, address, offset],
+      async () => {
+        const search = new URLSearchParams();
+        search.set("pagination.limit", String(limit));
+        search.set("pagination.offset", String(offset));
+        search.append("events", `wasm._contract_address='${address}'`);
+        const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
+        const { data } = await apiClient.get(endpoint);
+        const txs = (data?.tx_responses ?? []).map(
+          (resp: any, index: number) => ({
+            ...resp,
+            tx: data?.txs?.[index]
+          })
+        );
+        const total = Number(data?.pagination?.total ?? 0);
+        const next =
+          total > offset + contractLimit ? offset + contractLimit : undefined;
+        return { txs, next };
+      },
+      {
+        enabled: shouldUseClassicContractLcd,
+        staleTime: 1000 * 60,
+        cacheTime: 1000 * 60
+      }
+    );
+
   const [txsRow, setTxsRow] = useState<JSX.Element[][]>([]);
 
   const ruleSet = useLogfinderAmountRuleSet();
@@ -178,8 +217,16 @@ const Txs = ({ address }: { address: string }) => {
     [ruleSet]
   );
 
-  const data = shouldUseLcd ? lcdData : fcdData;
-  const isLoading = shouldUseLcd ? lcdLoading : fcdLoading;
+  const data = shouldUseClassicContractLcd
+    ? classicContractData
+    : shouldUseLcd
+    ? lcdData
+    : fcdData;
+  const isLoading = shouldUseClassicContractLcd
+    ? classicContractLoading
+    : shouldUseLcd
+    ? lcdLoading
+    : fcdLoading;
 
   useEffect(() => {
     setTxsRow([]);

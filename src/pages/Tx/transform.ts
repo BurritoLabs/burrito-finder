@@ -6,7 +6,7 @@ interface Transaction extends TxInfo {
 }
 
 export const transformTx = (tx: any, network: string): TxResponse => {
-  if (network.startsWith("columbus")) {
+  if (network.startsWith("columbus") && !tx?.tx?.body) {
     // old fcd
     return tx;
   }

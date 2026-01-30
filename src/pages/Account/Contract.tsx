@@ -50,7 +50,7 @@ const Contract = ({ admin, code_id, init_msg, label }: Props) => {
 
       <Delegations address={address} />
       <Undelegations address={address} />
-      <Txs address={address} />
+      <Txs address={address} isContract />
     </>
   );
 };
