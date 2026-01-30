@@ -18,7 +18,7 @@ const App = () => {
       </section>
       {isFetching > 0 ? (
         <div className={s.loadingOverlay}>
-          <Loading />
+          <Loading global />
         </div>
       ) : null}
     </section>

@@ -89,10 +89,12 @@ const getAmount = (
 
 const Txs = ({
   address,
-  isContract
+  isContract,
+  sortAscending
 }: {
   address: string;
   isContract?: boolean;
+  sortAscending?: boolean;
 }) => {
   const { chainID, lcd } = useCurrentChain();
   const [offset, setOffset] = useState<number>(0);
@@ -234,7 +236,13 @@ const Txs = ({
 
   useEffect(() => {
     if (data?.txs) {
-      const txRow = data.txs.map((tx: any) => {
+      const orderedTxs = sortAscending
+        ? [...data.txs].sort(
+            (a: any, b: any) =>
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          )
+        : data.txs;
+      const txRow = orderedTxs.map((tx: any) => {
         const txData: TxResponse = transformTx(tx, chainID);
         const matchedLogs = getTxAmounts(
           JSON.stringify(txData),
