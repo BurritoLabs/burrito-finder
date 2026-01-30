@@ -102,6 +102,7 @@ const Txs = ({
     api?: string;
   };
   const [offset, setOffset] = useState<number>(0);
+  const [contractTotal, setContractTotal] = useState<number | null>(null);
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
   const pageSize = 30;
@@ -190,13 +191,19 @@ const Txs = ({
     useQuery<{
       next?: number;
       txs: TxInfo[];
+      total?: number;
     }>(
-      ["classic-contract-txs", lcd, address, offset],
+      ["classic-contract-txs", lcd, api, address, offset, contractTotal],
       async () => {
+        const hasTotal = contractTotal !== null && contractTotal >= 0;
+        const fetchLimit = contractTotal === null ? 1 : contractLimit;
+        const requestOffset = hasTotal
+          ? Math.max(contractTotal - contractLimit - offset, 0)
+          : 0;
         const search = new URLSearchParams();
-        search.set("pagination.limit", String(contractLimit));
-        search.set("pagination.offset", String(offset));
-        search.set("pagination.reverse", "true");
+        search.set("pagination.limit", String(fetchLimit));
+        search.set("pagination.offset", String(requestOffset));
+        search.set("pagination.count_total", "true");
         search.append("events", `wasm._contract_address='${address}'`);
         const endpoint = `/cosmos/tx/v1beta1/txs?${search.toString()}`;
         let data: any;
@@ -218,12 +225,20 @@ const Txs = ({
         const total = Number(data?.pagination?.total ?? 0);
         const next =
           total > offset + contractLimit ? offset + contractLimit : undefined;
-        return { txs, next };
+        return { txs, next, total };
       },
       {
         enabled: shouldUseClassicContractLcd,
         staleTime: 1000 * 60,
-        cacheTime: 1000 * 60
+        cacheTime: 1000 * 60,
+        onSuccess: result => {
+          if (contractTotal === null) {
+            const inferredTotal = result?.total;
+            if (typeof inferredTotal === "number" && inferredTotal >= 0) {
+              setContractTotal(inferredTotal);
+            }
+          }
+        }
       }
     );
 
@@ -243,13 +258,14 @@ const Txs = ({
     ? lcdData
     : fcdData;
   const isLoading = shouldUseClassicContractLcd
-    ? classicContractLoading
+    ? classicContractLoading || contractTotal === null
     : shouldUseLcd
     ? lcdLoading
     : fcdLoading;
 
   useEffect(() => {
     setOffset(0);
+    setContractTotal(null);
     setAllTxs([]);
     setVisibleCount(pageSize);
     setTxsRow([]);
@@ -257,6 +273,7 @@ const Txs = ({
 
   useEffect(() => {
     if (!data?.txs) return;
+    if (shouldUseClassicContractLcd && contractTotal === null) return;
     setAllTxs(prev => {
       const seen = new Set(prev.map(tx => tx?.txhash).filter(Boolean));
       const merged = [...prev];
