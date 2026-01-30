@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ValAddress } from "@terra-money/terra.js";
 import { isTnsName, useTns } from "../../libs/tns";
 import { getEndpointByKeyword } from "../../scripts/utility";
 import { useCurrentChain } from "../../contexts/ChainsContext";
@@ -31,6 +32,12 @@ const Address = () => {
 
   useEffect(() => {
     const resolveTns = async () => {
+      if (ValAddress.validate(address.trim())) {
+        return navigate(`/${name}/validator/${address.trim()}`, {
+          replace: true
+        });
+      }
+
       if (isTnsName(address.trim())) {
         const terraAddress = await getTerraAddress(address.trim());
 
