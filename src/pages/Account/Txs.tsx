@@ -96,12 +96,16 @@ const Txs = ({
   isContract?: boolean;
   sortAscending?: boolean;
 }) => {
-  const { chainID, lcd } = useCurrentChain();
+  const { chainID, lcd, api } = useCurrentChain() as {
+    chainID: string;
+    lcd?: string;
+    api?: string;
+  };
   const [offset, setOffset] = useState<number>(0);
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
   const limit = 50;
-  const contractLimit = 20;
+  const contractLimit = 10;
 
   const params = { offset, limit: 100, account: address };
   const url = useGetQueryURL("/v1/txs");
@@ -191,8 +195,17 @@ const Txs = ({
         search.set("pagination.limit", String(limit));
         search.set("pagination.offset", String(offset));
         search.append("events", `wasm._contract_address='${address}'`);
-        const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
-        const { data } = await apiClient.get(endpoint);
+        const endpoint = `/cosmos/tx/v1beta1/txs?${search.toString()}`;
+        let data: any;
+        if (api && api !== lcd) {
+          try {
+            ({ data } = await apiClient.get(`${api}${endpoint}`));
+          } catch {
+            ({ data } = await apiClient.get(`${lcd}${endpoint}`));
+          }
+        } else {
+          ({ data } = await apiClient.get(`${lcd}${endpoint}`));
+        }
         const txs = (data?.tx_responses ?? []).map(
           (resp: any, index: number) => ({
             ...resp,
@@ -319,6 +332,7 @@ const getRow = (
   isClassic?: boolean
 ) => {
   const { tx: txBody, txhash, height, timestamp, chainId, logs } = response;
+  const resolvedChainId = chainId || network;
   const isSuccess = !response.code;
   const [amountIn, amountOut] = getAmount(address, matchedMsg, 3);
   const fee = getTxFee(txBody?.value?.fee?.amount?.[0], isClassic);
@@ -342,7 +356,7 @@ const getRow = (
       <Finder q="blocks" network={network} v={String(height)}>
         {String(height)}
       </Finder>
-      <span>({chainId})</span>
+      <span>({resolvedChainId})</span>
     </span>,
     <span className={s.amount}>
       {amountOut.length

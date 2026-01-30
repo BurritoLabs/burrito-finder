@@ -44,6 +44,7 @@ export const transformTx = (tx: any, network: string): TxResponse => {
     const fee = { denom: amount[0]?.denom, amount: amount[0]?.amount };
     return {
       ...intermediate,
+      chainId: (intermediate as any).chainId ?? network,
       height: String(intermediate.height),
       tx: {
         type: "core/StdTx",
