@@ -241,6 +241,11 @@ const Txs = ({
             (a: any, b: any) =>
               new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
           )
+        : shouldUseClassicContractLcd
+        ? [...data.txs].sort(
+            (a: any, b: any) =>
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          )
         : data.txs;
       const txRow = orderedTxs.map((tx: any) => {
         const txData: TxResponse = transformTx(tx, chainID);
