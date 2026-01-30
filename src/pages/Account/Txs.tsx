@@ -238,7 +238,9 @@ const Txs = ({
           return resp ? { ...resp, tx: data?.tx } : undefined;
         };
 
-        const txs = (await Promise.all(hashes.map(fetchTx))).filter(Boolean);
+        const txs = (await Promise.all(hashes.map(fetchTx))).filter(
+          (tx): tx is TxInfo => Boolean(tx)
+        );
         const next =
           total > contractPage * contractLimit ? contractPage + 1 : undefined;
         return { txs, next, total };
