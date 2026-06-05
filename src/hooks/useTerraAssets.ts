@@ -119,6 +119,9 @@ const fetchHexxagonArray = async <T>(path: string): Promise<T[]> => {
 const safeIcon = (value?: string) => {
   const trimmed = value?.trim();
   if (!trimmed) return undefined;
+  if (/^https?:\/\/whitelist\.anchorprotocol\.com\//i.test(trimmed)) {
+    return undefined;
+  }
   if (trimmed.startsWith("/") || trimmed.startsWith("data:image/")) {
     return trimmed;
   }
@@ -425,9 +428,8 @@ export const useLaunchpadCw20Contracts = () => {
 export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   const chain = useCurrentChain();
   const { lcd, chainID } = chain;
-  const fallbackBases = chainID.startsWith("columbus")
-    ? getClassicLcdFallbackBases(lcd)
-    : [lcd];
+  const isClassic = chainID.startsWith("columbus");
+  const fallbackBases = isClassic ? getClassicLcdFallbackBases(lcd) : [lcd];
   const { data } = useQuery(["IBCWhitelist", chain], () =>
     fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
   );
@@ -460,7 +462,7 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
       );
     },
     {
-      enabled: missingHashes.length > 0,
+      enabled: missingHashes.length > 0 && !isClassic,
       staleTime: 24 * 60 * 60 * 1000
     }
   );

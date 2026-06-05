@@ -19,6 +19,9 @@ import { useIsClassic } from "../../contexts/ChainsContext";
 
 const thumbnail = { className: s.thumbnail, width: 80, height: 80 };
 const KEYBASE_PROXY_URL = "https://keybase.burrito.money";
+const renderPercent = (value?: number | string) =>
+  value === undefined ? "-" : readPercent(value);
+
 const Header = ({ address }: { address: string }) => {
   const { data: terraValidator } = useTerraValidator(address);
   const { data: validator } = useValidator(address);
@@ -114,7 +117,7 @@ const Header = ({ address }: { address: string }) => {
         <div className={c("row", s.summary)}>
           <article className="col">
             <h1>Voting power</h1>
-            <p>{readPercent(votingPowerRate)}</p>
+            <p>{renderPercent(votingPowerRate)}</p>
             <hr />
             <Amount fontSize={14} denom="uluna" decimals={6}>
               {validator.tokens.toString()}
@@ -123,7 +126,7 @@ const Header = ({ address }: { address: string }) => {
 
           <article className="col">
             <h1>Self-delegation</h1>
-            <p>{readPercent(selfDelegationRate)}</p>
+            <p>{renderPercent(selfDelegationRate)}</p>
             <hr />
             {selfDelegationAmount !== undefined ? (
               <Amount fontSize={14} denom="uluna">

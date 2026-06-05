@@ -1,20 +1,43 @@
 import { useQuery } from "react-query";
+import { useCurrentChain, useIsClassic } from "../contexts/ChainsContext";
+import {
+  axiosGetWithEndpointFallback,
+  getClassicLcdFallbackBases
+} from "../queries/endpointFallback";
 import { isIbcDenom } from "../scripts/utility";
-import useLCDClient from "./useLCD";
+import { useIBCWhitelist } from "./useTerraAssets";
+
+type IbcTraceResponse = {
+  denom_trace?: {
+    path?: string;
+    base_denom?: string;
+  };
+};
 
 const useDenomTrace = (denom = "") => {
-  const lcd = useLCDClient();
+  const { lcd } = useCurrentChain();
+  const isClassic = useIsClassic();
   const hash = denom.replace("ibc/", "");
+  const whitelist = useIBCWhitelist(denom ? [denom] : undefined);
+  const whitelisted = whitelist?.[hash];
   const { data } = useQuery(
-    ["denomTrace", hash],
+    ["denomTrace", hash, lcd],
     async () => {
-      const denom_trace = await lcd.ibcTransfer.denomTrace(hash);
-      return denom_trace;
+      const { data } = await axiosGetWithEndpointFallback<IbcTraceResponse>(
+        `${lcd}/ibc/apps/transfer/v1/denom_traces/${hash}`,
+        {},
+        isClassic ? getClassicLcdFallbackBases(lcd) : [lcd]
+      );
+
+      return data.denom_trace;
     },
-    { enabled: isIbcDenom(denom) }
+    {
+      enabled: isIbcDenom(denom) && !whitelisted && !isClassic,
+      retry: false
+    }
   );
 
-  return data;
+  return whitelisted ?? data;
 };
 
 export default useDenomTrace;

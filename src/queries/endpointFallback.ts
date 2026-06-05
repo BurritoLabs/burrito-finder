@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const DEFAULT_TIMEOUT = 8000;
-const FALLBACK_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
+const FALLBACK_STATUS_CODES = new Set([408, 425, 429, 500, 501, 502, 503, 504]);
 
 export const CLASSIC_LCD_ENDPOINTS = [
   "https://terra-classic-lcd.publicnode.com",
@@ -52,7 +52,17 @@ export const axiosGetWithEndpointFallback = async <T>(
       lastResponse = response;
     } catch (error: any) {
       const status = error?.response?.status;
+      const message =
+        error?.response?.data?.message ?? error?.response?.data ?? "";
       lastError = error;
+
+      if (
+        status === 500 &&
+        typeof message === "string" &&
+        message.includes("no such contract")
+      ) {
+        throw error;
+      }
 
       if (
         status &&

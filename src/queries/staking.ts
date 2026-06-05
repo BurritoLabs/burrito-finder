@@ -28,8 +28,22 @@ export const useDelegation = (address: string, validator: string) => {
   const lcd = useLCDClient();
   return useQuery(
     [lcd.config, address, validator, "delegation"],
-    async () => await lcd.staking.delegation(address, validator),
-    { ...RefetchOptions.DEFAULT }
+    async () => {
+      try {
+        return await lcd.staking.delegation(address, validator);
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (
+          status === 404 ||
+          status === 503 ||
+          error?.message === "Network Error"
+        ) {
+          return undefined;
+        }
+        throw error;
+      }
+    },
+    { ...RefetchOptions.DEFAULT, retry: false }
   );
 };
 
@@ -60,13 +74,24 @@ export const useSelfDelegationAmount = (validatorAddress: string) => {
     [lcd.config, validatorAddress, "selfDelegation"],
     async () => {
       const delegator = AccAddress.fromValAddress(validatorAddress);
-      const { balance } = await lcd.staking.delegation(
-        delegator,
-        validatorAddress
-      );
+      let delegation;
+      try {
+        delegation = await lcd.staking.delegation(delegator, validatorAddress);
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (
+          status === 404 ||
+          status === 503 ||
+          error?.message === "Network Error"
+        ) {
+          return undefined;
+        }
+        throw error;
+      }
+      const balance = delegation?.balance;
       return balance?.amount;
     },
-    { ...RefetchOptions.INFINITY, enabled: !!validatorAddress }
+    { ...RefetchOptions.INFINITY, enabled: !!validatorAddress, retry: false }
   );
 };
 

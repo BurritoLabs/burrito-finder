@@ -69,16 +69,20 @@ const AmountCard = ({
   const mainnetIconDenom = rawDenom === "uluna" ? "LUNA" : denom;
   const iconDenom = isClassic ? classicIconDenom : mainnetIconDenom;
   const iconLink = `${ASSET_URL}/icon/60/${iconDenom}.png`;
+  const lunaIconCandidates =
+    rawDenom === "uluna"
+      ? isClassic
+        ? [`${ASSET_URL}/icon/svg/LUNC.svg`]
+        : [`${ASSET_URL}/icon/svg/Luna.svg`, `${ASSET_URL}/icon/60/Luna.png`]
+      : [];
   const iconCandidates = [
     icon,
+    ...lunaIconCandidates,
     iconLink,
     `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
     `${ASSET_URL}/icon/60/${iconDenom}.png`,
     `${ASSET_URL}/icon/svg/${String(iconDenom).toUpperCase()}.svg`,
     `${ASSET_URL}/icon/60/${String(iconDenom).toLowerCase()}.png`,
-    ...(iconDenom === "LUNA"
-      ? [`${ASSET_URL}/icon/svg/Luna.svg`, `${ASSET_URL}/icon/60/Luna.png`]
-      : []),
     ...(isClassicStable
       ? [
           `${ASSET_URL}/icon/svg/USTC.svg`,
