@@ -1,6 +1,7 @@
 import { useIsClassic } from "../../contexts/ChainsContext";
 import useDenomTrace from "../../hooks/useDenomTrace";
 import format from "../../scripts/format";
+import { renderIbcDenom } from "../../scripts/ibc";
 
 interface Props {
   amount: string;
@@ -21,7 +22,7 @@ const TxAmount = ({ index, amount, denom, isFormatAmount }: Props) => {
   if (data) {
     return (
       <>
-        {renderAmount} {format.denom(data.base_denom, isClassic)}
+        {renderAmount} {renderIbcDenom(denom, data, isClassic)}
       </>
     );
   }

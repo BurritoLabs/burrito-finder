@@ -11,6 +11,7 @@ type IbcTraceResponse = {
   denom_trace?: {
     path?: string;
     base_denom?: string;
+    symbol?: string;
   };
 };
 

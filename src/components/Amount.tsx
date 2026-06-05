@@ -8,6 +8,8 @@ import {
   useWhitelist
 } from "../hooks/useTerraAssets";
 import format from "../scripts/format";
+import { isIbcDenom } from "../scripts/utility";
+import { renderIbcDenom } from "../scripts/ibc";
 import useDenomTrace from "../hooks/useDenomTrace";
 import { useIsClassic } from "../contexts/ChainsContext";
 
@@ -34,11 +36,12 @@ export const renderDenom = (
   const hash = str.replace("ibc/", "");
   const ibc = ibcWhitelist?.[hash];
 
-  if (
-    (AccAddress.validate(str) || str.startsWith("ibc")) &&
-    (list || contract || ibc)
-  ) {
-    const symbol = list?.symbol || contract?.name || ibc?.symbol;
+  if (isIbcDenom(str)) {
+    return renderIbcDenom(str, ibc, isClassic);
+  }
+
+  if (AccAddress.validate(str) && (list || contract)) {
+    const symbol = list?.symbol || contract?.name;
     return symbol;
   } else if (format.denom(str).length >= 40) {
     return "Token";
@@ -71,7 +74,7 @@ const Amount = (props: Props) => {
       <small>
         .{decimal}
         {data
-          ? ` ${format.denom(data.base_denom, isClassic)}`
+          ? ` ${renderIbcDenom(denom ?? "", data, isClassic)}`
           : denom &&
             ` ${renderDenom(
               denom,

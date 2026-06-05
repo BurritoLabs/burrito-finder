@@ -2,10 +2,13 @@ import { useIsClassic } from "../contexts/ChainsContext";
 import useDenomMetadata from "../hooks/useDenomMetadata";
 import useDenomTrace from "../hooks/useDenomTrace";
 import format from "../scripts/format";
+import { isIbcDenom } from "../scripts/utility";
+import { renderIbcDenom } from "../scripts/ibc";
 import s from "./Denom.module.scss";
 
 const Denom = ({ denom }: { denom: string }) => {
   const isClassic = useIsClassic();
+  const isIbc = isIbcDenom(denom);
   const isFactory = denom.startsWith("factory/");
   const metadata = useDenomMetadata(isFactory);
   const ibc = useDenomTrace(denom);
@@ -15,8 +18,8 @@ const Denom = ({ denom }: { denom: string }) => {
     factoryMetadata?.display ||
     factoryMetadata?.name;
   const factorySuffix = denom.includes("/") ? denom.split("/").pop() : denom;
-  const render = ibc
-    ? format.denom(ibc.base_denom)
+  const render = isIbc
+    ? renderIbcDenom(denom, ibc, isClassic)
     : isFactory
     ? factoryLabel || factorySuffix
     : format.denom(denom, isClassic);

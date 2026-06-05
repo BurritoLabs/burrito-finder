@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { isEmpty } from "lodash";
 import BigNumber from "bignumber.js";
 import { Coin } from "@terra-money/terra.js";
@@ -11,12 +11,18 @@ import Image from "../../components/Image";
 import { useIsClassic } from "../../contexts/ChainsContext";
 import format from "../../scripts/format";
 import { ASSET_URL, isIbcDenom } from "../../scripts/utility";
+import { renderIbcDenom } from "../../scripts/ibc";
 import { useIBCWhitelist } from "../../hooks/useTerraAssets";
 import s from "./Rewards.module.scss";
 
 const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
   const isClassic = useIsClassic();
-  const ibcWhitelist = useIBCWhitelist();
+  const ibcDenoms = useMemo(
+    () =>
+      list.filter(({ denom }) => isIbcDenom(denom)).map(({ denom }) => denom),
+    [list]
+  );
+  const ibcWhitelist = useIBCWhitelist(ibcDenoms);
   const ibcFallbackIcon =
     "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/IBC.svg";
   const cwFallbackIcon =
@@ -48,7 +54,7 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                 const hash = isIbc ? denom.replace("ibc/", "") : "";
                 const ibcInfo = isIbc ? ibcWhitelist?.[hash] : undefined;
                 const displayDenom = isIbc
-                  ? ibcInfo?.symbol ?? denom
+                  ? renderIbcDenom(denom, ibcInfo, isClassic)
                   : format.denom(denom, isClassic);
                 const classicIconDenom =
                   denom === "uluna"
