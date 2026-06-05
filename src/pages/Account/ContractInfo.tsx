@@ -9,9 +9,10 @@ import Image from "../../components/Image";
 import s from "./ContractInfo.module.scss";
 
 const ContractInfo = ({ address }: { address: string }) => {
-  const token = useWhitelist()?.[address];
-  const nft = useNFTContracts()?.[address];
-  const contract = useContracts()?.[address];
+  const normalizedAddress = address.trim().toLowerCase();
+  const token = useWhitelist([normalizedAddress])?.[normalizedAddress];
+  const nft = useNFTContracts()?.[normalizedAddress];
+  const contract = useContracts()?.[normalizedAddress];
 
   const whitelist = token || contract || nft;
   const icon = whitelist?.icon;
@@ -26,7 +27,9 @@ const ContractInfo = ({ address }: { address: string }) => {
       <Image urls={iconCandidates} className={s.icon} />
       {token ? (
         <span className={s.name}>
-          {`${token.protocol} ${token.symbol} Token `}
+          {`${token.protocol ?? token.name ?? token.symbol} ${
+            token.symbol
+          } Token `}
           <span className={s.vertical} />
           <span className={s.symbol}>{token.symbol}</span>
         </span>

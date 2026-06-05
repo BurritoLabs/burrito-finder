@@ -1,25 +1,26 @@
 interface Whitelist {
-  protocol: string;
+  protocol?: string;
   symbol: string;
   token: string;
   icon?: string;
   decimals?: number;
+  name?: string;
 }
 
 interface IBCWhitelist {
   denom: string;
-  path: string;
+  path?: string;
   base_denom: string;
   symbol: string;
   name: string;
-  icon: string;
+  icon?: string;
   decimals?: number;
 }
 
 interface Contracts {
-  protocol: string;
-  name: string;
-  icon: string;
+  protocol?: string;
+  name?: string;
+  icon?: string;
 }
 
 interface NFTContracts {

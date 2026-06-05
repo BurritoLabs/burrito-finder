@@ -23,7 +23,9 @@ const TokenBalance = ({ address }: { address: string }) => {
   const { data: balance } = useInitialBankBalance(address);
   const nativeBlanace = balance?.filter(({ denom }) => !isIbcDenom(denom));
   const ibcBalance = balance?.filter(({ denom }) => isIbcDenom(denom));
-  const ibcWhitelist = useIBCWhitelist();
+  const ibcWhitelist = useIBCWhitelist(
+    ibcBalance?.map(({ denom }) => denom) ?? []
+  );
 
   const { name } = useCurrentChain();
   const isClassic = useIsClassic();

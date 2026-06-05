@@ -11,7 +11,7 @@ type Props = {
 const IBCUnit = ({ denom = "", available }: Props) => {
   const { name } = useCurrentChain();
   const hash = denom.replace("ibc/", "");
-  const data = useIBCWhitelist();
+  const data = useIBCWhitelist([denom]);
   const tokenInfo = data?.[hash];
   const ibcFallbackIcon =
     "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/IBC.svg";
@@ -24,19 +24,20 @@ const IBCUnit = ({ denom = "", available }: Props) => {
     (factoryAddress && AccAddress.validate(factoryAddress) && factoryAddress) ||
     undefined;
 
-  return tokenInfo ? (
+  return (
     <AmountCard
       amount={available}
       hash={hash}
-      path={tokenInfo.path}
-      icon={tokenInfo.icon ?? ibcFallbackIcon}
-      denom={tokenInfo.symbol}
-      decimals={tokenInfo.decimals}
+      path={tokenInfo?.path}
+      icon={tokenInfo?.icon ?? ibcFallbackIcon}
+      denom={tokenInfo?.symbol ?? "IBC"}
+      rawDenom={tokenInfo?.base_denom ?? denom}
+      decimals={tokenInfo?.decimals ?? 6}
       linkTo={
         contractAddress ? `/${name}/address/${contractAddress}` : undefined
       }
     />
-  ) : null;
+  );
 };
 
 export default IBCUnit;

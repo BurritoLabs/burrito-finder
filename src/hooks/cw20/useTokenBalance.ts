@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { Dictionary } from "ramda";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import alias from "./alias";
 import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
-import { useContracts, useWhitelist } from "../useTerraAssets";
+import {
+  useContracts,
+  useLaunchpadCw20Contracts,
+  useWhitelist
+} from "../useTerraAssets";
+import {
+  axiosGetWithEndpointFallback,
+  getClassicLcdFallbackBases
+} from "../../queries/endpointFallback";
 
 export interface Token {
   icon?: string;
   symbol: string;
-  protocol: string;
+  protocol?: string;
   decimals?: number;
+  token?: string;
+  name?: string;
 }
 
 export interface TokenBalance extends Token {
@@ -59,13 +68,30 @@ const chunkEntries = <T>(items: T[], size: number) => {
   return chunks;
 };
 
+const buildWhitelistSignature = (whitelist: Tokens) => {
+  const keys = Object.keys(whitelist)
+    .map(key => key.trim().toLowerCase())
+    .filter(Boolean)
+    .sort();
+
+  let hash = 0;
+  keys.forEach(key => {
+    for (let index = 0; index < key.length; index += 1) {
+      hash = (hash * 33 + key.charCodeAt(index)) >>> 0;
+    }
+  });
+
+  return `${keys.length}:${hash.toString(16)}`;
+};
+
 const useTokenBalance = (
   address: string
 ): { loading: boolean; whitelist?: Tokens; list?: TokenBalance[] } => {
   const [result, setResult] = useState<Dictionary<string>>();
 
   const isClassic = useIsClassic();
-  const whitelist = useWhitelist();
+  const { data: launchpadContracts = [] } = useLaunchpadCw20Contracts();
+  const whitelist = useWhitelist(isClassic ? launchpadContracts : undefined);
   const contracts = useContracts();
   const mergedWhitelist = useMemo(() => {
     if (isClassic) {
@@ -91,13 +117,20 @@ const useTokenBalance = (
   const { mantle, hive, lcd } = useCurrentChain();
 
   useEffect(() => {
+    if (!address) {
+      setResult(undefined);
+      return;
+    }
+
     if (address && Object.keys(mergedWhitelist).length) {
-      const cacheKey = `cw20balance:${address}:${
+      const whitelistSignature = buildWhitelistSignature(mergedWhitelist);
+      const cacheKey = `cw20balance:v2:${address}:${
         isClassic ? "classic" : "mainnet"
-      }`;
-      const invalidKey = `cw20invalid:${isClassic ? "classic" : "mainnet"}`;
+      }:${whitelistSignature}`;
+      const invalidKey = `cw20invalid:v2:${isClassic ? "classic" : "mainnet"}`;
       const load = async () => {
         try {
+          setResult(undefined);
           if (typeof window !== "undefined") {
             const cached = window.localStorage.getItem(cacheKey);
             if (cached) {
@@ -219,8 +252,12 @@ const useTokenBalance = (
                     const query = btoa(
                       JSON.stringify({ balance: { address } })
                     );
-                    const { data } = await axios.get(
-                      `${lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${query}`
+                    const { data } = await axiosGetWithEndpointFallback<{
+                      data?: { balance?: string };
+                    }>(
+                      `${lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${query}`,
+                      {},
+                      getClassicLcdFallbackBases(lcd)
                     );
                     lcdResults[contract] = data?.data?.balance ?? "0";
                   } catch (error: any) {

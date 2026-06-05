@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ValAddress } from "@terra-money/terra.js";
+import { AccAddress, ValAddress } from "@terra-money/terra.js";
 import { isTnsName, useTns } from "../../libs/tns";
 import { getEndpointByKeyword } from "../../scripts/utility";
 import { useCurrentChain } from "../../contexts/ChainsContext";
@@ -16,14 +16,17 @@ import Contract from "./Contract";
 
 const Address = () => {
   const { address = "" } = useParams();
-  const whitelist = useWhitelist();
+  const normalizedAddress = address.trim().toLowerCase();
+  const whitelist = useWhitelist([normalizedAddress]);
   const contracts = useContracts();
   const nfts = useNFTContracts();
   const isKnownContract =
-    !!whitelist?.[address] || !!contracts?.[address] || !!nfts?.[address];
+    !!whitelist?.[normalizedAddress] ||
+    !!contracts?.[normalizedAddress] ||
+    !!nfts?.[normalizedAddress];
   const { data: contractInfo, isLoading } = useContractInfo(
     address,
-    isKnownContract
+    isKnownContract || AccAddress.validate(address.trim())
   );
   const [resolvedAddress, setResolvedAddress] = useState("");
   const { name } = useCurrentChain();

@@ -51,7 +51,7 @@ const Amount = (props: Props) => {
   const { estimated, fontSize, className, denom, children, decimals } = props;
   const whitelist = useWhitelist();
   const contracts = useContracts();
-  const ibcWhitelist = useIBCWhitelist();
+  const ibcWhitelist = useIBCWhitelist(denom ? [denom] : undefined);
   const isClassic = useIsClassic();
 
   const hash = denom?.replace("ibc/", "");
