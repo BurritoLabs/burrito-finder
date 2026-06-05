@@ -132,15 +132,15 @@ const Txs = ({
         const search = new URLSearchParams();
         search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
-        search.append("events", `${eventKey}=${address}`);
+        search.set("events", `${eventKey}='${address}'`);
         const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
         try {
           const { data } = await apiClient.get(endpoint);
           return data;
         } catch {
-          const quoted = new URLSearchParams(search);
-          quoted.set("events", `${eventKey}='${address}'`);
-          const fallbackEndpoint = `${lcd}/cosmos/tx/v1beta1/txs?${quoted.toString()}`;
+          const unquoted = new URLSearchParams(search);
+          unquoted.set("events", `${eventKey}=${address}`);
+          const fallbackEndpoint = `${lcd}/cosmos/tx/v1beta1/txs?${unquoted.toString()}`;
           const { data } = await apiClient.get(fallbackEndpoint);
           return data;
         }

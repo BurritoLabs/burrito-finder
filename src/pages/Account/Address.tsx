@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { AccAddress, ValAddress } from "@terra-money/terra.js";
+import apiClient from "../../apiClient";
 import { isTnsName, useTns } from "../../libs/tns";
 import { getEndpointByKeyword } from "../../scripts/utility";
 import { useCurrentChain } from "../../contexts/ChainsContext";
@@ -17,19 +19,43 @@ import Contract from "./Contract";
 const Address = () => {
   const { address = "" } = useParams();
   const normalizedAddress = address.trim().toLowerCase();
-  const whitelist = useWhitelist([normalizedAddress]);
+  const baseWhitelist = useWhitelist();
   const contracts = useContracts();
   const nfts = useNFTContracts();
-  const isKnownContract =
-    !!whitelist?.[normalizedAddress] ||
+  const isKnownContractBase =
+    !!baseWhitelist?.[normalizedAddress] ||
     !!contracts?.[normalizedAddress] ||
     !!nfts?.[normalizedAddress];
+  const isValidAccountAddress = AccAddress.validate(address.trim());
+  const { name, lcd } = useCurrentChain();
+  const shouldCheckAccount = isValidAccountAddress && !isKnownContractBase;
+  const { data: accountKind, isLoading: isAccountKindLoading } = useQuery(
+    ["addressAccountKind", normalizedAddress, lcd],
+    async () => {
+      const { status } = await apiClient.get(
+        `${lcd}/cosmos/auth/v1beta1/accounts/${normalizedAddress}`,
+        { validateStatus: status => status === 200 || status === 404 }
+      );
+
+      return status === 200 ? "account" : "unknown";
+    },
+    { enabled: shouldCheckAccount, retry: false }
+  );
+  const dynamicWhitelist = useWhitelist(
+    accountKind === "unknown" ? [normalizedAddress] : []
+  );
+  const isKnownContract =
+    isKnownContractBase || !!dynamicWhitelist?.[normalizedAddress];
+  const shouldCheckContract =
+    isKnownContract ||
+    (isValidAccountAddress &&
+      (!shouldCheckAccount ||
+        (!isAccountKindLoading && accountKind !== "account")));
   const { data: contractInfo, isLoading } = useContractInfo(
     address,
-    isKnownContract || AccAddress.validate(address.trim())
+    shouldCheckContract
   );
   const [resolvedAddress, setResolvedAddress] = useState("");
-  const { name } = useCurrentChain();
   const navigate = useNavigate();
   const { getTerraAddress } = useTns();
 
@@ -59,7 +85,7 @@ const Address = () => {
 
   if (resolvedAddress !== address) return <Loading />;
 
-  return isLoading ? (
+  return isAccountKindLoading || isLoading ? (
     <Loading />
   ) : contractInfo ? (
     <Contract {...contractInfo} />
