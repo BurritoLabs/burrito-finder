@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   createActionRuleSet,
   createAmountRuleSet
@@ -6,11 +7,11 @@ import { useCurrentChain } from "../contexts/ChainsContext";
 
 export const useLogfinderActionRuleSet = () => {
   const { name } = useCurrentChain();
-  const actionRules = createActionRuleSet(name);
+  const actionRules = useMemo(() => createActionRuleSet(name), [name]);
   return actionRules;
 };
 
 export const useLogfinderAmountRuleSet = () => {
-  const amountRules = createAmountRuleSet();
+  const amountRules = useMemo(() => createAmountRuleSet(), []);
   return amountRules;
 };

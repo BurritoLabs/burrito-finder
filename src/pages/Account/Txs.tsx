@@ -262,7 +262,6 @@ const Txs = ({
 
   const [allTxs, setAllTxs] = useState<TxInfo[]>([]);
   const [visibleCount, setVisibleCount] = useState(pageSize);
-  const [txsRow, setTxsRow] = useState<JSX.Element[][]>([]);
 
   const ruleSet = useLogfinderAmountRuleSet();
   const logMatcher = useMemo(
@@ -287,7 +286,6 @@ const Txs = ({
     setContractTotal(null);
     setAllTxs([]);
     setVisibleCount(pageSize);
-    setTxsRow([]);
   }, [address, chainID, pageSize]);
 
   useEffect(() => {
@@ -296,17 +294,19 @@ const Txs = ({
     setAllTxs(prev => {
       const seen = new Set(prev.map(tx => tx?.txhash).filter(Boolean));
       const merged = [...prev];
+      let changed = false;
       data.txs.forEach(tx => {
         if (!tx?.txhash || !seen.has(tx.txhash)) {
           merged.push(tx);
+          changed = true;
           if (tx?.txhash) {
             seen.add(tx.txhash);
           }
         }
       });
-      return merged;
+      return changed ? merged : prev;
     });
-  }, [data?.txs]);
+  }, [contractTotal, data?.txs, shouldUseClassicContractRpc]);
 
   const orderedTxs = useMemo(() => {
     if (sortAscending) {
@@ -329,12 +329,8 @@ const Txs = ({
     [orderedTxs, visibleCount]
   );
 
-  useEffect(() => {
-    if (!visibleTxs.length) {
-      setTxsRow([]);
-      return;
-    }
-    const txRow = visibleTxs.map((tx: any) => {
+  const txsRow = useMemo(() => {
+    return visibleTxs.map((tx: any) => {
       const txData: TxResponse = transformTx(tx, chainID);
       const matchedLogs = getTxAmounts(
         JSON.stringify(txData),
@@ -343,7 +339,6 @@ const Txs = ({
       );
       return getRow(txData, chainID, address, matchedLogs, isClassic);
     });
-    setTxsRow(txRow);
   }, [visibleTxs, chainID, address, logMatcher, isClassic]);
 
   const nextFromServer =

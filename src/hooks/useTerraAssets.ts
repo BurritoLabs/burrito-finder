@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { Dictionary } from "lodash";
@@ -431,7 +432,10 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
     fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
   );
 
-  const base = pickChainAssets(data, chain.name, chain.chainID) ?? {};
+  const base = useMemo(
+    () => pickChainAssets(data, chain.name, chain.chainID) ?? {},
+    [chain.chainID, chain.name, data]
+  );
   const hashes = Array.from(
     new Set(
       (denoms ?? [])
@@ -461,7 +465,7 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
     }
   );
 
-  return { ...base, ...(resolved ?? {}) };
+  return useMemo(() => ({ ...base, ...(resolved ?? {}) }), [base, resolved]);
 };
 
 const pickChainAssets = <T>(
@@ -521,10 +525,13 @@ export const useWhitelist = (contracts?: string[]) => {
     { staleTime: 60 * 60 * 1000 }
   );
 
-  const base = {
-    ...(pickChainAssets(data, name, chainID) ?? {}),
-    ...(hexxagonTokens ?? {})
-  };
+  const base = useMemo(
+    () => ({
+      ...(pickChainAssets(data, name, chainID) ?? {}),
+      ...(hexxagonTokens ?? {})
+    }),
+    [chainID, data, hexxagonTokens, name]
+  );
   const normalizedContracts = Array.from(
     new Set((contracts ?? []).map(normalizeAddress).filter(Boolean))
   );
@@ -546,7 +553,7 @@ export const useWhitelist = (contracts?: string[]) => {
     }
   );
 
-  return { ...base, ...(resolved ?? {}) };
+  return useMemo(() => ({ ...base, ...(resolved ?? {}) }), [base, resolved]);
 };
 
 export const useContracts = () => {
@@ -575,10 +582,13 @@ export const useContracts = () => {
     { staleTime: 60 * 60 * 1000 }
   );
 
-  return {
-    ...(pickChainAssets(data, name, chainID) ?? {}),
-    ...(hexxagonContracts ?? {})
-  };
+  return useMemo(
+    () => ({
+      ...(pickChainAssets(data, name, chainID) ?? {}),
+      ...(hexxagonContracts ?? {})
+    }),
+    [chainID, data, hexxagonContracts, name]
+  );
 };
 
 export const useNFTContracts = () => {
