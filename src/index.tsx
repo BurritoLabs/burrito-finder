@@ -40,9 +40,7 @@ const Root = () => {
   }, []);
 
   return (
-    <BrowserRouter
-      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-    >
+    <BrowserRouter>
       <CurrencyProvider>
         <QueryClientProvider client={queryClient}>
           <ChainsProvider value={chains}>
