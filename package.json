@@ -118,6 +118,7 @@
     "typescript": "^4.9.5"
   },
   "overrides": {
+    "axios": "$axios",
     "protobufjs": "7.6.5"
   }
 }

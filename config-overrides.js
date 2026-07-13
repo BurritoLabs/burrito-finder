@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const path = require("path");
 
 module.exports = config => {
   config.ignoreWarnings = [
@@ -14,6 +15,10 @@ module.exports = config => {
     os: require.resolve("os-browserify/browser"),
     stream: require.resolve("stream-browserify"),
     url: require.resolve("url/")
+  };
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    "axios$": path.resolve(__dirname, "node_modules/axios/index.js")
   };
   config.plugins.push(
     new webpack.ProvidePlugin({
