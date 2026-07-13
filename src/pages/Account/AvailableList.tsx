@@ -67,11 +67,18 @@ const AvailableList = ({
         // fall through to alternative source
       }
 
-      const { data: paprika } = await axios.get<{
-        quotes?: { USD?: { price?: number } };
-      }>("https://api.coinpaprika.com/v1/tickers/ust-terrausd");
+      try {
+        const { data: paprika } = await axios.get<{
+          quotes?: { USD?: { price?: number } };
+        }>("https://api.coinpaprika.com/v1/tickers/ust-terrausd");
 
-      return paprika?.quotes?.USD?.price;
+        return paprika?.quotes?.USD?.price;
+      } catch {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("ustcPriceTs", String(Date.now()));
+        }
+        return undefined;
+      }
     },
     {
       staleTime: PRICE_TTL,
@@ -80,12 +87,7 @@ const AvailableList = ({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
-      enabled: shouldFetchUstc,
-      onError: () => {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem("ustcPriceTs", String(Date.now()));
-        }
-      }
+      enabled: shouldFetchUstc
     }
   );
 
@@ -109,14 +111,21 @@ const AvailableList = ({
   const { data: lunaPrice } = useQuery(
     ["coingecko-luna"],
     async () => {
-      const { data: result } = await axios.get<{
-        terra?: { usd?: number };
-        "terra-luna-2"?: { usd?: number };
-      }>(
-        "https://api.coingecko.com/api/v3/simple/price?ids=terra,terra-luna-2&vs_currencies=usd"
-      );
+      try {
+        const { data: result } = await axios.get<{
+          terra?: { usd?: number };
+          "terra-luna-2"?: { usd?: number };
+        }>(
+          "https://api.coingecko.com/api/v3/simple/price?ids=terra,terra-luna-2&vs_currencies=usd"
+        );
 
-      return result?.terra?.usd ?? result?.["terra-luna-2"]?.usd;
+        return result?.terra?.usd ?? result?.["terra-luna-2"]?.usd;
+      } catch {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("lunaPriceTs", String(Date.now()));
+        }
+        return undefined;
+      }
     },
     {
       staleTime: PRICE_TTL,
@@ -125,12 +134,7 @@ const AvailableList = ({
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
-      enabled: shouldFetchLuna,
-      onError: () => {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem("lunaPriceTs", String(Date.now()));
-        }
-      }
+      enabled: shouldFetchLuna
     }
   );
 
@@ -175,10 +179,14 @@ const AvailableList = ({
   const { data: fxRates } = useQuery(
     ["fx-rates-usd"],
     async () => {
-      const { data: result } = await axios.get<{
-        rates?: Record<string, number>;
-      }>("https://open.er-api.com/v6/latest/USD");
-      return result?.rates;
+      try {
+        const { data: result } = await axios.get<{
+          rates?: Record<string, number>;
+        }>("https://open.er-api.com/v6/latest/USD");
+        return result?.rates;
+      } catch {
+        return undefined;
+      }
     },
     {
       staleTime: FX_TTL,

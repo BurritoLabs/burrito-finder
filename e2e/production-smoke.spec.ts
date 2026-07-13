@@ -7,7 +7,7 @@ const collectRuntimeErrors = (page: Page) => {
   page.on("console", message => {
     if (
       message.type() === "error" &&
-      /(?:uncaught|typeerror|referenceerror|value is undefined|cannot read|refused to (?:load|connect|execute|apply|frame))/i.test(
+      /(?:uncaught|typeerror|referenceerror|axioserror: network error|value is undefined|cannot read|refused to (?:load|connect|execute|apply|frame))/i.test(
         message.text()
       )
     ) {
@@ -70,6 +70,20 @@ test("Phoenix CW20 balances survive aggregate API failure", async ({
     "https://api.burrito.money/v1/finder/account-assets",
     route => route.abort()
   );
+  await page.goto(
+    "/mainnet/address/terra104dnzgzzx7hjt32sml9zspqfmvr7fdae8l6vy8"
+  );
+
+  await expect(page.getByText("arbLUNA", { exact: true })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("NaN");
+  expect(errors).toEqual([]);
+});
+
+test("Phoenix account tolerates unavailable price feeds", async ({ page }) => {
+  const errors = collectRuntimeErrors(page);
+  await page.route("https://api.coingecko.com/**", route => route.abort());
+  await page.route("https://api.coinpaprika.com/**", route => route.abort());
+  await page.route("https://open.er-api.com/**", route => route.abort());
   await page.goto(
     "/mainnet/address/terra104dnzgzzx7hjt32sml9zspqfmvr7fdae8l6vy8"
   );
