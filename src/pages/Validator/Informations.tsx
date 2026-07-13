@@ -1,4 +1,4 @@
-import { AccAddress } from "@terra-money/terra.js";
+import { AccAddress } from "../../libs/address";
 import { percent } from "../../scripts/math";
 import Finder from "../../components/Finder";
 import format from "../../scripts/format";

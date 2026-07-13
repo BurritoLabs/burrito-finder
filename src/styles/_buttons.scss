@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "mixins";
+@use "variables";
+
 .btn {
   display: inline-flex;
   justify-content: center;
@@ -32,11 +36,11 @@ a.btn {
 
 /* Colors */
 .btn-primary {
-  background: $brand;
+  background: variables.$brand;
   color: white;
 
   &:hover:not(:disabled) {
-    background: darken($brand, 5%);
+    background: color.adjust(variables.$brand, $lightness: -5%);
   }
 
   &:disabled {
@@ -45,11 +49,11 @@ a.btn {
 }
 
 .btn-sky {
-  background: $sky;
+  background: variables.$sky;
   color: white;
 
   &:hover:not(:disabled) {
-    background: darken($sky, 5%);
+    background: color.adjust(variables.$sky, $lightness: -5%);
   }
 
   &:disabled {
@@ -58,11 +62,11 @@ a.btn {
 }
 
 .btn-danger {
-  background: $red;
+  background: variables.$red;
   color: white;
 
   &:hover:not(:disabled) {
-    background: darken($red, 5%);
+    background: color.adjust(variables.$red, $lightness: -5%);
   }
 
   &:disabled {
@@ -71,11 +75,11 @@ a.btn {
 }
 
 .btn-light {
-  background: $line;
-  color: $brand;
+  background: variables.$line;
+  color: variables.$brand;
 
   &:hover:not(:disabled) {
-    background: darken($line, 5%);
+    background: color.adjust(variables.$line, $lightness: -5%);
   }
 
   &:disabled {
@@ -84,17 +88,17 @@ a.btn {
 }
 
 .btn-link {
-  color: $sky;
+  color: variables.$sky;
   text-decoration: underline;
 }
 
 .btn-icon-group {
-  @include flex();
+  @include mixins.flex();
   margin: -10px;
 }
 
 .btn-icon {
-  @include flex();
+  @include mixins.flex();
 
   border-radius: 5px;
   padding: 10px;

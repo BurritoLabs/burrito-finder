@@ -1,4 +1,4 @@
-import { AccAddress } from "@terra-money/terra.js";
+import { AccAddress } from "../../libs/address";
 import { useCurrentChain } from "../../contexts/ChainsContext";
 import { useIBCWhitelist } from "../../hooks/useTerraAssets";
 import AmountCard from "./AmountCard";

@@ -1,8 +1,8 @@
-@import "../styles/mixins";
-@import "../styles/variables";
+@use "../styles/mixins";
+@use "../styles/variables";
 
 .header {
-  @include flex(space-between);
+  @include mixins.flex(space-between);
   margin-bottom: 20px;
 }
 

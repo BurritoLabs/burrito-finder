@@ -1,14 +1,14 @@
 @use 'sass:math';
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 $border: #ebeff8;
 $releasing: #459cf4;
 
 .component {
   margin-top: 5px;
-  @media (min-width: $breakpoint) {
-    @include flex(flex-start, stretch);
+  @media (min-width: variables.$breakpoint) {
+    @include mixins.flex(flex-start, stretch);
   }
 
   > :last-child {
@@ -21,7 +21,7 @@ $releasing: #459cf4;
     padding-bottom: 20px;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     /* line */
     .dot:before {
       content: "";
@@ -48,7 +48,7 @@ $releasing: #459cf4;
 }
 
 .circle {
-  @include flex();
+  @include mixins.flex();
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -71,7 +71,7 @@ $releasing: #459cf4;
 }
 
 .header {
-  @include flex(space-between);
+  @include mixins.flex(space-between);
 
   .releaseInfo {
     font-size: 12px;

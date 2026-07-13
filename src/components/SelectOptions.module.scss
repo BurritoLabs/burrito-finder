@@ -1,11 +1,11 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .rightHeader {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   right: 40px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     top: 50%;
     transform: translateY(-50%);
     right: 15px;
@@ -17,7 +17,7 @@
   top: 50%;
   transform: translateY(-50%);
   right: 150px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     top: 50%;
     transform: translateY(-50%);
     right: 100px;
@@ -28,7 +28,7 @@
   position: absolute;
   top: 24px;
   right: 40px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     top: 8px;
     right: 15px;
   }
@@ -38,7 +38,7 @@
   position: absolute;
   top: 24px;
   right: 150px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     top: 8px;
     right: 100px;
   }

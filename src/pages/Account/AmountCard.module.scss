@@ -1,8 +1,8 @@
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 .meta {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     display: none;
   }
 
@@ -28,19 +28,19 @@
 .article {
   white-space: nowrap;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     white-space: normal;
   }
 }
 
 .header {
-  @include flex(space-between);
+  @include mixins.flex(space-between);
   gap: 12px;
   min-width: 0;
 }
 
 .denom {
-  @include flex(center);
+  @include mixins.flex(center);
   font-size: 16px;
   min-width: 0;
   overflow: hidden;
@@ -49,7 +49,7 @@
 }
 
 .action {
-  @include flex(center, flex-end);
+  @include mixins.flex(center, flex-end);
   flex-direction: column;
   flex: 0 1 48%;
   min-width: 0;
@@ -62,34 +62,34 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     font-size: 16px;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     font-size: 20px;
   }
 }
 
 .currency {
-  color: $brand;
+  color: variables.$brand;
   opacity: 0.5;
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     font-size: 11px;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     font-size: 13px;
   }
 }
 
 .button button {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     margin-left: 5px;
     min-width: unset;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     margin-left: 25px;
   }
 }

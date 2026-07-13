@@ -1,24 +1,27 @@
+@use "mixins";
+@use "variables";
+
 @use 'sass:math';
 
 $margin: 10px;
 $margin-large: 20px;
 
 .row {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     margin: -$margin;
   }
 
-  @media (min-width: $breakpoint) {
-    @include flex(flex-start, stretch);
+  @media (min-width: variables.$breakpoint) {
+    @include mixins.flex(flex-start, stretch);
     margin: math.div($margin-large, -2);
   }
 
   .col {
-    @media (max-width: $breakpoint - 1) {
+    @media (max-width: variables.$breakpoint - 1) {
       padding: $margin;
     }
 
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: 1;
       padding: math.div($margin-large, 2);
     }
@@ -29,46 +32,46 @@ $margin-large: 20px;
   }
 
   .col-2 {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: none;
       width: math.div(100% * 2, 12);
     }
   }
 
   .col-4 {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: none;
       width: math.div(100% * 4, 12);
     }
   }
 
   .col-5 {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: none;
       width: math.div(100% * 5, 12);
     }
   }
 
   .col-6 {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: none;
       width: math.div(100% * 6, 12);
     }
   }
 
   .col-8 {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       flex: none;
       width: math.div(100% * 8, 12);
     }
   }
 
   & + & {
-    @media (max-width: $breakpoint - 1) {
+    @media (max-width: variables.$breakpoint - 1) {
       margin-top: $margin;
     }
 
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       margin-top: math.div($margin-large, 2);
     }
   }
@@ -77,11 +80,11 @@ $margin-large: 20px;
 .row + .card,
 .card + .row,
 .card + .card {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     margin-top: (2 * $margin);
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     margin-top: $margin-large;
   }
 }

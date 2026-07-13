@@ -1,4 +1,4 @@
-@import "../styles/variables";
+@use "../styles/variables";
 
 .main {
   min-height: 100vh;
@@ -11,10 +11,10 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 40px;
-  color: $app-fg !important;
+  color: variables.$app-fg !important;
   flex: 1;
   -webkit-text-size-adjust: 100%;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     padding: 50px 15px;
     padding-top: 85px;
   }

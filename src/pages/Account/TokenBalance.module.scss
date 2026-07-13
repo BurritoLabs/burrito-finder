@@ -1,7 +1,8 @@
-@import "../../styles/list";
+@use "../../styles/list";
+@use "../../styles/variables";
 
 .cardTitle {
-  background: $table-head;
+  background: variables.$table-head;
   gap: 12px;
 }
 

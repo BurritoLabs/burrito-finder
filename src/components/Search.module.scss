@@ -1,33 +1,33 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 input::-webkit-input-placeholder {
   color: rgba(255, 255, 255, 0.3);
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     color: rgba(255, 255, 255, 0.3);
   }
 }
 input:-moz-placeholder {
   color: rgba(255, 255, 255, 0.3);
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     color: rgba(255, 255, 255, 0.3);
   }
 }
 input::-moz-placeholder {
   color: rgba(255, 255, 255, 0.3);
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     color: rgba(255, 255, 255, 0.3);
   }
 }
 input:-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.3);
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     color: rgba(255, 255, 255, 0.3);
   }
 }
 
 input[type="search"]::-webkit-search-cancel-button {
   display: none;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     display: inline;
   }
 }
@@ -52,7 +52,7 @@ input {
   padding-right: 45px !important;
   border-radius: 0;
   word-break: normal;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     border-radius: 0;
     background: transparent;
     color: #fff;
@@ -75,7 +75,7 @@ input {
     padding: 0 5px 0 10px;
     font-size: 21px;
     line-height: 39px;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       color: #fff;
       padding: 0 3px 0 5px;
       font-size: 19px;
@@ -87,7 +87,7 @@ input {
 form {
   display: inline-flex;
   min-height: 40px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     top: 54px;
     right: 0;
     padding: 0;

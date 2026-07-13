@@ -1,11 +1,11 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .logo {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   line-height: 1;
-  color: $app-fg;
+  color: variables.$app-fg;
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -24,7 +24,7 @@
   letter-spacing: -0.02em;
 }
 
-@media (max-width: $breakpoint) {
+@media (max-width: variables.$breakpoint) {
   .icon {
     height: 18px;
   }

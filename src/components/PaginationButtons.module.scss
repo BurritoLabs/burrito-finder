@@ -1,10 +1,10 @@
-@import "../styles/mixins";
-@import "../styles/variables";
+@use "../styles/mixins";
+@use "../styles/variables";
 
 $size: 38px;
 
 .component {
-  @include flex(center);
+  @include mixins.flex(center);
   margin-bottom: 10px;
   margin-top: 20px;
   background-color: rgba($color: #edf4fe, $alpha: 0.5);
@@ -15,12 +15,12 @@ $size: 38px;
   height: $size;
 
   a {
-    color: $brand;
+    color: variables.$brand;
     text-decoration: none;
   }
 
   span {
-    color: $line;
+    color: variables.$line;
     cursor: default;
   }
 
@@ -30,7 +30,7 @@ $size: 38px;
 }
 
 .text {
-  background: $brand;
+  background: variables.$brand;
   color: white;
   padding: 0 15px;
 }

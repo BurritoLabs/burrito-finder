@@ -1,9 +1,9 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .wrapper {
   width: 160px;
   height: 36px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     width: 100px;
     height: 28px;
   }
@@ -31,7 +31,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     font-size: 11px;
     padding: 0 27px 0 10px;
   }
@@ -70,12 +70,12 @@
   line-height: 28px;
   height: 28px;
   font-size: 12px;
-  color: $app-fg;
+  color: variables.$app-fg;
   text-transform: capitalize;
   background: transparent;
   border: 0;
   min-height: 0;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     font-size: 10px;
     line-height: 28px;
     height: 28px;
@@ -107,14 +107,14 @@
   color: #fff !important;
   line-height: 34px;
   pointer-events: none;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     width: 27px !important;
   }
   i {
     font-size: 18px;
     vertical-align: middle;
     margin-top: -2px;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       height: 24px;
     }
   }

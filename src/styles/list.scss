@@ -1,22 +1,22 @@
-@import "variables.scss";
+@use "variables.scss";
 
 .list {
   display: flex;
   flex-direction: column;
-  border: 1px solid $line;
+  border: 1px solid variables.$line;
   border-radius: 5px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     border: none;
     border-radius: 0px;
-    border-top: 1px solid $line;
+    border-top: 1px solid variables.$line;
   }
   .row {
     display: flex;
     flex-direction: row;
-    border-bottom: 1px solid $line;
+    border-bottom: 1px solid variables.$line;
     min-height: 60px;
     line-height: 60px;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       flex-direction: column;
       min-height: 50px;
       line-height: 50px;
@@ -25,10 +25,10 @@
       font-weight: 500;
       padding-left: 30px;
       min-width: 240px;
-      background-color: $table-head;
+      background-color: variables.$table-head;
       display: flex;
       align-items: center;
-      @media (max-width: $breakpoint) {
+      @media (max-width: variables.$breakpoint) {
         background: none;
         padding-left: 0px;
         min-width: unset;
@@ -50,7 +50,7 @@
           margin: 15px 0;
         }
       }
-      @media (max-width: $breakpoint) {
+      @media (max-width: variables.$breakpoint) {
         padding: 0 0 20px;
       }
     }

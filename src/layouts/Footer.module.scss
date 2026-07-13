@@ -1,7 +1,7 @@
-@import "../styles/variables";
+@use "../styles/variables";
 
 .footer {
-  border-top: 1px solid $line;
+  border-top: 1px solid variables.$line;
   color: rgba(234, 245, 235, 0.68);
   font-size: 12px;
 }
@@ -25,7 +25,7 @@
     color: rgba(234, 245, 235, 0.78);
   }
 
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     padding: 0 15px;
   }
 }

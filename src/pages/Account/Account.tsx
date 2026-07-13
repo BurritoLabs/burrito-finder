@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { AccAddress } from "@terra-money/terra.js";
+import { AccAddress } from "../../libs/address";
 import NotFound from "../../components/NotFound";
 import Delegations from "./Delegations";
 import Undelegations from "./Undelegations";

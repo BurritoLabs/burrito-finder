@@ -1,7 +1,8 @@
-@import "../../styles/list";
+@use "../../styles/list";
+@use "../../styles/variables";
 
 .cardTitle {
-  background: $table-head;
+  background: variables.$table-head;
 }
 
 .cardBodyContainer {
@@ -20,13 +21,13 @@
 
 .wrapper {
   border-radius: 3px;
-  border: 1px solid $line;
+  border: 1px solid variables.$line;
 }
 
 .table {
   box-sizing: border-box;
   tr:not(:first-child) {
-    border-top: 1px solid $line;
+    border-top: 1px solid variables.$line;
   }
 
   th {

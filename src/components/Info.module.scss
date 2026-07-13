@@ -1,10 +1,10 @@
-@import "../styles/mixins";
-@import "../styles/variables";
+@use "../styles/mixins";
+@use "../styles/variables";
 
 .component {
-  @include flex();
+  @include mixins.flex();
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     flex-direction: column;
     text-align: center;
     i {
@@ -13,14 +13,14 @@
     }
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     justify-content: flex-start;
   }
 
   margin: 25px 0;
 
   .content {
-    @media (min-width: $breakpoint) {
+    @media (min-width: variables.$breakpoint) {
       margin-left: 20px;
     }
   }
@@ -29,7 +29,7 @@
     font-size: 20px;
     font-weight: 500;
 
-    @media (max-width: $breakpoint - 1) {
+    @media (max-width: variables.$breakpoint - 1) {
       margin-top: 10px;
       margin-bottom: 10px;
     }

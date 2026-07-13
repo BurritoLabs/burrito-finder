@@ -1,7 +1,10 @@
+@use "sass:color";
+@use "variables";
+
 @use 'sass:math';
 
 .badge {
-  color: $brand;
+  color: variables.$brand;
   display: inline-block;
   font-size: 12px;
   font-weight: normal;
@@ -24,29 +27,29 @@
   }
 
   &.badge-light {
-    background: fade-out($brand, 0.9);
-    color: fade-out($brand, 0.25);
+    background: color.adjust(variables.$brand, $alpha: -0.9);
+    color: color.adjust(variables.$brand, $alpha: -0.25);
   }
 }
 
 .badge-primary {
-  background: $brand;
+  background: variables.$brand;
 }
 
 .badge-secondary {
-  background: $sky;
+  background: variables.$sky;
 }
 
 .badge-success {
-  background: $green;
+  background: variables.$green;
 }
 
 .badge-warning {
-  background: $orange;
+  background: variables.$orange;
 }
 
 .badge-danger {
-  background: $red;
+  background: variables.$red;
 }
 
 .badge-small {

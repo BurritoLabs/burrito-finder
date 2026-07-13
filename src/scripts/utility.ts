@@ -4,10 +4,9 @@ import isBase64 from "is-base64";
 import { Dictionary } from "ramda";
 import { countries, Country } from "countries-list";
 import { filter } from "lodash";
-import { Coin, Coins } from "@terra-money/terra.js";
 import { isDenomIBC } from "@terra.kitchen/utils";
 import { isInteger } from "./math";
-import { isTnsName } from "../libs/tns";
+import { isTnsName } from "../libs/tnsName";
 
 export const DEFAULT_CURRENCY = `uusd`;
 export const BASE_DENOM = `uluna`;
@@ -118,24 +117,17 @@ export function getDefaultCurrency(denoms: string[]) {
 }
 
 export const splitCoinData = (coin: string) => {
-  try {
-    const coinData = Coin.fromString(coin);
-    const amount = coinData.amount.toString();
-    const denom = coinData.denom;
+  const parsed = coin.match(/^(\d+)([^\s]+)$/);
+  if (parsed) {
+    const [, amount, denom] = parsed;
     return { amount, denom };
-  } catch {
-    const denom = coin.match(TERRA_ADDRESS_REGEX)?.[0];
-    const amount = coin.replace(TERRA_ADDRESS_REGEX, "");
-    if (denom && amount) {
-      return { amount, denom };
-    }
   }
 };
 
 export const isIbcDenom = (string = "") => string.startsWith("ibc/");
 
 export const sortCoins = (
-  coins: Coins,
+  coins: { toData: () => CoinData[] },
   currency?: string,
   sorter?: (a: CoinData, b: CoinData) => number
 ) => {

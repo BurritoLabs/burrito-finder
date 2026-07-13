@@ -10,6 +10,7 @@
     "analyze": "vite build --mode analyze",
     "start": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
+    "audit:prod": "node scripts/audit-production.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "serve:e2e": "serve -s build -l 4173",
@@ -59,6 +60,7 @@
     "ace-builds": "^1.4.12",
     "assert": "^2.1.0",
     "axios": "^1.18.1",
+    "bech32": "^2.0.0",
     "bignumber.js": "^9.0.1",
     "buffer": "^6.0.3",
     "classnames": "^2.2.6",
@@ -113,7 +115,6 @@
     "typescript": "^7.0.2",
     "vite": "^8.1.4",
     "vite-plugin-node-polyfills": "^0.28.0",
-    "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.10"
   },
   "overrides": {

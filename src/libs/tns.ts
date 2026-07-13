@@ -3,6 +3,7 @@ import { Buffer } from "buffer";
 import keccak256 from "keccak256";
 import { useCurrentChain } from "../contexts/ChainsContext";
 import useLCDClient from "../hooks/useLCD";
+export { isTnsName } from "./tnsName";
 
 const registryMap: Record<string, string> = {
   mainnet: "terra19gqw63xnt9237d2s8cdrzstn98g98y7hkl80gs",
@@ -26,20 +27,6 @@ export const useTns = () => {
  * @param name - A TNS identifier such as "alice.ust"
  * @returns `true` if it is a valid TNS identifier, `false` otherwise
  */
-export const isTnsName = (name: string) => {
-  const baseNames = ["ust"];
-
-  return baseNames.some(baseName => {
-    const dotBaseName = "." + baseName;
-
-    return (
-      !name.startsWith(".") &&
-      !name.includes("..") &&
-      name.endsWith(dotBaseName)
-    );
-  });
-};
-
 /**
  * Resolve terra address from a domain name.
  *

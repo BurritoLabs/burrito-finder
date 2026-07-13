@@ -1,12 +1,12 @@
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 .header {
   text-align: center;
 }
 
 .title {
-  color: $app-fg;
+  color: variables.$app-fg;
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
@@ -26,9 +26,9 @@
 .nextButton {
   width: 100%;
   text-align: center;
-  background-color: $a-bg;
-  color: $app-fg;
-  border: 1px solid $brand;
+  background-color: variables.$a-bg;
+  color: variables.$app-fg;
+  border: 1px solid variables.$brand;
   margin-top: 40px;
   border-radius: 22px;
   height: 44px;
@@ -39,8 +39,8 @@
   background-color: rgba(255, 255, 255, 0.04);
   font-size: 14px;
   padding: 12px 0px 12px 15px;
-  color: $app-fg;
-  border: solid 1px $line;
+  color: variables.$app-fg;
+  border: solid 1px variables.$line;
   border-radius: 5px;
   height: 40px;
   line-height: 14px;
@@ -53,17 +53,17 @@
 }
 
 .innerHeader {
-  @include flex(space-between, flex-end);
+  @include mixins.flex(space-between, flex-end);
   margin-bottom: 10px;
 }
 
 .back {
-  @include flex;
+  @include mixins.flex;
   position: absolute;
   top: 0;
   left: 0;
   padding: 15px;
-  color: $brand;
+  color: variables.$brand;
 }
 
 .copyWrapper {
@@ -74,22 +74,22 @@
 }
 
 .copyButton {
-  @include flex(center);
+  @include mixins.flex(center);
   font-size: 12px;
   font-weight: 500;
-  color: $app-fg;
+  color: variables.$app-fg;
   line-height: 12px;
   padding: 6px 15px;
 }
 
 .result {
-  border: solid 1px $line;
+  border: solid 1px variables.$line;
   border-radius: 5px;
   padding: 14px 200px 20px 15px;
   height: 250px;
   overflow-y: auto;
   white-space: pre;
-  color: $app-fg;
+  color: variables.$app-fg;
   background-color: rgba(0, 0, 0, 0.2);
   font-family: monospace;
   font-size: 12px;
@@ -101,7 +101,7 @@
 }
 
 .errorIcon {
-  color: $brand;
+  color: variables.$brand;
   margin-top: 20px;
 }
 
@@ -113,5 +113,5 @@
 
 .errorMassage {
   text-align: center;
-  color: $brand;
+  color: variables.$brand;
 }

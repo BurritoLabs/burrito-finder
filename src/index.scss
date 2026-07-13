@@ -1,9 +1,8 @@
-@import "./styles/material-icons.scss";
-@import "./styles/mixins";
-@import "./styles/variables";
-@import "./styles/material-icons";
-@import "./styles/reboot.scss";
-@import "./styles/components";
+@use "styles/material-icons.scss";
+@use "styles/mixins";
+@use "styles/variables";
+@use "styles/reboot.scss";
+@use "styles/components";
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
@@ -26,14 +25,14 @@ code {
   display: inline-block;
   border-radius: 13px;
   height: 26px;
-  background-color: rgba($brand, 0.18);
+  background-color: rgba(variables.$brand, 0.18);
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   font-stretch: normal;
   line-height: 26px;
   letter-spacing: -0.3px;
-  color: $brand;
+  color: variables.$brand;
   padding: 0 15px;
   vertical-align: middle;
 }

@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { path, uniqBy } from "ramda";
 /* TODO: Fix terra.js */
 import { BondStatus } from "@terra-money/terra.proto/cosmos/staking/v1beta1/staking";
-import { AccAddress } from "@terra-money/terra.js";
+import { AccAddress } from "../libs/address";
 import useLCDClient from "../hooks/useLCD";
 import { Pagination, RefetchOptions } from "./query";
 

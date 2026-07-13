@@ -9,7 +9,7 @@ import ValidatorStatus from "../../components/ValidatorStatus";
 import { useTerraValidator } from "../../queries/TerraAPI";
 import s from "./Header.module.scss";
 
-import Terra from "../../Terra.svg?react";
+import terraIcon from "../../Terra.svg?url";
 import {
   useValidator,
   useSelfDelegationAmount,
@@ -86,7 +86,7 @@ const Header = ({ address }: { address: string }) => {
           ) : keybasePicture ? (
             <img src={keybasePicture} alt="" {...thumbnail} />
           ) : (
-            <Terra {...thumbnail} />
+            <img src={terraIcon} alt="" {...thumbnail} />
           )}
           <section>
             <h1 className={s.moniker}>

@@ -1,4 +1,4 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .error {
   height: calc(100vh - 140px);
@@ -21,8 +21,8 @@
     line-height: normal;
     letter-spacing: -0.8px;
     text-align: center;
-    color: $app-bg;
-    @media (max-width: $breakpoint) {
+    color: variables.$app-bg;
+    @media (max-width: variables.$breakpoint) {
       margin-top: 0;
       margin-bottom: 15px;
       font-size: 40px;
@@ -37,24 +37,24 @@
     letter-spacing: -0.2px;
     text-align: center;
     padding: 0;
-    color: $link;
+    color: variables.$link;
     max-width: 540px;
     margin: 0 auto;
     word-break: break-word;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       font-size: 15px;
       padding: 0 20px;
     }
     span {
-      color: $link-bg;
+      color: variables.$link-bg;
     }
   }
   i {
     font-size: 72px;
-    color: $link;
+    color: variables.$link;
     display: block;
     line-height: 1;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       font-size: 60px;
     }
   }
@@ -67,11 +67,11 @@
     text-align: center;
     border-radius: 25px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-    background-color: $link-bg;
+    background-color: variables.$link-bg;
     font-size: 17px;
     color: #ffffff;
     text-decoration: none;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       width: 176px;
       font-size: 16px;
     }

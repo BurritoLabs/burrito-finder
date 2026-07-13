@@ -1,22 +1,24 @@
+@use "variables";
+
 /* colors */
 .text-primary {
-  color: $brand;
+  color: variables.$brand;
 }
 
 .text-secondary {
-  color: $sky;
+  color: variables.$sky;
 }
 
 .text-success {
-  color: $green;
+  color: variables.$green;
 }
 
 .text-warning {
-  color: $orange;
+  color: variables.$orange;
 }
 
 .text-danger {
-  color: $red;
+  color: variables.$red;
 }
 
 /* alignments */

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { AccAddress, ValAddress } from "@terra-money/terra.js";
+import { AccAddress, ValAddress } from "../../libs/address";
 import apiClient from "../../apiClient";
-import { isTnsName, useTns } from "../../libs/tns";
+import { useTns } from "../../libs/tns";
+import { isTnsName } from "../../libs/tnsName";
 import { getEndpointByKeyword } from "../../scripts/utility";
 import { useCurrentChain } from "../../contexts/ChainsContext";
 import Loading from "../../components/Loading";

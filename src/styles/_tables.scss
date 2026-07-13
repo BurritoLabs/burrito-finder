@@ -1,4 +1,5 @@
-@import "variables.scss";
+@use "sass:color";
+@use "variables.scss";
 
 .table-responsive {
   width: 100%;
@@ -13,7 +14,7 @@ table {
 th,
 td {
   &:not(:last-child) {
-    padding-right: $gutter;
+    padding-right: variables.$gutter;
   }
 }
 
@@ -32,7 +33,7 @@ td {
   position: relative;
 
   thead + tbody & {
-    border-top: 1px solid $line;
+    border-top: 1px solid variables.$line;
     padding-top: 15px;
     padding-bottom: 15px;
   }
@@ -42,6 +43,6 @@ td {
   }
 
   .table-light & {
-    border-color: fade-out($line, 0.95);
+    border-color: color.adjust(variables.$line, $alpha: -0.95);
   }
 }

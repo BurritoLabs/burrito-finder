@@ -1,15 +1,15 @@
-@import "../../styles/variables.scss";
+@use "../../styles/variables.scss";
 
 .exportCsvButton {
-  color: $link-bg;
+  color: variables.$link-bg;
   text-decoration: underline;
 }
 
 .loading {
-  color: $link-bg;
+  color: variables.$link-bg;
 }
 
 .error {
-  color: $red;
+  color: variables.$red;
   margin-left: 10px;
 }

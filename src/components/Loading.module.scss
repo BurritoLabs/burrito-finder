@@ -1,4 +1,4 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .loader-wrapper {
   animation: fadeIn 1s ease-in;
@@ -52,14 +52,14 @@
 }
 
 .a:after {
-  background: $brand;
+  background: variables.$brand;
   animation: zoom 2s ease-in-out infinite alternate;
   -webkit-animation: zoom 2s ease-in-out infinite alternate;
   -webkit-animation-delay: -1s;
 }
 
 .b:after {
-  background: $brand;
+  background: variables.$brand;
   animation: zoom 2s ease-in-out infinite alternate-reverse;
   -webkit-animation: zoom 2s ease-in-out infinite alternate-reverse;
   -webkit-animation-delay: -1s;

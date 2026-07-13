@@ -1,4 +1,4 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .select {
   width: 100px;
@@ -20,7 +20,7 @@
     background: #eaf5eb;
     text-transform: capitalize;
   }
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     width: 80px;
     height: 28px !important;
     font-size: 11px !important;
@@ -46,14 +46,14 @@
   color: #fff !important;
   line-height: 34px;
   pointer-events: none;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     width: 27px !important;
   }
   i {
     font-size: 18px;
     vertical-align: middle;
     margin-top: -2px;
-    @media (max-width: $breakpoint) {
+    @media (max-width: variables.$breakpoint) {
       height: 24px;
     }
   }

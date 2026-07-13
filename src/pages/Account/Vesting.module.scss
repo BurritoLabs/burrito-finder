@@ -1,22 +1,22 @@
 @use 'sass:math';
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 .schedules {
-  border-top: 1px solid $line;
+  border-top: 1px solid variables.$line;
   margin-top: 20px;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     padding-top: 20px;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     padding-top: 40px;
   }
 }
 
 .button {
-  @include flex();
+  @include mixins.flex();
 
   border: 1px solid #eee;
   border-radius: 50%;
@@ -26,7 +26,7 @@
 }
 
 .wrapper {
-  @include flex(space-between, flex-end);
+  @include mixins.flex(space-between, flex-end);
   margin-top: 8px;
 }
 

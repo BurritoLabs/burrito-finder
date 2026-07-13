@@ -1,5 +1,5 @@
 import c from "classnames";
-import { AccAddress } from "@terra-money/terra.js";
+import { AccAddress } from "../libs/address";
 import {
   ContractList,
   TokenList,

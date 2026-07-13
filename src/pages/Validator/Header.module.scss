@@ -1,10 +1,10 @@
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 .header {
-  @include flex();
+  @include mixins.flex();
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     width: 100%;
     flex-direction: column;
     text-align: center;
@@ -14,25 +14,25 @@
 .thumbnail {
   flex: none;
   border-radius: 50%;
-  background: $line;
+  background: variables.$line;
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     margin-right: 15px;
   }
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     margin-bottom: 30px;
   }
 }
 
 .moniker {
-  @include flex();
+  @include mixins.flex();
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     font-size: 16px;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     justify-content: flex-start;
     font-size: 24px;
   }
@@ -56,7 +56,7 @@
   flex-wrap: wrap;
   text-align: center;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     article {
       width: 50%;
     }

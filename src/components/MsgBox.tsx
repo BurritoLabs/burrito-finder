@@ -1,6 +1,6 @@
 import { useState } from "react";
 import c from "classnames/bind";
-import { AccAddress, ValAddress } from "@terra-money/terra.js";
+import { AccAddress, ValAddress } from "../libs/address";
 import { LogFinderActionResult } from "@terra-money/log-finder-ruleset";
 import CoinComponent from "../components/Coin";
 import { sliceMsgType } from "../scripts/utility";

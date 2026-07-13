@@ -1,15 +1,15 @@
-@import "../../styles/mixins";
-@import "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 
 .list {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     li:not(:first-child) {
       margin-top: 30px;
     }
   }
 
-  @media (min-width: $breakpoint) {
-    @include flex(flex-start);
+  @media (min-width: variables.$breakpoint) {
+    @include mixins.flex(flex-start);
     flex-wrap: wrap;
     margin: -15px;
 

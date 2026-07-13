@@ -1,17 +1,14 @@
 import { useMemo } from "react";
 import BigNumber from "bignumber.js";
 import { bech32 } from "bech32";
-import {
-  AccAddress,
-  DelegateValidator,
-  Validator
-} from "@terra-money/terra.js";
+import type { DelegateValidator, Validator } from "@terra-money/terra.js";
 /* FIXME(terra.js): Import from terra.js */
 import { BondStatus } from "@terra-money/terra.proto/cosmos/staking/v1beta1/staking";
 import { bondStatusFromJSON } from "@terra-money/terra.proto/cosmos/staking/v1beta1/staking";
 import { useDelegation } from "./staking";
 import { useTerraValidators } from "./TerraAPI";
 import { TerraValidator } from "../types/validator";
+import { AccAddress } from "../libs/address";
 
 export const useVotingPowerRate = (address: string) => {
   const { data: TerraValidators, ...state } = useTerraValidators();

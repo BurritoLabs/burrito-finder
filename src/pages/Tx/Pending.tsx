@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { intervalToDuration } from "date-fns";
 import CircularProgress from "@mui/material/CircularProgress";
 import classNames from "classnames";
-import Icon from "../../images/Queued.svg?react";
+import queuedIcon from "../../images/Queued.svg?url";
 import styles from "./Pending.module.scss";
 
 const Pending = ({ timestamp }: { timestamp: string }) => {
@@ -36,7 +36,7 @@ const Pending = ({ timestamp }: { timestamp: string }) => {
         </div>
 
         <div className={classNames(styles.item, styles.icons)}>
-          <Icon className={styles.icon} />
+          <img className={styles.icon} src={queuedIcon} alt="" />
         </div>
       </section>
       <p className={styles.timestamp}>{fromNow}</p>

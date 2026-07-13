@@ -1,14 +1,16 @@
-@import "grid";
-@import "tables";
-@import "buttons";
-@import "forms";
-@import "card";
-@import "badge";
-@import "text";
+@use "grid";
+@use "tables";
+@use "buttons";
+@use "forms";
+@use "card";
+@use "badge";
+@use "text";
+@use "mixins";
+@use "variables";
 
 /* flex */
 .flex {
-  @include flex(flex-start);
+  @include mixins.flex(flex-start);
 }
 
 .space-between {
@@ -18,31 +20,31 @@
 /* utils */
 .clickable {
   cursor: pointer;
-  color: $sky;
+  color: variables.$sky;
   white-space: nowrap;
 }
 
 .mobile {
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     display: none !important;
   }
 }
 
 .desktop {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     display: none !important;
   }
 }
 
 .desktop-large {
-  @media (max-width: $breakpoint-large - 1) {
+  @media (max-width: variables.$breakpoint-large - 1) {
     display: none !important;
   }
 }
 
 /* border */
 .border {
-  $border: 1px solid $line;
+  $border: 1px solid variables.$line;
   border: $border;
 
   &-top {

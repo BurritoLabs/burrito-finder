@@ -1,4 +1,7 @@
-$border: $line;
+@use "mixins";
+@use "variables";
+
+$border: variables.$line;
 
 form {
   > h1 {
@@ -38,7 +41,7 @@ form {
 
   label:before,
   label:after {
-    background-color: $brand;
+    background-color: variables.$brand;
     border-radius: 1px;
     content: "";
   }
@@ -74,10 +77,10 @@ input {
 .form-control {
   appearance: none;
   border: 1px solid $border;
-  border-radius: $radius;
+  border-radius: variables.$radius;
   display: block;
   font-size: 14px;
-  padding: 0 $gutter;
+  padding: 0 variables.$gutter;
   height: 40px;
   width: 100%;
   min-width: 1px;
@@ -97,12 +100,12 @@ input {
 }
 
 textarea.form-control {
-  padding: 10px $gutter;
+  padding: 10px variables.$gutter;
   height: auto;
 }
 
 .form-text {
-  @include flex(flex-start, flex-start);
+  @include mixins.flex(flex-start, flex-start);
 
   font-size: 12px;
   margin-top: 10px;
@@ -120,7 +123,7 @@ textarea.form-control {
 }
 
 .label-button {
-  @include flex();
+  @include mixins.flex();
   font-size: 12px;
 
   i {
@@ -129,7 +132,7 @@ textarea.form-control {
 }
 
 .input-group {
-  @include flex(flex-start, stretch);
+  @include mixins.flex(flex-start, stretch);
 
   .form-control {
     border-top-right-radius: 0;
@@ -137,13 +140,13 @@ textarea.form-control {
   }
 
   .input-group-append {
-    @include flex();
+    @include mixins.flex();
 
     background: #f4f5fb;
     border: 1px solid $border;
     border-left: 0;
-    border-top-right-radius: $radius;
-    border-bottom-right-radius: $radius;
+    border-top-right-radius: variables.$radius;
+    border-bottom-right-radius: variables.$radius;
     font-size: 12px;
     padding: 0 15px;
     word-break: initial;
@@ -157,7 +160,7 @@ textarea.form-control {
   background: $bg;
   border: 1px solid $border;
   border-radius: 5px;
-  color: $red;
+  color: variables.$red;
   display: flex;
   font-size: 12px;
   padding: 5px 7px;

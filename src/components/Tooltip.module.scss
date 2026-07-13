@@ -1,4 +1,4 @@
-@import "../styles/variables";
+@use "../styles/variables";
 
 .container {
   position: absolute;
@@ -29,16 +29,16 @@
   }
 
   &.top:after {
-    border-top-color: $brand;
+    border-top-color: variables.$brand;
   }
 
   &.bottom:before {
-    border-bottom-color: $brand;
+    border-bottom-color: variables.$brand;
   }
 }
 
 .content {
-  background: $brand;
+  background: variables.$brand;
   border-radius: 5px;
   color: white;
   padding: 10px 12px;
@@ -47,7 +47,7 @@
   position: relative;
   white-space: pre-line;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     left: initial !important;
   }
 

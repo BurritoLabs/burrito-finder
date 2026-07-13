@@ -1,27 +1,32 @@
+@use "sass:color";
+@use "forms";
+@use "mixins";
+@use "variables";
+
 @use 'sass:math';
 
-$border: 1px solid $line;
-$box-shadow: fade-out(black, 0.95);
+forms.$border: 1px solid variables.$line;
+$box-shadow: color.adjust(black, $alpha: -0.95);
 $padding: 25px;
 $padding-small: 20px;
 
 .card {
   background: rgba(255, 255, 255, 0.04);
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     box-shadow: 0 8px 24px 0 $box-shadow;
-    border: $border;
-    border-radius: $radius;
+    border: forms.$border;
+    border-radius: variables.$radius;
 
     & & {
-      border: $border;
-      border-radius: $radius;
+      border: forms.$border;
+      border-radius: variables.$radius;
     }
   }
 
-  @media (min-width: $breakpoint) {
-    border: $border;
-    border-radius: $radius;
+  @media (min-width: variables.$breakpoint) {
+    border: forms.$border;
+    border-radius: variables.$radius;
     box-shadow: 0 8px 24px 0 $box-shadow;
   }
 
@@ -31,13 +36,13 @@ $padding-small: 20px;
 }
 
 .card-header {
-  @include flex(space-between);
+  @include mixins.flex(space-between);
 
   font-size: 15px;
   font-weight: 500;
 
   .card-actions {
-    @include flex();
+    @include mixins.flex();
     flex: none;
   }
 
@@ -45,11 +50,11 @@ $padding-small: 20px;
     font-size: 13px;
   }
 
-  @media (max-width: $breakpoint - 1) {
-    padding: $gutter;
+  @media (max-width: variables.$breakpoint - 1) {
+    padding: variables.$gutter;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     padding: 12px $padding;
 
     .card-small & {
@@ -58,11 +63,11 @@ $padding-small: 20px;
   }
 
   &.bordered {
-    border-bottom: $border;
+    border-bottom: forms.$border;
   }
 
   &.bg {
-    background: $bg-hover;
+    background: variables.$bg-hover;
   }
 
   &.collapsed {
@@ -72,11 +77,11 @@ $padding-small: 20px;
 
 .card-body {
   font-size: 14px;
-  @media (max-width: $breakpoint - 1) {
-    padding: $gutter;
+  @media (max-width: variables.$breakpoint - 1) {
+    padding: variables.$gutter;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     padding: $padding;
 
     .card-small & {
@@ -87,11 +92,11 @@ $padding-small: 20px;
 }
 
 .card-footer {
-  @media (max-width: $breakpoint - 1) {
-    padding: $gutter;
+  @media (max-width: variables.$breakpoint - 1) {
+    padding: variables.$gutter;
   }
 
-  @media (min-width: $breakpoint) {
+  @media (min-width: variables.$breakpoint) {
     padding: $padding;
 
     .card-small & {

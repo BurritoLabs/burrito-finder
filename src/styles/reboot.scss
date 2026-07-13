@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "variables";
+
 *,
 *:before,
 *:after {
@@ -5,7 +8,7 @@
 }
 
 html {
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     overflow-x: hidden;
   }
 }
@@ -16,7 +19,7 @@ body {
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   letter-spacing: -0.2px;
-  color: $app-fg;
+  color: variables.$app-fg;
   background: radial-gradient(
       1600px 900px at 12% -20%,
       rgba(255, 255, 255, 0.045),
@@ -32,20 +35,20 @@ body {
   -webkit-tap-highlight-color: transparent;
   word-break: break-word;
 
-  @media (max-width: $breakpoint - 1) {
+  @media (max-width: variables.$breakpoint - 1) {
     overflow-x: hidden;
   }
 }
 
 hr {
-  margin-top: $gutter;
-  margin-bottom: $gutter;
+  margin-top: variables.$gutter;
+  margin-bottom: variables.$gutter;
   border: 0;
-  border-top: 1px solid $line;
+  border-top: 1px solid variables.$line;
 }
 
 a {
-  color: $link-bg;
+  color: variables.$link-bg;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -107,12 +110,12 @@ textarea {
   resize: none;
 
   &::placeholder {
-    color: fade-out($brand, 0.7);
+    color: color.adjust(variables.$brand, $alpha: -0.7);
   }
 
   &:read-only {
-    border-color: $line;
-    background: $line;
+    border-color: variables.$line;
+    background: variables.$line;
   }
 }
 

@@ -1,9 +1,9 @@
-@import "../styles/variables.scss";
+@use "../styles/variables.scss";
 
 .msgBox {
   display: block;
   border-radius: 5px;
-  border: 1px solid $line;
+  border: 1px solid variables.$line;
   margin: 25px 0;
   overflow: auto;
   width: 100%;
@@ -15,7 +15,7 @@
   display: table;
   table-layout: fixed;
   width: 100%;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     display: flex;
     flex-direction: column;
   }
@@ -42,7 +42,7 @@
 
 .events {
   margin-bottom: 20px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     tr,
     th,
     td {
@@ -57,7 +57,7 @@
 .eventType {
   font-weight: normal;
   font-size: 16px;
-  @media (max-width: $breakpoint) {
+  @media (max-width: variables.$breakpoint) {
     margin-top: 20px;
     font-weight: 500;
   }
@@ -87,7 +87,7 @@
 }
 
 .show {
-  border-bottom: 1px solid $line;
+  border-bottom: 1px solid variables.$line;
 }
 
 .button {
@@ -95,6 +95,6 @@
   align-items: center;
   font-weight: 500;
   font-size: 14px;
-  color: $brand;
+  color: variables.$brand;
   padding: 20px 0;
 }
