@@ -7,7 +7,7 @@ const collectRuntimeErrors = (page: Page) => {
   page.on("console", message => {
     if (
       message.type() === "error" &&
-      /(?:uncaught|typeerror|referenceerror|value is undefined|cannot read)/i.test(
+      /(?:uncaught|typeerror|referenceerror|value is undefined|cannot read|refused to (?:load|connect|execute|apply|frame))/i.test(
         message.text()
       )
     ) {
