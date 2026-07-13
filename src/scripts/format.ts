@@ -4,11 +4,14 @@ import { DateTime } from "luxon";
 const formatDecimal = (number: BigNumber.Value): string =>
   new BigNumber(number).decimalPlaces(6, BigNumber.ROUND_DOWN).toFixed(6);
 
-const formatAmount = (amount: BigNumber.Value, decimals = 6): string =>
-  new BigNumber(amount)
+const formatAmount = (amount: BigNumber.Value, decimals = 6): string => {
+  const value = new BigNumber(amount);
+  if (!value.isFinite()) return "0.000000";
+  return value
     .div(new BigNumber(10).pow(decimals))
     .decimalPlaces(6, BigNumber.ROUND_DOWN)
     .toFormat(6);
+};
 
 const formatDenom = (denom: string, isClassic?: boolean): string => {
   if (!denom) {

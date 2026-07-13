@@ -1,3 +1,5 @@
+import { runtimeEnv } from "./config/runtimeEnv";
+
 export type ClientErrorKind =
   | "error"
   | "unhandledrejection"
@@ -10,7 +12,7 @@ type ErrorContext = {
 };
 
 const API_BASE = (
-  process.env.REACT_APP_BURRITO_API_URL?.trim() || "https://api.burrito.money"
+  runtimeEnv.burritoApiUrl || "https://api.burrito.money"
 ).replace(/\/$/, "");
 const REPORT_URL = `${API_BASE}/v1/finder/client-errors`;
 const recentReports = new Map<string, number>();
@@ -28,7 +30,7 @@ const asError = (value: unknown) => {
 
 const reportingEnabled = () =>
   window.location.hostname === "finder.burrito.money" ||
-  process.env.REACT_APP_CLIENT_ERROR_REPORTING === "true";
+  runtimeEnv.clientErrorReporting === "true";
 
 export const reportClientError = (
   kind: ClientErrorKind,

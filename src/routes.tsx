@@ -1,14 +1,19 @@
-import React from "react";
+import React, { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
-import Index from "./pages/Index/Index";
-import Block from "./pages/Block";
-import Tx from "./pages/Tx";
-import Address from "./pages/Account/Address";
-import Validator from "./pages/Validator";
-import NotFound from "./components/NotFound";
-import { Privacy, Terms } from "./pages/Legal/Legal";
+const Index = lazy(() => import("./pages/Index/Index"));
+const Block = lazy(() => import("./pages/Block"));
+const Tx = lazy(() => import("./pages/Tx"));
+const Address = lazy(() => import("./pages/Account/Address"));
+const Validator = lazy(() => import("./pages/Validator"));
+const NotFound = lazy(() => import("./components/NotFound"));
+const Privacy = lazy(() =>
+  import("./pages/Legal/Legal").then(module => ({ default: module.Privacy }))
+);
+const Terms = lazy(() =>
+  import("./pages/Legal/Legal").then(module => ({ default: module.Terms }))
+);
 
-export default (
+const AppRoutes = () => (
   <Routes>
     <Route index element={<Index />} />
     <Route path="blocks/:height" element={<Block />} />
@@ -24,3 +29,5 @@ export default (
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
+
+export default AppRoutes;

@@ -1,9 +1,10 @@
 import axios from "axios";
+import { runtimeEnv } from "../config/runtimeEnv";
 
 const DEFAULT_BURRITO_API_URL = "https://api.burrito.money";
 
 export const BURRITO_API_URL = (
-  process.env.REACT_APP_BURRITO_API_URL?.trim() || DEFAULT_BURRITO_API_URL
+  runtimeEnv.burritoApiUrl || DEFAULT_BURRITO_API_URL
 ).replace(/\/$/, "");
 
 export const MINTSCAN_PROXY_URL = `${BURRITO_API_URL}/v1/finder/mintscan`;

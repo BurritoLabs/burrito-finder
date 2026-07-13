@@ -1,14 +1,16 @@
-import "react-app-polyfill/stable";
 import "core-js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { RecoilRoot } from "recoil";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./index.scss";
 import App from "./layouts/App";
-import * as serviceWorker from "./serviceWorker";
-import { getChains, ChainsProvider } from "./contexts/ChainsContext";
+import {
+  getChains,
+  getInitialChains,
+  ChainsProvider
+} from "./contexts/ChainsContext";
 import { installGlobalErrorReporting } from "./reportError";
 
 const queryClient = new QueryClient({
@@ -24,11 +26,20 @@ const queryClient = new QueryClient({
 
 installGlobalErrorReporting();
 
-getChains().then(chains => {
-  const container = document.getElementById("root");
-  if (!container) throw new Error("Root element is missing");
+const Root = () => {
+  const [chains, setChains] = useState(getInitialChains);
 
-  createRoot(container).render(
+  useEffect(() => {
+    let mounted = true;
+    void getChains().then(next => {
+      if (mounted) setChains(next);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  return (
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
@@ -44,9 +55,8 @@ getChains().then(chains => {
       </RecoilRoot>
     </BrowserRouter>
   );
-});
+};
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const container = document.getElementById("root");
+if (!container) throw new Error("Root element is missing");
+createRoot(container).render(<Root />);

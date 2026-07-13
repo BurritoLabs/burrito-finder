@@ -17,6 +17,23 @@ const collectRuntimeErrors = (page: Page) => {
   return errors;
 };
 
+test("bundled chain config keeps the Finder available when the registry is down", async ({
+  page
+}) => {
+  await page.route("https://assets.terra.dev/chains.json", route =>
+    route.abort()
+  );
+  await page.goto("/classic");
+  const searchboxes = page.getByRole("searchbox", {
+    name: "Search Block / Tx / Account"
+  });
+  await expect(searchboxes).toHaveCount(2);
+  await expect(searchboxes.first()).toBeVisible();
+  const networkButtons = page.getByRole("button", { name: /classic/ });
+  await expect(networkButtons).toHaveCount(2);
+  await expect(networkButtons.first()).toBeVisible();
+});
+
 test("Classic validator resolves IBC labels without runtime errors", async ({
   page
 }) => {
@@ -26,7 +43,8 @@ test("Classic validator resolves IBC labels without runtime errors", async ({
   );
 
   await expect(page.getByText("BNB (channel-19)")).toBeVisible();
-  await expect(page.getByText(/IBC 077EE5/)).toBeVisible();
+  await expect(page.getByText("WHALE (channel-84)")).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("IBC 077EE5");
   await expect(page.locator("body")).not.toContainText("Value is undefined");
   expect(errors).toEqual([]);
 });
@@ -40,7 +58,22 @@ test("Phoenix account resolves CW20 and IBC assets", async ({ page }) => {
   for (const symbol of ["arbLUNA", "axlUSDC", "KAVA", "USK"]) {
     await expect(page.getByText(symbol, { exact: true })).toBeVisible();
   }
+  await expect(page.locator("body")).not.toContainText("NaN");
   expect(errors).toEqual([]);
+});
+
+test("Finder data API publishes runtime health metrics", async ({
+  request
+}) => {
+  const response = await request.get(
+    "https://api.burrito.money/v1/finder/status"
+  );
+  expect(response.ok()).toBeTruthy();
+  const status = await response.json();
+  expect(status.state).toMatch(/^(ok|degraded)$/);
+  expect(typeof status.latencyP95Ms).toBe("number");
+  expect(typeof status.cacheHitRate).toBe("number");
+  expect(typeof status.tokenMisses).toBe("number");
 });
 
 test("Phoenix transaction renders canonical actions", async ({ page }) => {

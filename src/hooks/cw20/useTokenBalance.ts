@@ -12,6 +12,7 @@ import {
   axiosGetWithEndpointFallback,
   getLcdFallbackBases
 } from "../../queries/endpointFallback";
+import { fetchFinderAccountAssets } from "../../queries/finderAssets";
 
 export interface Token {
   icon?: string;
@@ -88,6 +89,9 @@ const useTokenBalance = (
   address: string
 ): { loading: boolean; whitelist?: Tokens; list?: TokenBalance[] } => {
   const [result, setResult] = useState<Dictionary<string>>();
+  const [resolvedMetadata, setResolvedMetadata] = useState<
+    Dictionary<Partial<Token>>
+  >({});
 
   const isClassic = useIsClassic();
   const { data: launchpadContracts = [] } = useLaunchpadCw20Contracts();
@@ -131,6 +135,7 @@ const useTokenBalance = (
       const load = async () => {
         try {
           setResult(undefined);
+          setResolvedMetadata({});
           if (typeof window !== "undefined") {
             const cached = window.localStorage.getItem(cacheKey);
             if (cached) {
@@ -165,8 +170,32 @@ const useTokenBalance = (
           const entries = Object.entries(mergedWhitelist).filter(
             ([contract]) => !invalidContracts[contract]
           );
-          const chunkSize = 49;
-          const chunks = chunkEntries(entries, chunkSize);
+          const graphUri = isClassic ? undefined : hive ?? mantle;
+          let parsed: Dictionary<string> = {};
+
+          try {
+            const aggregate = await fetchFinderAccountAssets({
+              network: isClassic ? "classic" : "mainnet",
+              address,
+              contracts: entries.map(([contract]) => contract)
+            });
+            const metadata: Dictionary<Partial<Token>> = {};
+            aggregate.cw20.forEach(asset => {
+              if (asset.status !== "ok") return;
+              if (asset.balance !== undefined) {
+                parsed[asset.contract] = asset.balance;
+              }
+              if (asset.metadata) metadata[asset.contract] = asset.metadata;
+            });
+            setResolvedMetadata(metadata);
+          } catch {
+            // The existing graph/LCD path below remains the client fallback.
+          }
+
+          const graphEntries = entries.filter(
+            ([contract]) => parsed[contract] === undefined
+          );
+          const chunks = chunkEntries(graphEntries, 49);
           const queries = chunks.map(chunk =>
             alias(
               chunk.map(([key]) => ({
@@ -178,10 +207,7 @@ const useTokenBalance = (
             )
           );
 
-          const graphUri = isClassic ? undefined : hive ?? mantle;
-          let parsed: Dictionary<string> = {};
-
-          if (graphUri) {
+          if (graphUri && queries.length) {
             const client = new ApolloClient({
               link: new HttpLink({ uri: graphUri }),
               cache: new InMemoryCache()
@@ -229,7 +255,7 @@ const useTokenBalance = (
               {}
             );
 
-            parsed = parseResult(merged, isClassic);
+            parsed = { ...parsed, ...parseResult(merged, isClassic) };
           }
 
           const missingBalanceEntries = entries.filter(
@@ -306,6 +332,7 @@ const useTokenBalance = (
       mergedWhitelist &&
       Object.entries(result).map(([token, balance]) => ({
         ...mergedWhitelist[token],
+        ...(resolvedMetadata[token] ?? {}),
         balance,
         address: token
       }))

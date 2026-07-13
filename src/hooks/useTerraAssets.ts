@@ -10,6 +10,11 @@ import {
   getLcdFallbackBases
 } from "../queries/endpointFallback";
 import { fetchMintscanAssets, fetchMintscanCw20 } from "../queries/mintscan";
+import {
+  fetchFinderAccountAssets,
+  proxyAssetIcon
+} from "../queries/finderAssets";
+import { runtimeEnv } from "../config/runtimeEnv";
 
 const fetchAsset = async <T>(path: string) => {
   try {
@@ -99,8 +104,7 @@ const LOCAL_CW20_TOKEN_OVERRIDES: Record<string, Partial<Whitelist>> = {
     icon: "/system/do-cookie.jpg"
   }
 };
-const LAUNCHPAD_REGISTRY_ADDRESS =
-  process.env.REACT_APP_LAUNCHPAD_REGISTRY_ADDRESS?.trim();
+const LAUNCHPAD_REGISTRY_ADDRESS = runtimeEnv.launchpadRegistryAddress;
 const isLaunchRegistryConfigured = Boolean(LAUNCHPAD_REGISTRY_ADDRESS);
 
 const CW20_TOKEN_INFO_CACHE_TTL = 24 * 60 * 60 * 1000;
@@ -131,8 +135,8 @@ const safeIcon = (value?: string) => {
   if (trimmed.startsWith("/") || trimmed.startsWith("data:image/")) {
     return trimmed;
   }
-  if (!/^https?:\/\//i.test(trimmed)) return undefined;
-  return trimmed;
+  if (!/^https:\/\//i.test(trimmed)) return undefined;
+  return proxyAssetIcon(trimmed);
 };
 
 const parseDecimals = (value: number | string | undefined) => {
@@ -470,9 +474,16 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
       },
       {}
     );
+    const terraIbc = pickChainAssets(data, chain.name, chain.chainID) ?? {};
+    const normalizedTerraIbc = Object.fromEntries(
+      Object.entries(terraIbc).map(([hash, token]) => [
+        hash,
+        { ...token, icon: safeIcon(token.icon) }
+      ])
+    );
     return {
       ...mintscanIbc,
-      ...(pickChainAssets(data, chain.name, chain.chainID) ?? {})
+      ...normalizedTerraIbc
     };
   }, [chain.chainID, chain.name, data, mintscanAssets]);
   const hashes = Array.from(
@@ -488,19 +499,59 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   const { data: resolved } = useQuery(
     ["IBCWhitelistResolved", lcd, missingHashes.join(",")],
     async () => {
-      const entries = await Promise.all(
-        missingHashes.map(async hash => {
-          const token = await fetchIbcTraceToken(lcd, hash, fallbackBases);
-          return token ? ([hash, token] as const) : undefined;
-        })
+      const entries: [string, IBCWhitelist][] = [];
+      try {
+        const aggregate = await fetchFinderAccountAssets({
+          network: isClassic ? "classic" : "mainnet",
+          ibcDenoms: missingHashes.map(hash => `ibc/${hash}`)
+        });
+        aggregate.ibc.forEach(asset => {
+          if (asset.status !== "ok" || !asset.metadata) return;
+          entries.push([
+            asset.hash,
+            {
+              denom: asset.metadata.denom,
+              path: asset.metadata.path,
+              base_denom: asset.metadata.baseDenom,
+              symbol: asset.metadata.symbol,
+              name: asset.metadata.name,
+              icon: asset.metadata.icon,
+              decimals: asset.metadata.decimals
+            }
+          ]);
+        });
+      } catch {
+        // Per-denom LCD fallback below handles API outages.
+      }
+
+      const resolvedHashes = new Set(entries.map(([hash]) => hash));
+      const unresolved = missingHashes.filter(
+        hash => !resolvedHashes.has(hash)
       );
-      return Object.fromEntries(
-        entries.filter(Boolean) as [string, IBCWhitelist][]
+      let index = 0;
+      const workers = Array.from(
+        { length: Math.min(4, unresolved.length) },
+        async () => {
+          while (index < unresolved.length) {
+            const current = index;
+            index += 1;
+            const hash = unresolved[current];
+            try {
+              const token = await fetchIbcTraceToken(lcd, hash, fallbackBases);
+              if (token) entries.push([hash, token]);
+            } catch {
+              // Keep unresolved IBC assets readable through the UI fallback.
+            }
+          }
+        }
       );
+      await Promise.all(workers);
+      return Object.fromEntries(entries);
     },
     {
-      enabled: missingHashes.length > 0 && !isClassic,
-      staleTime: 24 * 60 * 60 * 1000
+      enabled: missingHashes.length > 0,
+      staleTime: 24 * 60 * 60 * 1000,
+      retry: false
     }
   );
 
@@ -590,9 +641,16 @@ export const useWhitelist = (contracts?: string[]) => {
       },
       {}
     );
+    const terraTokens = pickChainAssets(data, name, chainID) ?? {};
+    const normalizedTerraTokens = Object.fromEntries(
+      Object.entries(terraTokens).map(([address, token]) => [
+        address,
+        { ...token, icon: safeIcon(token.icon) }
+      ])
+    );
     return {
       ...mintscanTokens,
-      ...(pickChainAssets(data, name, chainID) ?? {}),
+      ...normalizedTerraTokens,
       ...(hexxagonTokens ?? {})
     };
   }, [chainID, data, hexxagonTokens, mintscanCw20, name]);

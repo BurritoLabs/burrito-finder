@@ -9,7 +9,7 @@ import ValidatorStatus from "../../components/ValidatorStatus";
 import { useTerraValidator } from "../../queries/TerraAPI";
 import s from "./Header.module.scss";
 
-import { ReactComponent as Terra } from "../../Terra.svg";
+import Terra from "../../Terra.svg?react";
 import {
   useValidator,
   useSelfDelegationAmount,

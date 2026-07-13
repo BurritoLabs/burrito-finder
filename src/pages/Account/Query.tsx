@@ -1,7 +1,6 @@
 import React, { FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
-import "ace-builds";
-import "ace-builds/webpack-resolver";
+import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-tomorrow_night";
 import AceEditor from "react-ace";
