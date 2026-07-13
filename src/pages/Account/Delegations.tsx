@@ -51,7 +51,7 @@ const Delegations = ({ address }: { address: string }) => {
       const orderedRewards = filteredRewards?.sort((a, b) => {
         const aAmount = new BigNumber(a.amount.toString());
         const bAmount = new BigNumber(b.amount.toString());
-        return bAmount.comparedTo(aAmount);
+        return bAmount.comparedTo(aAmount) ?? 0;
       });
 
       return [

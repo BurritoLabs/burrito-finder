@@ -135,7 +135,7 @@ const TokenBalance = ({ address }: { address: string }) => {
                 if (!hideLowValueTokens) return true;
                 return item.value.gte(0.01);
               })
-              .sort((a, b) => b.value.comparedTo(a.value))
+              .sort((a, b) => b.value.comparedTo(a.value) ?? 0)
               .map(item =>
                 item.type === "ibc" ? (
                   <Available

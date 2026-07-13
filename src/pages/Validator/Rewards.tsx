@@ -42,10 +42,11 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
           <tbody>
             {list
               .slice()
-              .sort((a, b) =>
-                new BigNumber(b.amount.toString()).comparedTo(
-                  a.amount.toString()
-                )
+              .sort(
+                (a, b) =>
+                  new BigNumber(b.amount.toString()).comparedTo(
+                    a.amount.toString()
+                  ) ?? 0
               )
               .map(({ denom, amount }, index) => {
                 const isIbc = isIbcDenom(denom);
