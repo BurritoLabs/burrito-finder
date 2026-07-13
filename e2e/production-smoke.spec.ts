@@ -1,15 +1,20 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-const collectRuntimeErrors = (page: Page) => {
+const collectRuntimeErrors = (
+  page: Page,
+  { includeNetworkErrors = false }: { includeNetworkErrors?: boolean } = {}
+) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("console", message => {
     if (
       message.type() === "error" &&
-      /(?:uncaught|typeerror|referenceerror|axioserror: network error|value is undefined|cannot read|refused to (?:load|connect|execute|apply|frame))/i.test(
+      (/(?:uncaught|typeerror|referenceerror|value is undefined|cannot read|refused to (?:load|connect|execute|apply|frame))/i.test(
         message.text()
-      )
+      ) ||
+        (includeNetworkErrors &&
+          /axioserror: network error/i.test(message.text())))
     ) {
       errors.push(message.text());
     }
@@ -80,7 +85,7 @@ test("Phoenix CW20 balances survive aggregate API failure", async ({
 });
 
 test("Phoenix account tolerates unavailable price feeds", async ({ page }) => {
-  const errors = collectRuntimeErrors(page);
+  const errors = collectRuntimeErrors(page, { includeNetworkErrors: true });
   await page.route("https://api.coingecko.com/**", route => route.abort());
   await page.route("https://api.coinpaprika.com/**", route => route.abort());
   await page.route("https://open.er-api.com/**", route => route.abort());
