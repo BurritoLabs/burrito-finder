@@ -2,7 +2,7 @@ import { Component, ReactNode } from "react";
 
 const OOPS = "Oops! Something went wrong.";
 
-type Props = { fallback?: ReactNode };
+type Props = { fallback?: ReactNode; children?: ReactNode };
 class ErrorBoundary extends Component<Props> {
   state = { hasError: null };
   static getDerivedStateFromError = () => ({ hasError: true });

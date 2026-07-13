@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import React, { FC, ReactNode } from "react";
 import c from "classnames";
 
 interface Props {
   wrapperClassName?: string;
   className?: string;
+  children?: ReactNode;
 }
 
 const Table: FC<Props> = ({ wrapperClassName, className, children }) => (

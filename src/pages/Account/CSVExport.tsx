@@ -27,7 +27,7 @@ import {
 } from "../../hooks/useTerraAssets";
 import { useLogfinderAmountRuleSet } from "../../hooks/useLogfinder";
 import { renderDenom } from "../../components/Amount";
-import { transformTx } from "../Tx/transform";
+import { toLogFinderTransaction, transformTx } from "../Tx/transform";
 
 interface CSV {
   timestamp: string;
@@ -377,7 +377,7 @@ const CsvExport = ({ address }: { address: string }) => {
       txs.forEach(tx => {
         const transaction = transformTx(tx, network);
         const matchedLogs = getTxAmounts(
-          JSON.stringify(transaction),
+          toLogFinderTransaction(transaction),
           logMatcher,
           address
         );

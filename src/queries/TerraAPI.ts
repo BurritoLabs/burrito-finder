@@ -12,7 +12,7 @@ export const useTerraAPIURL = (network?: string) => {
   const { name } = useCurrentChain();
   return {
     mainnet: "https://phoenix-api.terra.dev",
-    classic: "https://api.terra.dev",
+    classic: undefined,
     testnet: "https://pisco-api.terra.dev"
   }[network ?? name];
 };

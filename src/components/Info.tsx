@@ -2,7 +2,7 @@ import React, { FC, ReactNode } from "react";
 import Icon from "./Icon";
 import s from "./Info.module.scss";
 
-type Props = { icon: string | ReactNode; title: string };
+type Props = { icon: string | ReactNode; title: string; children?: ReactNode };
 
 const Info: FC<Props> = ({ icon, title, children }) => (
   <article className={s.component}>

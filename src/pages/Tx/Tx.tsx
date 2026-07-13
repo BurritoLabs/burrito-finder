@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { get, last } from "lodash";
 import c from "classnames";
 import {
-  getTxAllCanonicalMsgs,
+  getTxCanonicalMsgs,
   createLogMatcherForActions
 } from "@terra-money/log-finder-ruleset";
 import { TxInfo } from "@terra-money/terra.js";
@@ -22,7 +22,7 @@ import Pending from "./Pending";
 import Searching from "./Searching";
 import TxAmount from "./TxAmount";
 import TaxRateAmount from "./TaxRateAmount";
-import { transformTx } from "./transform";
+import { toLogFinderTransaction, transformTx } from "./transform";
 import s from "./Tx.module.scss";
 import { useIsClassic } from "../../contexts/ChainsContext";
 import {
@@ -47,7 +47,7 @@ const TxComponent = ({ hash }: { hash: string }) => {
   const tx = transformTx(response, chainID);
 
   const isPending = !response?.height;
-  const matchedMsg = getTxAllCanonicalMsgs(JSON.stringify(tx), logMatcher);
+  const matchedMsg = getTxCanonicalMsgs(toLogFinderTransaction(tx), logMatcher);
 
   const fee: Amount[] = get(tx, "tx.value.fee.amount");
 

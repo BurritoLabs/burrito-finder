@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { intervalToDuration } from "date-fns";
-import { CircularProgress } from "@material-ui/core";
+import CircularProgress from "@mui/material/CircularProgress";
 import classNames from "classnames";
 import { ReactComponent as Icon } from "../../images/Queued.svg";
 import styles from "./Pending.module.scss";

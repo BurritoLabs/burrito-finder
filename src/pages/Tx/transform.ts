@@ -74,6 +74,38 @@ export const transformTx = (tx: any, network: string): TxResponse => {
   }
 };
 
+export const toLogFinderTransaction = (tx: TxResponse) => ({
+  ...tx,
+  height: Number(tx.height),
+  gas_wanted: Number(tx.gas_wanted),
+  gas_used: Number(tx.gas_used),
+  timestamp: tx.timestamp.toString(),
+  logs: tx.logs?.map(log => ({
+    ...log,
+    msg_index: Number(log.msg_index),
+    log: typeof log.log === "string" ? log.log : JSON.stringify(log.log),
+    events: log.events.map(event => ({
+      ...event,
+      attributes: event.attributes.map(attribute => ({
+        key: attribute.key ?? "",
+        value: attribute.value ?? ""
+      }))
+    }))
+  })),
+  tx: {
+    body: {
+      messages: (tx.tx.value?.msg ?? []).map(msg => ({
+        "@type": `/${msg.type.split("/").at(-1) ?? msg.type}`,
+        ...msg.value
+      })),
+      memo: tx.tx.value?.memo
+    },
+    auth_info: {
+      fee: tx.tx.value?.fee
+    }
+  }
+});
+
 const convertProtoType = (protoType: string): string => {
   // '/terra.oracle.v1beta1.MsgAggregateExchangeRatePrevote' ->
   // [ 'terra', 'oracle', 'v1beta1', 'MsgAggregateExchangeRatePrevote' ]

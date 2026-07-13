@@ -9,7 +9,7 @@ Finder is derived from the [Cosmos Explorer](https://github.com/cosmos/explorer)
 ## Project setup
 
 ```
-**NOTE: Make sure you are using Node 16**
+**NOTE: Make sure you are using Node 22**
 ```
 ```
 npm install

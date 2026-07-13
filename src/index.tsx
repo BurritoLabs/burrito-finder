@@ -1,7 +1,7 @@
-import "react-app-polyfill/ie9";
+import "react-app-polyfill/stable";
 import "core-js";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { RecoilRoot } from "recoil";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -22,8 +22,13 @@ const queryClient = new QueryClient({
 });
 
 getChains().then(chains => {
-  ReactDOM.render(
-    <BrowserRouter>
+  const container = document.getElementById("root");
+  if (!container) throw new Error("Root element is missing");
+
+  createRoot(container).render(
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <RecoilRoot>
         <QueryClientProvider client={queryClient}>
           <ChainsProvider value={chains}>
@@ -34,8 +39,7 @@ getChains().then(chains => {
           </ChainsProvider>
         </QueryClientProvider>
       </RecoilRoot>
-    </BrowserRouter>,
-    document.getElementById("root")
+    </BrowserRouter>
   );
 });
 

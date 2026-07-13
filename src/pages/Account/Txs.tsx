@@ -25,7 +25,7 @@ import { useLogfinderAmountRuleSet } from "../../hooks/useLogfinder";
 import useRequest from "../../hooks/useRequest";
 import { useGetQueryURL } from "../../queries/query";
 import TxAmount from "../Tx/TxAmount";
-import { transformTx } from "../Tx/transform";
+import { toLogFinderTransaction, transformTx } from "../Tx/transform";
 import TaxRateAmount from "../Tx/TaxRateAmount";
 import CsvExport from "./CSVExport";
 import s from "./Txs.module.scss";
@@ -376,7 +376,7 @@ const Txs = ({
     return visibleTxs.map((tx: any) => {
       const txData: TxResponse = transformTx(tx, chainID);
       const matchedLogs = getTxAmounts(
-        JSON.stringify(txData),
+        toLogFinderTransaction(txData),
         logMatcher,
         address
       );

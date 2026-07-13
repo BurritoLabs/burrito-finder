@@ -1,9 +1,13 @@
-import React, { FC } from "react";
+import React, { FC, ReactNode } from "react";
 import c from "classnames";
 import Tooltip, { Props as TooltipProps } from "./Tooltip";
 import s from "./Pop.module.scss";
 
-type Props = { className?: string; tooltip: TooltipProps };
+type Props = {
+  className?: string;
+  tooltip: TooltipProps;
+  children?: ReactNode;
+};
 
 const Pop: FC<Props> = ({ className, tooltip, children }) => (
   <div className={c(s.container, className)}>

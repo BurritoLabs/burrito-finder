@@ -12,8 +12,12 @@ import {
 import { fetchMintscanAssets, fetchMintscanCw20 } from "../queries/mintscan";
 
 const fetchAsset = async <T>(path: string) => {
-  const { data } = await axios.get<T>(`https://assets.terra.dev/${path}`);
-  return data;
+  try {
+    const { data } = await axios.get<T>(`https://assets.terra.dev/${path}`);
+    return data;
+  } catch {
+    return {} as T;
+  }
 };
 
 const useTerraAssets = <T = any>(path: string) =>

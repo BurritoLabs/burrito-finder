@@ -1,4 +1,4 @@
-import { CircularProgress } from "@material-ui/core";
+import CircularProgress from "@mui/material/CircularProgress";
 import { format } from "date-fns";
 import c from "classnames/bind";
 import { percent } from "../../scripts/math";

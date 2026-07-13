@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dictionary } from "ramda";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import alias from "./alias";
 import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
 import {
@@ -183,7 +183,7 @@ const useTokenBalance = (
 
           if (graphUri) {
             const client = new ApolloClient({
-              uri: graphUri,
+              link: new HttpLink({ uri: graphUri }),
               cache: new InMemoryCache()
             });
 
