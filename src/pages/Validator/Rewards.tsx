@@ -81,8 +81,8 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                   ...(isMainnetLuna
                     ? []
                     : [
-                        `${ASSET_URL}/icon/60/${iconDenom}.png`,
                         `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
+                        `${ASSET_URL}/icon/60/${iconDenom}.png`,
                         `${ASSET_URL}/icon/60/${String(
                           iconDenom
                         ).toLowerCase()}.png`
