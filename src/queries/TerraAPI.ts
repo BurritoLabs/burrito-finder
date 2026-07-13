@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import BigNumber from "bignumber.js";
 import { OracleParams, ValAddress } from "@terra-money/terra.js";
@@ -27,15 +27,18 @@ export const useTerraAPI = <T>(path: string, params?: object, fallback?: T) => {
   const available = useIsTerraAPIAvailable();
   const shouldFallback = !available && fallback;
 
-  return useQuery<T, AxiosError>(
-    ["terraAPI", baseURL, path, params],
-    async () => {
+  return useQuery({
+    queryKey: ["terraAPI", baseURL, path, params],
+
+    queryFn: async () => {
       if (shouldFallback) return fallback;
       const { data } = await axios.get(path, { baseURL, params });
       return data;
     },
-    { ...RefetchOptions.INFINITY, enabled: !!(baseURL || shouldFallback) }
-  );
+
+    ...RefetchOptions.INFINITY,
+    enabled: !!(baseURL || shouldFallback)
+  });
 };
 
 export const useTerraValidator = (address: ValAddress) => {

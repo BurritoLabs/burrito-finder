@@ -29,7 +29,7 @@ import { toLogFinderTransaction, transformTx } from "../Tx/transform";
 import TaxRateAmount from "../Tx/TaxRateAmount";
 import CsvExport from "./CSVExport";
 import s from "./Txs.module.scss";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import apiClient from "../../apiClient";
 import {
   MINTSCAN_PROXY_URL,
@@ -130,13 +130,10 @@ const Txs = ({
   const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
   const mintscanCursor = mintscanCursors[offset];
-  const { data: lcdData, isLoading: lcdLoading } = useQuery<{
-    next?: number;
-    txs: TxInfo[];
-    searchAfter?: string;
-  }>(
-    ["phoenix-txs", lcd, address, offset, mintscanCursor],
-    async () => {
+  const { data: lcdData, isLoading: lcdLoading } = useQuery({
+    queryKey: ["phoenix-txs", lcd, address, offset, mintscanCursor],
+
+    queryFn: async () => {
       try {
         const { data: mintscanData } = await apiClient.get<{
           transactions?: any[];
@@ -215,29 +212,15 @@ const Txs = ({
 
       return { txs, next };
     },
-    {
-      enabled: shouldUseLcd,
-      staleTime: 1000 * 60,
-      cacheTime: 1000 * 60,
-      onSuccess: result => {
-        if (result?.next && result.searchAfter) {
-          setMintscanCursors(previous =>
-            previous[result.next as number] === result.searchAfter
-              ? previous
-              : { ...previous, [result.next as number]: result.searchAfter }
-          );
-        }
-      }
-    }
-  );
+
+    enabled: shouldUseLcd,
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60
+  });
 
   const { data: classicContractData, isLoading: classicContractLoading } =
-    useQuery<{
-      next?: number;
-      txs: TxInfo[];
-      total?: number;
-    }>(
-      [
+    useQuery({
+      queryKey: [
         "classic-contract-txs",
         rpc,
         lcd,
@@ -246,7 +229,8 @@ const Txs = ({
         contractPage,
         contractTotal
       ],
-      async () => {
+
+      queryFn: async () => {
         const payload = {
           jsonrpc: "2.0",
           id: 1,
@@ -287,20 +271,29 @@ const Txs = ({
           total > contractPage * contractLimit ? contractPage + 1 : undefined;
         return { txs, next, total };
       },
-      {
-        enabled: shouldUseClassicContractRpc,
-        staleTime: 1000 * 60,
-        cacheTime: 1000 * 60,
-        onSuccess: result => {
-          if (contractTotal === null) {
-            const inferredTotal = result?.total;
-            if (typeof inferredTotal === "number" && inferredTotal >= 0) {
-              setContractTotal(inferredTotal);
-            }
-          }
-        }
-      }
-    );
+
+      enabled: shouldUseClassicContractRpc,
+      staleTime: 1000 * 60,
+      gcTime: 1000 * 60
+    });
+
+  useEffect(() => {
+    if (lcdData?.next && lcdData.searchAfter) {
+      setMintscanCursors(previous =>
+        previous[lcdData.next as number] === lcdData.searchAfter
+          ? previous
+          : { ...previous, [lcdData.next as number]: lcdData.searchAfter }
+      );
+    }
+  }, [lcdData]);
+
+  useEffect(() => {
+    if (contractTotal !== null) return;
+    const inferredTotal = classicContractData?.total;
+    if (typeof inferredTotal === "number" && inferredTotal >= 0) {
+      setContractTotal(inferredTotal);
+    }
+  }, [classicContractData, contractTotal]);
 
   const [allTxs, setAllTxs] = useState<TxInfo[]>([]);
   const [visibleCount, setVisibleCount] = useState(pageSize);

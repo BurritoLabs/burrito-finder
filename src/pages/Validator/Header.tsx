@@ -40,7 +40,7 @@ const Header = ({ address }: { address: string }) => {
   }, [stakingPool?.bonded_tokens?.amount, validator?.tokens]);
 
   const selfDelegationRate = useMemo(() => {
-    if (!validator?.tokens || selfDelegationAmount === undefined) {
+    if (!validator?.tokens || selfDelegationAmount == null) {
       return undefined;
     }
 
@@ -128,7 +128,7 @@ const Header = ({ address }: { address: string }) => {
             <h1>Self-delegation</h1>
             <p>{renderPercent(selfDelegationRate)}</p>
             <hr />
-            {selfDelegationAmount !== undefined ? (
+            {selfDelegationAmount != null ? (
               <Amount fontSize={14} denom="uluna">
                 {selfDelegationAmount.toString()}
               </Amount>

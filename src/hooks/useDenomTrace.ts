@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useCurrentChain, useIsClassic } from "../contexts/ChainsContext";
 import {
   axiosGetWithEndpointFallback,
@@ -21,9 +21,10 @@ const useDenomTrace = (denom = "") => {
   const hash = denom.replace("ibc/", "");
   const whitelist = useIBCWhitelist(denom ? [denom] : undefined);
   const whitelisted = whitelist?.[hash];
-  const { data } = useQuery(
-    ["denomTrace", hash, lcd],
-    async () => {
+  const { data } = useQuery({
+    queryKey: ["denomTrace", hash, lcd],
+
+    queryFn: async () => {
       const { data } = await axiosGetWithEndpointFallback<IbcTraceResponse>(
         `${lcd}/ibc/apps/transfer/v1/denom_traces/${hash}`,
         {},
@@ -32,11 +33,10 @@ const useDenomTrace = (denom = "") => {
 
       return data.denom_trace;
     },
-    {
-      enabled: isIbcDenom(denom) && !whitelisted && !isClassic,
-      retry: false
-    }
-  );
+
+    enabled: isIbcDenom(denom) && !whitelisted && !isClassic,
+    retry: false
+  });
 
   return whitelisted ?? data;
 };

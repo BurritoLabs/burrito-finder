@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { AccAddress, ValAddress } from "../../libs/address";
 import apiClient from "../../apiClient";
@@ -30,9 +30,10 @@ const Address = () => {
   const isValidAccountAddress = AccAddress.validate(address.trim());
   const { name, lcd } = useCurrentChain();
   const shouldCheckAccount = isValidAccountAddress && !isKnownContractBase;
-  const { data: accountKind, isLoading: isAccountKindLoading } = useQuery(
-    ["addressAccountKind", normalizedAddress, lcd],
-    async () => {
+  const { data: accountKind, isLoading: isAccountKindLoading } = useQuery({
+    queryKey: ["addressAccountKind", normalizedAddress, lcd],
+
+    queryFn: async () => {
       const { status } = await apiClient.get(
         `${lcd}/cosmos/auth/v1beta1/accounts/${normalizedAddress}`,
         { validateStatus: status => status === 200 || status === 404 }
@@ -40,8 +41,10 @@ const Address = () => {
 
       return status === 200 ? "account" : "unknown";
     },
-    { enabled: shouldCheckAccount, retry: false }
-  );
+
+    enabled: shouldCheckAccount,
+    retry: false
+  });
   const dynamicWhitelist = useWhitelist(
     accountKind === "unknown" ? [normalizedAddress] : []
   );

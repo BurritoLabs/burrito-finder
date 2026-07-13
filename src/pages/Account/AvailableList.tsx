@@ -5,7 +5,7 @@ import { useCurrency } from "../../contexts/CurrencyContext";
 import useRequest from "../../hooks/useRequest";
 import { useDenoms } from "../../queries/oracle";
 import { DEFAULT_CURRENCY } from "../../scripts/utility";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import Available from "./Available";
@@ -50,9 +50,10 @@ const AvailableList = ({
   const shouldFetchUstc =
     pricesEnabled && (!cachedUstcTs || Date.now() - cachedUstcTs > PRICE_TTL);
 
-  const { data: ustcPrice } = useQuery(
-    ["coingecko-ustc"],
-    async () => {
+  const { data: ustcPrice } = useQuery({
+    queryKey: ["coingecko-ustc"],
+
+    queryFn: async () => {
       try {
         const { data: result } = await axios.get<{
           terrausd?: { usd?: number };
@@ -77,19 +78,18 @@ const AvailableList = ({
         if (typeof window !== "undefined") {
           window.localStorage.setItem("ustcPriceTs", String(Date.now()));
         }
-        return undefined;
+        return null;
       }
     },
-    {
-      staleTime: PRICE_TTL,
-      cacheTime: PRICE_TTL,
-      retry: false,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      enabled: shouldFetchUstc
-    }
-  );
+
+    staleTime: PRICE_TTL,
+    gcTime: PRICE_TTL,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    enabled: shouldFetchUstc
+  });
 
   const cachedLunaPrice = useMemo(() => {
     if (typeof window === "undefined") return undefined;
@@ -108,9 +108,10 @@ const AvailableList = ({
   const shouldFetchLuna =
     pricesEnabled && (!cachedLunaTs || Date.now() - cachedLunaTs > PRICE_TTL);
 
-  const { data: lunaPrice } = useQuery(
-    ["coingecko-luna"],
-    async () => {
+  const { data: lunaPrice } = useQuery({
+    queryKey: ["coingecko-luna"],
+
+    queryFn: async () => {
       try {
         const { data: result } = await axios.get<{
           terra?: { usd?: number };
@@ -124,19 +125,18 @@ const AvailableList = ({
         if (typeof window !== "undefined") {
           window.localStorage.setItem("lunaPriceTs", String(Date.now()));
         }
-        return undefined;
+        return null;
       }
     },
-    {
-      staleTime: PRICE_TTL,
-      cacheTime: PRICE_TTL,
-      retry: false,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      enabled: shouldFetchLuna
-    }
-  );
+
+    staleTime: PRICE_TTL,
+    gcTime: PRICE_TTL,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    enabled: shouldFetchLuna
+  });
 
   const resolvedUstcPrice = ustcPrice ?? cachedUstcPrice;
 
@@ -176,28 +176,28 @@ const AvailableList = ({
     lunaPrice: resolvedLunaPrice
   };
 
-  const { data: fxRates } = useQuery(
-    ["fx-rates-usd"],
-    async () => {
+  const { data: fxRates } = useQuery({
+    queryKey: ["fx-rates-usd"],
+
+    queryFn: async () => {
       try {
         const { data: result } = await axios.get<{
           rates?: Record<string, number>;
         }>("https://open.er-api.com/v6/latest/USD");
         return result?.rates;
       } catch {
-        return undefined;
+        return null;
       }
     },
-    {
-      staleTime: FX_TTL,
-      cacheTime: FX_TTL,
-      retry: false,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      enabled: pricesEnabled
-    }
-  );
+
+    staleTime: FX_TTL,
+    gcTime: FX_TTL,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    enabled: pricesEnabled
+  });
 
   const fxUsdRates = useMemo(() => {
     if (!fxRates) return undefined;

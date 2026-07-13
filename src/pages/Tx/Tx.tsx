@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { get, last } from "lodash";
 import c from "classnames";
@@ -202,9 +202,10 @@ const usePollTxHash = (txhash: string) => {
   const txURL = useGetQueryURL(`/v1/tx/${txhash}`);
 
   /* query: tx */
-  const txQuery = useQuery(
-    [chainID, txhash, "tx"],
-    async () => {
+  const txQuery = useQuery({
+    queryKey: [chainID, txhash, "tx"],
+
+    queryFn: async () => {
       try {
         const response = await apiClient.get<TxInfo>(txURL);
         if (response.data) return response;
@@ -225,31 +226,27 @@ const usePollTxHash = (txhash: string) => {
 
       throw new Error("Transaction not found");
     },
-    {
-      refetchInterval: INTERVAL,
-      refetchOnWindowFocus: false,
-      enabled: refetchTx,
-      onSuccess: data => data.data && setStored(data.data)
-    }
-  );
+
+    refetchInterval: INTERVAL,
+    refetchOnWindowFocus: false,
+    enabled: refetchTx
+  });
 
   const mempoolURL = useGetQueryURL(`/v1/mempool/${txhash}`);
 
   /* query: mempool tx */
-  const mempoolQuery = useQuery(
-    [chainID, txhash, "mempool"],
-    () => apiClient.get<TxInfo>(mempoolURL),
-    {
-      refetchInterval: INTERVAL,
-      refetchOnWindowFocus: false,
-      enabled: refetchMempool,
-      onSuccess: data => data.data && setStored(data.data)
-    }
-  );
+  const mempoolQuery = useQuery({
+    queryKey: [chainID, txhash, "mempool"],
+    queryFn: () => apiClient.get<TxInfo>(mempoolURL),
+    refetchInterval: INTERVAL,
+    refetchOnWindowFocus: false,
+    enabled: refetchMempool
+  });
 
   // if tx not exists(null or no height), start polling mempool tx
   useEffect(() => {
     if (txQuery.data?.data) {
+      setStored(txQuery.data.data);
       setRefetchTx(false);
       setRefetchMempool(false);
     }
@@ -259,6 +256,7 @@ const usePollTxHash = (txhash: string) => {
     }
 
     if (mempoolQuery.data?.data) {
+      setStored(mempoolQuery.data.data);
       setRefetchMempool(false);
     }
 

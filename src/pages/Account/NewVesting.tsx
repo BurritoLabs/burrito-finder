@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import c from "classnames/bind";
 import Amount from "../../components/Amount";
 import useLCDClient from "../../hooks/useLCD";
@@ -69,9 +69,9 @@ export default NewVesting;
 
 const useLatestBlock = () => {
   const lcd = useLCDClient();
-  return useQuery(
-    ["latestBlock", lcd.config],
-    async () => await lcd.tendermint.blockInfo(),
-    { ...RefetchOptions.DEFAULT }
-  );
+  return useQuery({
+    queryKey: ["latestBlock", lcd.config],
+    queryFn: async () => await lcd.tendermint.blockInfo(),
+    ...RefetchOptions.DEFAULT
+  });
 };

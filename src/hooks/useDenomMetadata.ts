@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useCurrentChain } from "../contexts/ChainsContext";
 import { RefetchOptions } from "../queries/query";
 import {
@@ -26,9 +26,10 @@ const DEFAULT_LIMIT = 1000;
 const useDenomMetadata = (enabled: boolean = true) => {
   const { lcd, chainID } = useCurrentChain();
 
-  const { data } = useQuery(
-    ["denomMetadata", lcd],
-    async () => {
+  const { data } = useQuery({
+    queryKey: ["denomMetadata", lcd],
+
+    queryFn: async () => {
       const { data: response } = await axiosGetWithEndpointFallback<{
         metadatas: DenomMetadata[];
       }>(
@@ -46,8 +47,11 @@ const useDenomMetadata = (enabled: boolean = true) => {
 
       return map;
     },
-    { ...RefetchOptions.INFINITY, enabled, staleTime: 60 * 60 * 1000 }
-  );
+
+    ...RefetchOptions.INFINITY,
+    enabled,
+    staleTime: 60 * 60 * 1000
+  });
 
   return data;
 };

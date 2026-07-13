@@ -1,5 +1,5 @@
 import { Coin, Coins } from "@terra-money/terra.js";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import useLCDClient from "../hooks/useLCD";
 import useRequest from "../hooks/useRequest";
 import { RefetchOptions } from "./query";
@@ -18,10 +18,10 @@ export const useRewards = (address: string) => {
 
 export const useCommission = (address: string) => {
   const lcd = useLCDClient();
-  const { data } = useQuery(
-    ["Commission", lcd.config],
-    async () => await lcd.distribution.validatorCommission(address)
-  );
+  const { data } = useQuery({
+    queryKey: ["Commission", lcd.config],
+    queryFn: async () => await lcd.distribution.validatorCommission(address)
+  });
 
   return data;
 };
@@ -31,12 +31,14 @@ export const useCommission = (address: string) => {
 export const useStakingRewards = (address: string) => {
   const lcd = useLCDClient();
 
-  return useQuery(
-    ["stakingRewards", lcd.config, address],
-    async () => {
+  return useQuery({
+    queryKey: ["stakingRewards", lcd.config, address],
+
+    queryFn: async () => {
       if (!address) return { total: new Coins(), rewards: {} };
       return await lcd.distribution.rewards(address);
     },
-    { ...RefetchOptions.INFINITY }
-  );
+
+    ...RefetchOptions.INFINITY
+  });
 };

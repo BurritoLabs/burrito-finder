@@ -1,5 +1,5 @@
 import React from "react";
-import { useIsFetching } from "react-query";
+import { useIsFetching } from "@tanstack/react-query";
 import s from "./Loading.module.scss";
 
 const Loading = ({ global }: { global?: boolean }) => {

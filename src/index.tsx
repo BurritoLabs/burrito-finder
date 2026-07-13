@@ -2,7 +2,7 @@ import "core-js";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.scss";
 import App from "./layouts/App";
 import {
@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: false,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 5 * 60 * 1000
+      gcTime: 5 * 60 * 1000
     }
   }
 });

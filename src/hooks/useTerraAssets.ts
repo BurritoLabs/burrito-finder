@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dictionary } from "lodash";
 import { useCurrentChain } from "../contexts/ChainsContext";
@@ -26,7 +26,10 @@ const fetchAsset = async <T>(path: string) => {
 };
 
 const useTerraAssets = <T = any>(path: string) =>
-  useQuery([path, "terraAssets"], () => fetchAsset<T>(path));
+  useQuery({
+    queryKey: [path, "terraAssets"],
+    queryFn: () => fetchAsset<T>(path)
+  });
 
 export default useTerraAssets;
 
@@ -397,9 +400,15 @@ export const useLaunchpadCw20Contracts = () => {
   const { lcd, chainID } = useCurrentChain();
   const isClassic = chainID.startsWith("columbus");
 
-  return useQuery(
-    ["launchpad-cw20-contracts", lcd, chainID, LAUNCHPAD_REGISTRY_ADDRESS],
-    async () => {
+  return useQuery({
+    queryKey: [
+      "launchpad-cw20-contracts",
+      lcd,
+      chainID,
+      LAUNCHPAD_REGISTRY_ADDRESS
+    ],
+
+    queryFn: async () => {
       if (!LAUNCHPAD_REGISTRY_ADDRESS || !isClassic) return [];
       const contracts = new Set<string>();
       const limit = 100;
@@ -428,11 +437,10 @@ export const useLaunchpadCw20Contracts = () => {
 
       return Array.from(contracts);
     },
-    {
-      enabled: isLaunchRegistryConfigured && isClassic,
-      staleTime: 5 * 60 * 1000
-    }
-  );
+
+    enabled: isLaunchRegistryConfigured && isClassic,
+    staleTime: 5 * 60 * 1000
+  });
 };
 
 export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
@@ -440,18 +448,18 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   const { lcd, chainID } = chain;
   const isClassic = chainID.startsWith("columbus");
   const fallbackBases = getLcdFallbackBases(lcd, chainID);
-  const { data } = useQuery(["IBCWhitelist", chain], () =>
-    fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
-  );
-  const { data: mintscanAssets } = useQuery(
-    ["mintscan-assets", chainID],
-    fetchMintscanAssets,
-    {
-      enabled: chainID === "phoenix-1",
-      staleTime: 6 * 60 * 60 * 1000,
-      retry: false
-    }
-  );
+  const { data } = useQuery({
+    queryKey: ["IBCWhitelist", chain],
+
+    queryFn: () => fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
+  });
+  const { data: mintscanAssets } = useQuery({
+    queryKey: ["mintscan-assets", chainID],
+    queryFn: fetchMintscanAssets,
+    enabled: chainID === "phoenix-1",
+    staleTime: 6 * 60 * 60 * 1000,
+    retry: false
+  });
 
   const base = useMemo(() => {
     const mintscanIbc = (mintscanAssets ?? []).reduce<IBCTokenList>(
@@ -496,9 +504,10 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   );
   const missingHashes = hashes.filter(hash => !base[hash]);
 
-  const { data: resolved } = useQuery(
-    ["IBCWhitelistResolved", lcd, missingHashes.join(",")],
-    async () => {
+  const { data: resolved } = useQuery({
+    queryKey: ["IBCWhitelistResolved", lcd, missingHashes.join(",")],
+
+    queryFn: async () => {
       const entries: [string, IBCWhitelist][] = [];
       try {
         const aggregate = await fetchFinderAccountAssets({
@@ -548,12 +557,11 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
       await Promise.all(workers);
       return Object.fromEntries(entries);
     },
-    {
-      enabled: missingHashes.length > 0,
-      staleTime: 24 * 60 * 60 * 1000,
-      retry: false
-    }
-  );
+
+    enabled: missingHashes.length > 0,
+    staleTime: 24 * 60 * 60 * 1000,
+    retry: false
+  });
 
   return useMemo(() => ({ ...base, ...(resolved ?? {}) }), [base, resolved]);
 };
@@ -581,18 +589,17 @@ const pickChainAssets = <T>(
 export const useWhitelist = (contracts?: string[]) => {
   const { name, chainID, lcd } = useCurrentChain();
   const { data } = useTerraAssets<Dictionary<TokenList>>("cw20/tokens.json");
-  const { data: mintscanCw20 } = useQuery(
-    ["mintscan-cw20", chainID],
-    fetchMintscanCw20,
-    {
-      enabled: chainID === "phoenix-1",
-      staleTime: 6 * 60 * 60 * 1000,
-      retry: false
-    }
-  );
-  const { data: hexxagonTokens } = useQuery(
-    ["hexxagon-cw20-tokens", chainID],
-    async () => {
+  const { data: mintscanCw20 } = useQuery({
+    queryKey: ["mintscan-cw20", chainID],
+    queryFn: fetchMintscanCw20,
+    enabled: chainID === "phoenix-1",
+    staleTime: 6 * 60 * 60 * 1000,
+    retry: false
+  });
+  const { data: hexxagonTokens } = useQuery({
+    queryKey: ["hexxagon-cw20-tokens", chainID],
+
+    queryFn: async () => {
       if (!chainID.startsWith("columbus")) return {};
       const tokens = await fetchHexxagonArray<HexxagonCw20Token>(
         "cw20/tokens/mainnet/terra.js"
@@ -620,8 +627,9 @@ export const useWhitelist = (contracts?: string[]) => {
         return acc;
       }, {});
     },
-    { staleTime: 60 * 60 * 1000 }
-  );
+
+    staleTime: 60 * 60 * 1000
+  });
 
   const base = useMemo(() => {
     const mintscanTokens = (mintscanCw20 ?? []).reduce<TokenList>(
@@ -660,20 +668,20 @@ export const useWhitelist = (contracts?: string[]) => {
   const missingContracts = normalizedContracts.filter(
     contract => !base[contract]
   );
-  const { data: resolved } = useQuery(
-    ["cw20-token-info-resolved", lcd, missingContracts.join(",")],
-    () =>
+  const { data: resolved } = useQuery({
+    queryKey: ["cw20-token-info-resolved", lcd, missingContracts.join(",")],
+
+    queryFn: () =>
       fetchCw20TokenInfos(
         lcd,
         missingContracts,
         base,
         getLcdFallbackBases(lcd, chainID)
       ),
-    {
-      enabled: missingContracts.length > 0,
-      staleTime: 24 * 60 * 60 * 1000
-    }
-  );
+
+    enabled: missingContracts.length > 0,
+    staleTime: 24 * 60 * 60 * 1000
+  });
 
   return useMemo(() => ({ ...base, ...(resolved ?? {}) }), [base, resolved]);
 };
@@ -683,9 +691,10 @@ export const useContracts = () => {
   const { data } = useTerraAssets<Dictionary<ContractList>>(
     "cw20/contracts.json"
   );
-  const { data: hexxagonContracts } = useQuery(
-    ["hexxagon-cw20-contracts", chainID],
-    async () => {
+  const { data: hexxagonContracts } = useQuery({
+    queryKey: ["hexxagon-cw20-contracts", chainID],
+
+    queryFn: async () => {
       if (!chainID.startsWith("columbus")) return {};
       const contracts = await fetchHexxagonArray<HexxagonCw20Contract>(
         "cw20/contracts/mainnet/terra.js"
@@ -701,8 +710,9 @@ export const useContracts = () => {
         return acc;
       }, {});
     },
-    { staleTime: 60 * 60 * 1000 }
-  );
+
+    staleTime: 60 * 60 * 1000
+  });
 
   return useMemo(
     () => ({
