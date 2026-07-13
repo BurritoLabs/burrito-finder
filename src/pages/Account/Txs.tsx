@@ -31,6 +31,10 @@ import CsvExport from "./CSVExport";
 import s from "./Txs.module.scss";
 import { useQuery } from "react-query";
 import apiClient from "../../apiClient";
+import {
+  MINTSCAN_PROXY_URL,
+  normalizeMintscanTx
+} from "../../queries/mintscan";
 
 type Fee = {
   denom: string;
@@ -105,6 +109,9 @@ const Txs = ({
   const [offset, setOffset] = useState<number>(0);
   const [contractPage, setContractPage] = useState(1);
   const [contractTotal, setContractTotal] = useState<number | null>(null);
+  const [mintscanCursors, setMintscanCursors] = useState<
+    Record<number, string | undefined>
+  >({ 0: undefined });
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
   const pageSize = 30;
@@ -122,12 +129,38 @@ const Txs = ({
     isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0);
   const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
+  const mintscanCursor = mintscanCursors[offset];
   const { data: lcdData, isLoading: lcdLoading } = useQuery<{
     next?: number;
     txs: TxInfo[];
+    searchAfter?: string;
   }>(
-    ["phoenix-txs", lcd, address, offset],
+    ["phoenix-txs", lcd, address, offset, mintscanCursor],
     async () => {
+      try {
+        const { data: mintscanData } = await apiClient.get<{
+          transactions?: any[];
+          pagination?: { searchAfter?: string };
+        }>(`${MINTSCAN_PROXY_URL}/accounts/${address}/transactions`, {
+          params: {
+            take: contractLimit,
+            ...(mintscanCursor ? { searchAfter: mintscanCursor } : {})
+          },
+          timeout: 8000
+        });
+        const txs = (mintscanData.transactions ?? []).map(tx =>
+          normalizeMintscanTx(tx, chainID)
+        );
+        const searchAfter = mintscanData.pagination?.searchAfter;
+        return {
+          txs,
+          searchAfter,
+          next: searchAfter ? offset + contractLimit : undefined
+        };
+      } catch {
+        // Fall through to public LCD event search.
+      }
+
       const fetchByEvent = async (eventKey: string) => {
         const search = new URLSearchParams();
         search.set("pagination.limit", String(contractLimit));
@@ -185,7 +218,16 @@ const Txs = ({
     {
       enabled: shouldUseLcd,
       staleTime: 1000 * 60,
-      cacheTime: 1000 * 60
+      cacheTime: 1000 * 60,
+      onSuccess: result => {
+        if (result?.next && result.searchAfter) {
+          setMintscanCursors(previous =>
+            previous[result.next as number] === result.searchAfter
+              ? previous
+              : { ...previous, [result.next as number]: result.searchAfter }
+          );
+        }
+      }
     }
   );
 
@@ -284,6 +326,7 @@ const Txs = ({
     setOffset(0);
     setContractPage(1);
     setContractTotal(null);
+    setMintscanCursors({ 0: undefined });
     setAllTxs([]);
     setVisibleCount(pageSize);
   }, [address, chainID, pageSize]);

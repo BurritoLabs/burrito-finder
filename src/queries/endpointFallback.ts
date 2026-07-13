@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { MINTSCAN_LCD_URL } from "./mintscan";
 
 const DEFAULT_TIMEOUT = 8000;
 const FALLBACK_STATUS_CODES = new Set([408, 425, 429, 500, 501, 502, 503, 504]);
@@ -13,6 +14,16 @@ const unique = (values: string[]) => Array.from(new Set(values));
 
 export const getClassicLcdFallbackBases = (primary?: string) =>
   unique([primary, ...CLASSIC_LCD_ENDPOINTS].filter(Boolean) as string[]);
+
+export const getLcdFallbackBases = (primary?: string, chainID?: string) => {
+  if (chainID?.startsWith("columbus")) {
+    return getClassicLcdFallbackBases(primary);
+  }
+  if (chainID === "phoenix-1") {
+    return unique([primary, MINTSCAN_LCD_URL].filter(Boolean) as string[]);
+  }
+  return unique([primary].filter(Boolean) as string[]);
+};
 
 const buildFallbackUrls = (url: string, fallbackBases: string[] = []) => {
   const endpoints = unique(fallbackBases);

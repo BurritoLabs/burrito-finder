@@ -25,6 +25,10 @@ import TaxRateAmount from "./TaxRateAmount";
 import { transformTx } from "./transform";
 import s from "./Tx.module.scss";
 import { useIsClassic } from "../../contexts/ChainsContext";
+import {
+  MINTSCAN_PROXY_URL,
+  normalizeMintscanTx
+} from "../../queries/mintscan";
 
 const TxComponent = ({ hash }: { hash: string }) => {
   const ruleSet = useLogfinderActionRuleSet();
@@ -200,7 +204,27 @@ const usePollTxHash = (txhash: string) => {
   /* query: tx */
   const txQuery = useQuery(
     [chainID, txhash, "tx"],
-    () => apiClient.get<TxInfo>(txURL),
+    async () => {
+      try {
+        const response = await apiClient.get<TxInfo>(txURL);
+        if (response.data) return response;
+      } catch (error) {
+        if (chainID !== "phoenix-1") throw error;
+      }
+
+      if (chainID === "phoenix-1") {
+        const { data } = await apiClient.get<any[]>(
+          `${MINTSCAN_PROXY_URL}/txs/${txhash}`,
+          { timeout: 8000 }
+        );
+        const tx = data?.[0];
+        if (tx) {
+          return { data: normalizeMintscanTx(tx, chainID) as TxInfo };
+        }
+      }
+
+      throw new Error("Transaction not found");
+    },
     {
       refetchInterval: INTERVAL,
       refetchOnWindowFocus: false,

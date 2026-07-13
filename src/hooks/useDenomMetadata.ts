@@ -1,7 +1,10 @@
 import { useQuery } from "react-query";
-import axios from "axios";
 import { useCurrentChain } from "../contexts/ChainsContext";
 import { RefetchOptions } from "../queries/query";
+import {
+  axiosGetWithEndpointFallback,
+  getLcdFallbackBases
+} from "../queries/endpointFallback";
 
 type DenomMetadata = {
   description: string;
@@ -21,16 +24,18 @@ type DenomMetadata = {
 const DEFAULT_LIMIT = 1000;
 
 const useDenomMetadata = (enabled: boolean = true) => {
-  const { lcd } = useCurrentChain();
+  const { lcd, chainID } = useCurrentChain();
 
   const { data } = useQuery(
     ["denomMetadata", lcd],
     async () => {
-      const { data: response } = await axios.get<{
+      const { data: response } = await axiosGetWithEndpointFallback<{
         metadatas: DenomMetadata[];
-      }>(`${lcd}/cosmos/bank/v1beta1/denoms_metadata`, {
-        params: { "pagination.limit": DEFAULT_LIMIT }
-      });
+      }>(
+        `${lcd}/cosmos/bank/v1beta1/denoms_metadata`,
+        { params: { "pagination.limit": DEFAULT_LIMIT } },
+        getLcdFallbackBases(lcd, chainID)
+      );
 
       const map = new Map<string, DenomMetadata>();
       response?.metadatas?.forEach(metadata => {

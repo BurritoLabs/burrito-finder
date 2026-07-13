@@ -10,7 +10,7 @@ import {
 } from "../useTerraAssets";
 import {
   axiosGetWithEndpointFallback,
-  getClassicLcdFallbackBases
+  getLcdFallbackBases
 } from "../../queries/endpointFallback";
 
 export interface Token {
@@ -114,7 +114,7 @@ const useTokenBalance = (
       ...(whitelist ?? {})
     };
   }, [contracts, whitelist, isClassic]);
-  const { mantle, hive, lcd } = useCurrentChain();
+  const { mantle, hive, lcd, chainID } = useCurrentChain();
 
   useEffect(() => {
     if (!address) {
@@ -232,22 +232,20 @@ const useTokenBalance = (
             parsed = parseResult(merged, isClassic);
           }
 
-          if (
-            isClassic &&
-            lcd &&
-            Object.keys(parsed).length === 0 &&
-            entries.length
-          ) {
+          const missingBalanceEntries = entries.filter(
+            ([contract]) => parsed[contract] === undefined
+          );
+          if (lcd && missingBalanceEntries.length) {
             const lcdResults: Dictionary<string> = {};
             const limit = 4;
             let lcdIndex = 0;
             const workers = Array.from(
-              { length: Math.min(limit, entries.length) },
+              { length: Math.min(limit, missingBalanceEntries.length) },
               async () => {
-                while (lcdIndex < entries.length) {
+                while (lcdIndex < missingBalanceEntries.length) {
                   const current = lcdIndex;
                   lcdIndex += 1;
-                  const [contract] = entries[current];
+                  const [contract] = missingBalanceEntries[current];
                   try {
                     const query = btoa(
                       JSON.stringify({ balance: { address } })
@@ -257,7 +255,7 @@ const useTokenBalance = (
                     }>(
                       `${lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${query}`,
                       {},
-                      getClassicLcdFallbackBases(lcd)
+                      getLcdFallbackBases(lcd, chainID)
                     );
                     lcdResults[contract] = data?.data?.balance ?? "0";
                   } catch (error: any) {
@@ -281,8 +279,7 @@ const useTokenBalance = (
                 JSON.stringify({ ts: Date.now(), data: invalidContracts })
               );
             }
-            setResult(lcdResults);
-            return;
+            parsed = { ...lcdResults, ...parsed };
           }
 
           setResult(parsed);
@@ -299,7 +296,7 @@ const useTokenBalance = (
 
       load();
     }
-  }, [address, mergedWhitelist, lcd, mantle, hive, isClassic]);
+  }, [address, mergedWhitelist, lcd, mantle, hive, isClassic, chainID]);
 
   return {
     loading: Object.keys(mergedWhitelist).length > 0 && !result,

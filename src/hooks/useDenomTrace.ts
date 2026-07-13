@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { useCurrentChain, useIsClassic } from "../contexts/ChainsContext";
 import {
   axiosGetWithEndpointFallback,
-  getClassicLcdFallbackBases
+  getLcdFallbackBases
 } from "../queries/endpointFallback";
 import { isIbcDenom } from "../scripts/utility";
 import { useIBCWhitelist } from "./useTerraAssets";
@@ -16,7 +16,7 @@ type IbcTraceResponse = {
 };
 
 const useDenomTrace = (denom = "") => {
-  const { lcd } = useCurrentChain();
+  const { lcd, chainID } = useCurrentChain();
   const isClassic = useIsClassic();
   const hash = denom.replace("ibc/", "");
   const whitelist = useIBCWhitelist(denom ? [denom] : undefined);
@@ -27,7 +27,7 @@ const useDenomTrace = (denom = "") => {
       const { data } = await axiosGetWithEndpointFallback<IbcTraceResponse>(
         `${lcd}/ibc/apps/transfer/v1/denom_traces/${hash}`,
         {},
-        isClassic ? getClassicLcdFallbackBases(lcd) : [lcd]
+        getLcdFallbackBases(lcd, chainID)
       );
 
       return data.denom_trace;

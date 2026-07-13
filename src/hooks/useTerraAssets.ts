@@ -6,8 +6,10 @@ import { useCurrentChain } from "../contexts/ChainsContext";
 import { parseCommonJsArray } from "../scripts/cjsRegistry";
 import {
   axiosGetWithEndpointFallback,
-  getClassicLcdFallbackBases
+  getClassicLcdFallbackBases,
+  getLcdFallbackBases
 } from "../queries/endpointFallback";
+import { fetchMintscanAssets, fetchMintscanCw20 } from "../queries/mintscan";
 
 const fetchAsset = async <T>(path: string) => {
   const { data } = await axios.get<T>(`https://assets.terra.dev/${path}`);
@@ -429,15 +431,46 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   const chain = useCurrentChain();
   const { lcd, chainID } = chain;
   const isClassic = chainID.startsWith("columbus");
-  const fallbackBases = isClassic ? getClassicLcdFallbackBases(lcd) : [lcd];
+  const fallbackBases = getLcdFallbackBases(lcd, chainID);
   const { data } = useQuery(["IBCWhitelist", chain], () =>
     fetchAsset<Dictionary<IBCTokenList>>("ibc/tokens.json")
   );
-
-  const base = useMemo(
-    () => pickChainAssets(data, chain.name, chain.chainID) ?? {},
-    [chain.chainID, chain.name, data]
+  const { data: mintscanAssets } = useQuery(
+    ["mintscan-assets", chainID],
+    fetchMintscanAssets,
+    {
+      enabled: chainID === "phoenix-1",
+      staleTime: 6 * 60 * 60 * 1000,
+      retry: false
+    }
   );
+
+  const base = useMemo(() => {
+    const mintscanIbc = (mintscanAssets ?? []).reduce<IBCTokenList>(
+      (acc, asset) => {
+        if (asset.type !== "ibc" || !asset.denom?.startsWith("ibc/")) {
+          return acc;
+        }
+        const hash = normalizeIbcHash(asset.denom);
+        const symbol = asset.symbol?.trim() || "IBC";
+        acc[hash] = {
+          denom: `ibc/${hash}`,
+          base_denom: asset.ibc_info?.counterparty?.denom ?? asset.denom,
+          symbol,
+          name: asset.name?.trim() || symbol,
+          icon: safeIcon(asset.image),
+          decimals: parseDecimals(asset.decimals) ?? 6,
+          path: asset.ibc_info?.path
+        };
+        return acc;
+      },
+      {}
+    );
+    return {
+      ...mintscanIbc,
+      ...(pickChainAssets(data, chain.name, chain.chainID) ?? {})
+    };
+  }, [chain.chainID, chain.name, data, mintscanAssets]);
   const hashes = Array.from(
     new Set(
       (denoms ?? [])
@@ -492,8 +525,16 @@ const pickChainAssets = <T>(
 
 export const useWhitelist = (contracts?: string[]) => {
   const { name, chainID, lcd } = useCurrentChain();
-  const isClassic = chainID.startsWith("columbus");
   const { data } = useTerraAssets<Dictionary<TokenList>>("cw20/tokens.json");
+  const { data: mintscanCw20 } = useQuery(
+    ["mintscan-cw20", chainID],
+    fetchMintscanCw20,
+    {
+      enabled: chainID === "phoenix-1",
+      staleTime: 6 * 60 * 60 * 1000,
+      retry: false
+    }
+  );
   const { data: hexxagonTokens } = useQuery(
     ["hexxagon-cw20-tokens", chainID],
     async () => {
@@ -527,13 +568,30 @@ export const useWhitelist = (contracts?: string[]) => {
     { staleTime: 60 * 60 * 1000 }
   );
 
-  const base = useMemo(
-    () => ({
+  const base = useMemo(() => {
+    const mintscanTokens = (mintscanCw20 ?? []).reduce<TokenList>(
+      (acc, asset) => {
+        const address = normalizeAddress(asset.contract);
+        const symbol = asset.symbol?.trim();
+        if (!address || !symbol) return acc;
+        acc[address] = {
+          token: address,
+          symbol,
+          name: asset.name?.trim() || symbol,
+          protocol: asset.name?.trim() || symbol,
+          icon: safeIcon(asset.image),
+          decimals: parseDecimals(asset.decimals) ?? 6
+        };
+        return acc;
+      },
+      {}
+    );
+    return {
+      ...mintscanTokens,
       ...(pickChainAssets(data, name, chainID) ?? {}),
       ...(hexxagonTokens ?? {})
-    }),
-    [chainID, data, hexxagonTokens, name]
-  );
+    };
+  }, [chainID, data, hexxagonTokens, mintscanCw20, name]);
   const normalizedContracts = Array.from(
     new Set((contracts ?? []).map(normalizeAddress).filter(Boolean))
   );
@@ -547,7 +605,7 @@ export const useWhitelist = (contracts?: string[]) => {
         lcd,
         missingContracts,
         base,
-        isClassic ? getClassicLcdFallbackBases(lcd) : [lcd]
+        getLcdFallbackBases(lcd, chainID)
       ),
     {
       enabled: missingContracts.length > 0,
