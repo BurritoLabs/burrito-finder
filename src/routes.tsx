@@ -1,15 +1,17 @@
-import React, { lazy } from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
-const Index = lazy(() => import("./pages/Index/Index"));
-const Block = lazy(() => import("./pages/Block"));
-const Tx = lazy(() => import("./pages/Tx"));
-const Address = lazy(() => import("./pages/Account/Address"));
-const Validator = lazy(() => import("./pages/Validator"));
-const NotFound = lazy(() => import("./components/NotFound"));
-const Privacy = lazy(() =>
+import { lazyWithBuildRecovery } from "./libs/lazyWithBuildRecovery";
+
+const Index = lazyWithBuildRecovery(() => import("./pages/Index/Index"));
+const Block = lazyWithBuildRecovery(() => import("./pages/Block"));
+const Tx = lazyWithBuildRecovery(() => import("./pages/Tx"));
+const Address = lazyWithBuildRecovery(() => import("./pages/Account/Address"));
+const Validator = lazyWithBuildRecovery(() => import("./pages/Validator"));
+const NotFound = lazyWithBuildRecovery(() => import("./components/NotFound"));
+const Privacy = lazyWithBuildRecovery(() =>
   import("./pages/Legal/Legal").then(module => ({ default: module.Privacy }))
 );
-const Terms = lazy(() =>
+const Terms = lazyWithBuildRecovery(() =>
   import("./pages/Legal/Legal").then(module => ({ default: module.Terms }))
 );
 
