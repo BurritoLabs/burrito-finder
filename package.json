@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "npm@10.9.2",
   "engines": {
-    "node": ">=20 <25"
+    "node": ">=20.17 <25"
   },
   "scripts": {
     "analyze": "vite build --mode analyze",
     "start": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "audit:prod": "node scripts/audit-production.mjs",
+    "prepare": "husky",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "serve:e2e": "serve -s build -l 4173",
@@ -26,11 +28,6 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "browserslist": {
     "production": [
@@ -96,10 +93,10 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "husky": "^4.3.8",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
-    "lint-staged": "^10.5.3",
-    "prettier": "^2.2.1",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.5",
     "rollup-plugin-visualizer": "^7.0.1",
     "serve": "^14.2.6",
     "typescript": "^7.0.2",

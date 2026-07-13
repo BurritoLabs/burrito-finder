@@ -308,13 +308,13 @@ const Txs = ({
   const data = shouldUseClassicContractRpc
     ? classicContractData
     : shouldUseLcd
-    ? lcdData
-    : fcdData;
+      ? lcdData
+      : fcdData;
   const isLoading = shouldUseClassicContractRpc
     ? classicContractLoading || contractTotal === null
     : shouldUseLcd
-    ? lcdLoading
-    : fcdLoading;
+      ? lcdLoading
+      : fcdLoading;
 
   useEffect(() => {
     setOffset(0);
