@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dictionary } from "ramda";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import axios from "axios";
 import alias from "./alias";
 import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
 import {
@@ -208,22 +208,14 @@ const useTokenBalance = (
           );
 
           if (graphUri && queries.length) {
-            const client = new ApolloClient({
-              link: new HttpLink({ uri: graphUri }),
-              cache: new InMemoryCache()
-            });
-
-            const fetchChunk = async (
-              query: typeof queries[number]
-            ): Promise<QueryResult> => {
+            const fetchChunk = async (query: string): Promise<QueryResult> => {
               let lastError: unknown;
               for (let attempt = 0; attempt < 2; attempt += 1) {
                 try {
-                  const { data } = await client.query({
-                    query,
-                    errorPolicy: "ignore"
-                  });
-                  return data as QueryResult;
+                  const { data } = await axios.post<{
+                    data?: QueryResult;
+                  }>(graphUri, { query });
+                  return data.data ?? {};
                 } catch (error) {
                   lastError = error;
                 }

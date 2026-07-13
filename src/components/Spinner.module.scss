@@ -1,0 +1,23 @@
+.spinner {
+  animation: spinner-rotate 0.8s linear infinite;
+  border: var(--spinner-stroke) solid currentColor;
+  border-radius: 50%;
+  border-right-color: transparent;
+  box-sizing: border-box;
+  display: inline-block;
+  flex: none;
+  height: var(--spinner-size);
+  width: var(--spinner-size);
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.6s;
+  }
+}

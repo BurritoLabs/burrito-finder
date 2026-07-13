@@ -62,6 +62,23 @@ test("Phoenix account resolves CW20 and IBC assets", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("Phoenix CW20 balances survive aggregate API failure", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  await page.route(
+    "https://api.burrito.money/v1/finder/account-assets",
+    route => route.abort()
+  );
+  await page.goto(
+    "/mainnet/address/terra104dnzgzzx7hjt32sml9zspqfmvr7fdae8l6vy8"
+  );
+
+  await expect(page.getByText("arbLUNA", { exact: true })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("NaN");
+  expect(errors).toEqual([]);
+});
+
 test("Finder data API publishes runtime health metrics", async ({
   request
 }) => {

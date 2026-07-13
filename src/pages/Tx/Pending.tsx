@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { intervalToDuration } from "date-fns";
-import CircularProgress from "@mui/material/CircularProgress";
 import classNames from "classnames";
+import Spinner from "../../components/Spinner";
 import queuedIcon from "../../images/Queued.svg?url";
 import styles from "./Pending.module.scss";
 
@@ -24,7 +24,7 @@ const Pending = ({ timestamp }: { timestamp: string }) => {
 
   return (
     <article className={styles.component}>
-      <CircularProgress size={60} thickness={2} />
+      <Spinner size={60} strokeWidth={2} />
 
       <header className={styles.header}>
         <h1 className={styles.title}>Broadcasting transaction</h1>

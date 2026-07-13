@@ -1,5 +1,5 @@
 import { format } from "date-fns-tz";
-import distanceInWordsToNow from "date-fns/formatDistanceToNow";
+import { formatDistanceToNow } from "date-fns";
 import isBase64 from "is-base64";
 import { Dictionary } from "ramda";
 import { countries, Country } from "countries-list";
@@ -37,7 +37,7 @@ export function fromISOTime(time: string) {
 }
 
 export function fromNow(time: string) {
-  return distanceInWordsToNow(new Date(time));
+  return formatDistanceToNow(new Date(time));
 }
 
 export function sliceMsgType(msg: string) {

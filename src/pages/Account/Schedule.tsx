@@ -1,9 +1,9 @@
-import CircularProgress from "@mui/material/CircularProgress";
 import { format } from "date-fns";
 import c from "classnames/bind";
 import { percent } from "../../scripts/math";
 import Amount from "../../components/Amount";
 import Icon from "../../components/Icon";
+import Spinner from "../../components/Spinner";
 import s from "./Schedule.module.scss";
 
 const cx = c.bind(s);
@@ -59,12 +59,7 @@ const Schedule = ({ index, isPeriodicVestingAccount, ...schedule }: Props) => {
           {state === "Released" ? (
             <Icon name="check_circle" size={13} className={s.icon} />
           ) : state === "Releasing" ? (
-            <CircularProgress
-              size={10}
-              thickness={5}
-              color="inherit"
-              className={s.progress}
-            />
+            <Spinner size={10} strokeWidth={2} className={s.progress} />
           ) : null}
           <span>
             <span className={cx({ releasing: state === "Releasing" }, s.state)}>

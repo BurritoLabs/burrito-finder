@@ -1,13 +1,12 @@
 import { Coin } from "@terra-money/terra.js";
 import { useMemo } from "react";
-import { useRecoilValue } from "recoil";
 import { useFCDURL, useIsClassic } from "../../contexts/ChainsContext";
+import { useCurrency } from "../../contexts/CurrencyContext";
 import useRequest from "../../hooks/useRequest";
 import { useDenoms } from "../../queries/oracle";
 import { DEFAULT_CURRENCY } from "../../scripts/utility";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { Currency } from "../../store/CurrencyStore";
 import BigNumber from "bignumber.js";
 import Available from "./Available";
 import format from "../../scripts/format";
@@ -24,7 +23,7 @@ const AvailableList = ({
   showLowValueCoins?: boolean;
   pricesEnabled?: boolean;
 }) => {
-  const currency = useRecoilValue(Currency);
+  const { currency } = useCurrency();
   const { data: denoms } = useDenoms();
   const denom = denoms?.includes(currency) ? currency : DEFAULT_CURRENCY;
   const fcdURL = useFCDURL();

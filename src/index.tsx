@@ -1,7 +1,6 @@
 import "core-js";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { RecoilRoot } from "recoil";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./index.scss";
@@ -11,6 +10,7 @@ import {
   getInitialChains,
   ChainsProvider
 } from "./contexts/ChainsContext";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 import { installGlobalErrorReporting } from "./reportError";
 
 const queryClient = new QueryClient({
@@ -43,7 +43,7 @@ const Root = () => {
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
-      <RecoilRoot>
+      <CurrencyProvider>
         <QueryClientProvider client={queryClient}>
           <ChainsProvider value={chains}>
             <Routes>
@@ -52,7 +52,7 @@ const Root = () => {
             </Routes>
           </ChainsProvider>
         </QueryClientProvider>
-      </RecoilRoot>
+      </CurrencyProvider>
     </BrowserRouter>
   );
 };

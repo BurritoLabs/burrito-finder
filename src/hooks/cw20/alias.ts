@@ -1,5 +1,3 @@
-import { gql } from "@apollo/client";
-
 interface Item {
   address: string;
   contract: string;
@@ -7,33 +5,31 @@ interface Item {
   isClassic?: boolean;
 }
 
-const stringify = (msg: object) => JSON.stringify(msg).replace(/"/g, '\\"');
+const graphQLString = (value: string) => JSON.stringify(value);
 
 const aliasItem = ({ contract, msg, isClassic, address }: Item) =>
   isClassic
     ? `
     ${contract}: WasmContractsContractAddressStore(
-      ContractAddress: "${contract}"
-      QueryMsg: "${stringify(msg)}"
+      ContractAddress: ${graphQLString(contract)}
+      QueryMsg: ${graphQLString(JSON.stringify(msg))}
     ) {
       Height
       Result
     }`
     : `${contract}: wasm{
       contractQuery( 
-        contractAddress: "${contract}"
+        contractAddress: ${graphQLString(contract)}
         query: {
           balance: {
-            address: "${address}"
+            address: ${graphQLString(address)}
           }
         }
       )
     }`;
 
-const alias = (list: Item[]) => gql`
-  query {
-    ${list.map(aliasItem)}
-  }
-`;
+const alias = (list: Item[]) => `query {
+  ${list.map(aliasItem).join("\n")}
+}`;
 
 export default alias;

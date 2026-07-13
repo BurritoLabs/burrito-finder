@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useCurrency } from "../contexts/CurrencyContext";
 import { useDenoms } from "../queries/oracle";
 import { getCookie } from "../scripts/cookie";
 import { DEFAULT_CURRENCY } from "../scripts/utility";
-import { Currency } from "../store/CurrencyStore";
 import s from "./SelectCurrency.module.scss";
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
 };
 
 const SelectCurrency = (props: Props) => {
-  const [currency, setCurrency] = useRecoilState(Currency);
+  const { currency, setCurrency } = useCurrency();
   const { data: denoms } = useDenoms();
   const denom = denoms?.includes(currency) ? currency : DEFAULT_CURRENCY;
 
