@@ -68,11 +68,9 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                   ...(isIbc ? [ibcFallbackIcon] : []),
                   ...(isMainnetLuna ? lunaIcons : []),
                   ...(isClassicNative
-                    ? [
-                        `${ASSET_URL}/icon/svg/${
-                          denom === "uluna" ? "LUNC" : "USTC"
-                        }.svg`
-                      ]
+                    ? denom === "uluna"
+                      ? [`${ASSET_URL}/icon/svg/LUNC.svg`]
+                      : []
                     : isMainnetLuna || isIbc
                     ? []
                     : [
