@@ -1,6 +1,8 @@
 const webpack = require("webpack");
 const path = require("path");
 
+const axiosPath = path.resolve(__dirname, "node_modules/axios");
+
 module.exports = config => {
   config.ignoreWarnings = [
     ...(config.ignoreWarnings ?? []),
@@ -18,8 +20,14 @@ module.exports = config => {
   };
   config.resolve.alias = {
     ...config.resolve.alias,
-    "axios$": path.resolve(__dirname, "node_modules/axios/index.js")
+    "axios$": path.join(axiosPath, "index.js")
   };
+  const moduleScopePlugin = config.resolve.plugins?.find(
+    plugin => plugin.constructor?.name === "ModuleScopePlugin"
+  );
+  if (moduleScopePlugin && !moduleScopePlugin.allowedPaths.includes(axiosPath)) {
+    moduleScopePlugin.allowedPaths.push(axiosPath);
+  }
   config.plugins.push(
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
