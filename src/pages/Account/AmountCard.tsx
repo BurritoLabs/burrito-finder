@@ -100,6 +100,10 @@ const AmountCard = ({
       ? baseLabel
       : baseLabel + "C"
     : baseLabel;
+  const displayDenom =
+    formatDenom.length > 20
+      ? format.truncate(formatDenom, [8, 6])
+      : formatDenom;
 
   const iconRender = (
     <div className={s.icon}>
@@ -110,7 +114,9 @@ const AmountCard = ({
   const tokenHeader = (
     <div className={s.token_wrapper}>
       {iconRender}
-      <h1 className={s.denom}>{formatDenom}</h1>
+      <h1 className={s.denom} title={formatDenom}>
+        {displayDenom}
+      </h1>
       {hash && path && (
         <span className={s.meta}>
           {format.truncate(hash, [6, 6])} ({path})

@@ -1,0 +1,31 @@
+@import "../styles/variables";
+
+.footer {
+  border-top: 1px solid $line;
+  color: rgba(234, 245, 235, 0.68);
+  font-size: 12px;
+}
+
+.inner {
+  width: 100%;
+  max-width: 1440px;
+  min-height: 52px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+
+  a {
+    color: rgba(234, 245, 235, 0.78);
+  }
+
+  @media (max-width: $breakpoint) {
+    padding: 0 15px;
+  }
+}

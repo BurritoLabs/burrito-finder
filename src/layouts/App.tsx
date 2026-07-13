@@ -4,6 +4,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { useCurrentChain } from "../contexts/ChainsContext";
 import Header from "./Header";
 import Loading from "../components/Loading";
+import Footer from "./Footer";
 import s from "./App.module.scss";
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
       <section className={s.content}>
         <ErrorBoundary>{routes}</ErrorBoundary>
       </section>
+      <Footer />
       {isFetching > 0 ? (
         <div className={s.loadingOverlay}>
           <Loading global />

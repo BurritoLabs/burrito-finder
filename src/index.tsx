@@ -9,6 +9,7 @@ import "./index.scss";
 import App from "./layouts/App";
 import * as serviceWorker from "./serviceWorker";
 import { getChains, ChainsProvider } from "./contexts/ChainsContext";
+import { installGlobalErrorReporting } from "./reportError";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,8 @@ const queryClient = new QueryClient({
     }
   }
 });
+
+installGlobalErrorReporting();
 
 getChains().then(chains => {
   const container = document.getElementById("root");
