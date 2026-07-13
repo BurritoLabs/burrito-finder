@@ -123,6 +123,32 @@ test("Phoenix transaction renders canonical actions", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("Success", { exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("Unknown");
+  await expect(page.getByRole("link", { name: "ORNE" })).toBeVisible();
+  await expect(page.getByText("1.013236 Luna", { exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+
+  await page.getByRole("link", { name: "ORNE" }).click();
+  await expect(page).toHaveURL(
+    /\/mainnet\/address\/terra19p20mfnvwh9yvyr7aus3a6z6g6uk28fv4jhx9kmnc2m7krg27q2qkfenjw$/
+  );
+});
+
+test("Classic transaction formats native coins and unknown addresses", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  await page.goto(
+    "/classic/tx/56417B87BCC8BCBB3FBBFAC4DF346CC31E6B349DC5DC51A1B8888E46FAA536F2"
+  );
+
+  await expect(
+    page.getByRole("heading", { name: "Transaction Details" })
+  ).toBeVisible();
+  await expect(page.getByText("133.400000 Lunc", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "terra1hf...aqyvj4" })).toBeVisible();
+  await expect(page.locator("body")).not.toContainText(
+    "terra1hfhr4uup3n8wca6ksl2fs07w4hmx3qytaqyvj4 send"
+  );
   expect(errors).toEqual([]);
 });
 

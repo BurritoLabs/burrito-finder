@@ -1,42 +1,21 @@
-import { TxDescription } from "@terra-money/react-base-components";
-import { useEffect, useMemo, useState } from "react";
-import { useQueryClient } from "react-query";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentChain } from "../../contexts/ChainsContext";
-import { useWhitelist } from "../../hooks/useTerraAssets";
+import { useContracts, useWhitelist } from "../../hooks/useTerraAssets";
+import TxDescription from "./TxDescription";
 import s from "./Action.module.scss";
 
 const tokenAddressPattern = /terra1[a-z0-9]{38,58}/g;
 
-const shortAddress = (address: string) =>
-  `${address.slice(0, 8)}...${address.slice(-6)}`;
-
 const Action = ({ action }: { action: string }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { name, chainID, lcd } = useCurrentChain();
+  const { name } = useCurrentChain();
   const tokenAddresses = useMemo(
     () => Array.from(new Set(action.match(tokenAddressPattern) ?? [])),
     [action]
   );
   const tokens = useWhitelist(tokenAddresses);
-  const [tokenCacheReady, setTokenCacheReady] = useState(
-    tokenAddresses.length === 0
-  );
-
-  useEffect(() => {
-    tokenAddresses.forEach(address => {
-      queryClient.setQueryData(
-        ["token", address],
-        tokens[address] ?? {
-          symbol: shortAddress(address),
-          name: shortAddress(address),
-          decimals: 6
-        }
-      );
-    });
-    setTokenCacheReady(true);
-  }, [queryClient, tokenAddresses, tokens]);
+  const contracts = useContracts();
 
   const toLocalRoute = (href: string) => {
     try {
@@ -95,14 +74,12 @@ const Action = ({ action }: { action: string }) => {
       onClick={handleLinkClick}
       onClickCapture={handleLinkClick}
     >
-      {tokenCacheReady && (
-        <TxDescription
-          network={{ chainID, URL: lcd ?? "", name }}
-          config={{ printCoins: 3 }}
-        >
-          {action}
-        </TxDescription>
-      )}
+      <TxDescription
+        sentence={action}
+        tokens={tokens}
+        contracts={contracts}
+        printCoins={3}
+      />
     </span>
   );
 };
