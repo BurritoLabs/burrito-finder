@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 import { isEmpty } from "lodash";
 import {
   LogFinderAmountResult,
@@ -47,7 +48,7 @@ export const getTxFee = (prop: Fee, isClassic?: boolean) =>
 
 const getRenderAmount = (
   amountList: string[] | undefined,
-  amountArray: JSX.Element[]
+  amountArray: ReactElement[]
 ) => {
   amountList?.forEach(amount => {
     const coin = splitCoinData(amount.trim());
@@ -65,8 +66,8 @@ const getAmount = (
   matchedMsg?: LogFinderAmountResult[][],
   rowLimit?: number
 ) => {
-  const amountIn: JSX.Element[] = [];
-  const amountOut: JSX.Element[] = [];
+  const amountIn: ReactElement[] = [];
+  const amountOut: ReactElement[] = [];
   matchedMsg?.forEach(matchedLog => {
     matchedLog?.forEach(log => {
       const amounts = log.transformed?.amount?.split(",");

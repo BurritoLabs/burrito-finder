@@ -1,5 +1,6 @@
 import "core-js";
 import React, { useEffect, useState } from "react";
+import type { ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -11,7 +12,7 @@ import {
   ChainsProvider
 } from "./contexts/ChainsContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
-import { installGlobalErrorReporting } from "./reportError";
+import { installGlobalErrorReporting, reportClientError } from "./reportError";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,4 +58,14 @@ const Root = () => {
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root element is missing");
-createRoot(container).render(<Root />);
+const reportReactError = (error: unknown, errorInfo: ErrorInfo) => {
+  reportClientError("react", error, {
+    componentStack: errorInfo.componentStack ?? undefined
+  });
+};
+
+createRoot(container, {
+  onCaughtError: reportReactError,
+  onRecoverableError: reportReactError,
+  onUncaughtError: reportReactError
+}).render(<Root />);
