@@ -30,7 +30,9 @@ type Prop = {
 };
 
 const WasmMsg = (prop: Prop) => (
-  <pre className={s.wrapper}>{prettifyWasmMsg(prop.msg)}</pre>
+  <pre className={s.wrapper} data-component="wasm-message">
+    {prettifyWasmMsg(prop.msg)}
+  </pre>
 );
 
 export default WasmMsg;
