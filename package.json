@@ -65,6 +65,7 @@
     "json5": "^2.2.3",
     "keccak256": "^1.0.6",
     "lodash": "^4.18.1",
+    "lucide-react": "^0.468.0",
     "luxon": "^3.7.2",
     "os-browserify": "^0.3.0",
     "process": "^0.11.10",

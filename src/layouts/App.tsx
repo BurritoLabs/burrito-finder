@@ -8,9 +8,9 @@ import Footer from "./Footer";
 import s from "./App.module.scss";
 
 const App = () => {
-  const { chainID } = useCurrentChain();
+  const { chainID, name } = useCurrentChain();
   return (
-    <section className={s.main} key={chainID}>
+    <section className={s.main} data-chain={name} key={chainID}>
       <Header />
       <section className={s.content}>
         <ErrorBoundary>

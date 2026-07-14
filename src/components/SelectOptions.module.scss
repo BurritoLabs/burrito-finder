@@ -1,14 +1,11 @@
 @use "../styles/variables.scss";
 
 .rightHeader {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 40px;
+  position: relative;
+  justify-self: end;
   @media (max-width: variables.$breakpoint) {
-    top: 50%;
-    transform: translateY(-50%);
-    right: 15px;
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 

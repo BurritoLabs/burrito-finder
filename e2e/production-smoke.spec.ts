@@ -34,8 +34,10 @@ test("bundled chain config keeps the Finder available when the registry is down"
   });
   await expect(searchboxes).toHaveCount(2);
   await expect(searchboxes.first()).toBeVisible();
-  const networkButtons = page.getByRole("button", { name: /classic/ });
-  await expect(networkButtons).toHaveCount(2);
+  const networkButtons = page.getByRole("button", {
+    name: "Classic (LUNC) network"
+  });
+  await expect(networkButtons).toHaveCount(1);
   await expect(networkButtons.first()).toBeVisible();
 });
 
@@ -144,8 +146,12 @@ test("Classic transaction formats native coins and unknown addresses", async ({
   await expect(
     page.getByRole("heading", { name: "Transaction Details" })
   ).toBeVisible();
-  await expect(page.getByText("133.400000 Lunc", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "terra1hf...aqyvj4" })).toBeVisible();
+  await expect(
+    page.getByText("133.400000 Lunc", { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "terra1hf...aqyvj4" })
+  ).toBeVisible();
   await expect(page.locator("body")).not.toContainText(
     "terra1hfhr4uup3n8wca6ksl2fs07w4hmx3qytaqyvj4 send"
   );

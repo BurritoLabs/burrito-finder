@@ -7,15 +7,16 @@ $size: 38px;
   @include mixins.flex(center);
   margin-bottom: 10px;
   margin-top: 20px;
-  background-color: rgba($color: #edf4fe, $alpha: 0.5);
-  border-radius: 19px;
+  border: 1px solid variables.$line;
+  background-color: rgba(255, 255, 255, 0.035);
+  border-radius: variables.$radius;
 
   transition: background-color 0.2s;
 
   height: $size;
 
   a {
-    color: variables.$brand;
+    color: var(--chain-accent);
     text-decoration: none;
   }
 
@@ -25,13 +26,13 @@ $size: 38px;
   }
 
   &:hover {
-    background-color: #edf4fe;
+    background-color: rgba(255, 255, 255, 0.06);
   }
 }
 
 .text {
-  background: variables.$brand;
-  color: white;
+  background: rgba(var(--chain-rgb), 0.14);
+  color: var(--chain-accent);
   padding: 0 15px;
 }
 

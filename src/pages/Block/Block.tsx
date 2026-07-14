@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import c from "classnames";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Txs from "../Txs";
 import Loading from "../../components/Loading";
 import Finder from "../../components/Finder";
@@ -12,11 +13,11 @@ import s from "./Block.module.scss";
 const heightButton = (height: number) => (
   <span className={s.height}>
     <span>{height}</span>
-    <Link to={`../blocks/${height - 1}`}>
-      <i className="material-icons">chevron_left</i>
+    <Link to={`../blocks/${height - 1}`} aria-label="Previous block">
+      <ChevronLeft aria-hidden="true" />
     </Link>
-    <Link to={`../blocks/${height + 1}`}>
-      <i className="material-icons">chevron_right</i>
+    <Link to={`../blocks/${height + 1}`} aria-label="Next block">
+      <ChevronRight aria-hidden="true" />
     </Link>
   </span>
 );

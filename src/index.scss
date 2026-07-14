@@ -1,22 +1,23 @@
-@use "styles/material-icons.scss";
 @use "styles/mixins";
 @use "styles/variables";
 @use "styles/reboot.scss";
 @use "styles/components";
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 500;
-  margin-bottom: 20px;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 24px;
   margin-top: 0px;
   > span {
-    font-weight: 300;
-    font-size: 23px;
+    color: variables.$muted;
+    font-weight: 500;
+    font-size: 18px;
     padding-left: 6px;
   }
 }

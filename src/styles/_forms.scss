@@ -10,7 +10,7 @@ form {
     text-align: center;
   }
 
-  button[type="submit"] {
+  > button[type="submit"] {
     margin-top: 40px;
   }
 }
@@ -41,7 +41,7 @@ form {
 
   label:before,
   label:after {
-    background-color: variables.$brand;
+    background-color: var(--chain-accent, variables.$brand);
     border-radius: 1px;
     content: "";
   }
@@ -78,12 +78,24 @@ input {
   appearance: none;
   border: 1px solid $border;
   border-radius: variables.$radius;
+  background: rgba(255, 255, 255, 0.035);
+  color: variables.$app-fg;
   display: block;
   font-size: 14px;
   padding: 0 variables.$gutter;
   height: 40px;
   width: 100%;
   min-width: 1px;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+
+  &:focus {
+    border-color: rgba(var(--chain-rgb), 0.72);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 2px rgba(var(--chain-rgb), 0.16);
+  }
 }
 
 .form-control-md {
@@ -142,7 +154,7 @@ textarea.form-control {
   .input-group-append {
     @include mixins.flex();
 
-    background: #f4f5fb;
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid $border;
     border-left: 0;
     border-top-right-radius: variables.$radius;
@@ -154,8 +166,8 @@ textarea.form-control {
 }
 
 .invalid-feedback {
-  $border: #ffd5d8;
-  $bg: #fff6f7;
+  $border: rgba(255, 85, 97, 0.42);
+  $bg: rgba(255, 85, 97, 0.1);
 
   background: $bg;
   border: 1px solid $border;

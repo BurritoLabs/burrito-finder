@@ -7,11 +7,17 @@
   justify-content: center;
   align-items: center;
 
-  border-radius: 22px;
-  font-size: 15px;
-  height: 44px;
-  min-width: 180px;
-  padding: 0 30px;
+  border-radius: variables.$radius;
+  font-size: 14px;
+  font-weight: 700;
+  height: 40px;
+  min-width: 128px;
+  padding: 0 20px;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 
   & + & {
     margin-left: 10px;
@@ -27,17 +33,17 @@ a.btn {
 }
 
 .btn-sm {
-  border-radius: 15px;
-  font-size: 14px;
-  height: 30px;
-  min-width: 100px;
-  padding: 0 15px;
+  border-radius: 6px;
+  font-size: 12px;
+  height: 32px;
+  min-width: 88px;
+  padding: 0 12px;
 }
 
 /* Colors */
 .btn-primary {
   background: variables.$brand;
-  color: white;
+  color: variables.$navy;
 
   &:hover:not(:disabled) {
     background: color.adjust(variables.$brand, $lightness: -5%);
@@ -50,7 +56,7 @@ a.btn {
 
 .btn-sky {
   background: variables.$sky;
-  color: white;
+  color: variables.$navy;
 
   &:hover:not(:disabled) {
     background: color.adjust(variables.$sky, $lightness: -5%);
@@ -75,11 +81,12 @@ a.btn {
 }
 
 .btn-light {
-  background: variables.$line;
-  color: variables.$brand;
+  border: 1px solid variables.$line;
+  background: rgba(255, 255, 255, 0.04);
+  color: variables.$app-fg;
 
   &:hover:not(:disabled) {
-    background: color.adjust(variables.$line, $lightness: -5%);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   &:disabled {
@@ -88,8 +95,8 @@ a.btn {
 }
 
 .btn-link {
-  color: variables.$sky;
-  text-decoration: underline;
+  color: variables.$link;
+  text-decoration: none;
 }
 
 .btn-icon-group {
@@ -100,10 +107,10 @@ a.btn {
 .btn-icon {
   @include mixins.flex();
 
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 8px;
 
   &:hover {
-    background: rgba(32, 67, 181, 0.05);
+    background: rgba(255, 255, 255, 0.06);
   }
 }

@@ -1,35 +1,7 @@
 @use "../styles/variables.scss";
 
-input::-webkit-input-placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  @media (max-width: variables.$breakpoint) {
-    color: rgba(255, 255, 255, 0.3);
-  }
-}
-input:-moz-placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  @media (max-width: variables.$breakpoint) {
-    color: rgba(255, 255, 255, 0.3);
-  }
-}
-input::-moz-placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  @media (max-width: variables.$breakpoint) {
-    color: rgba(255, 255, 255, 0.3);
-  }
-}
-input:-ms-input-placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  @media (max-width: variables.$breakpoint) {
-    color: rgba(255, 255, 255, 0.3);
-  }
-}
-
 input[type="search"]::-webkit-search-cancel-button {
   display: none;
-  @media (max-width: variables.$breakpoint) {
-    display: inline;
-  }
 }
 
 input[type="search"] {
@@ -42,62 +14,70 @@ input::-webkit-search-decoration {
 
 input {
   width: 100%;
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
-  font-size: 16px;
+  min-width: 0;
+  border: 0;
+  font-size: 14px;
   height: 40px;
-  color: #fff;
+  color: variables.$app-fg;
   background: transparent;
-  padding-left: 10px !important;
-  padding-right: 45px !important;
-  border-radius: 0;
+  padding: 0 44px 0 14px !important;
+  border-radius: variables.$radius;
   word-break: normal;
-  @media (max-width: variables.$breakpoint) {
-    border-radius: 0;
-    background: transparent;
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.9);
-    padding-left: 5px !important;
-    padding-right: 35px !important;
+
+  &::placeholder {
+    color: variables.$muted;
   }
 }
 
 .button {
   position: absolute;
-  right: 0;
-  bottom: 1px;
-  height: 39px;
+  right: 3px;
+  top: 3px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
   outline: 0;
   cursor: pointer;
   margin: 0;
-  i {
-    color: #fff;
-    padding: 0 5px 0 10px;
-    font-size: 21px;
-    line-height: 39px;
-    @media (max-width: variables.$breakpoint) {
-      color: #fff;
-      padding: 0 3px 0 5px;
-      font-size: 19px;
-      line-height: 42px;
-    }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: variables.$soft;
   }
 }
 
 form {
-  display: inline-flex;
+  display: flex;
   min-height: 40px;
-  @media (max-width: variables.$breakpoint) {
-    top: 54px;
-    right: 0;
-    padding: 0;
-    width: 100%;
-    padding: 0 15px;
-    max-width: none;
-  }
 }
 
 .group {
   position: relative;
   width: 100%;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid variables.$line;
+  border-radius: variables.$radius;
+  background: rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.055);
+  }
+
+  &:focus-within {
+    border-color: rgba(var(--chain-rgb), 0.72);
+    box-shadow: 0 0 0 2px rgba(var(--chain-rgb), 0.16);
+  }
 }

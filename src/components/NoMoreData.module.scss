@@ -1,11 +1,12 @@
 @use "../styles/variables";
 
 .container {
-  border-radius: 5px;
+  border-radius: variables.$radius;
   border: 1px solid variables.$line;
   width: 100%;
   height: 100px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.025);
+  color: variables.$muted;
   overflow-x: auto;
   min-width: unset;
   font-size: 14px;

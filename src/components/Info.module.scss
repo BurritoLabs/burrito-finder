@@ -7,8 +7,8 @@
   @media (max-width: variables.$breakpoint - 1) {
     flex-direction: column;
     text-align: center;
-    i {
-      font-size: 30px !important;
+    > svg {
+      height: 30px !important;
       width: 30px !important;
     }
   }

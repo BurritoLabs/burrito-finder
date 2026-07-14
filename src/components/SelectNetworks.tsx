@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useChains, useCurrentChain } from "../contexts/ChainsContext";
 
@@ -33,8 +34,9 @@ const SelectNetworks = (props: Props) => {
     return aIndex - bIndex;
   });
 
-  const currentLabel =
-    currentChain.name === "mainnet" ? "phoenix" : currentChain.name;
+  const displayLabel = (name: string) => (name === "mainnet" ? "LUNA" : "LUNC");
+  const networkLabel = (name: string) =>
+    name === "mainnet" ? "Phoenix (LUNA)" : "Classic (LUNC)";
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -56,22 +58,24 @@ const SelectNetworks = (props: Props) => {
         <button
           type="button"
           className={s.selectButton}
+          aria-label={`${networkLabel(currentChain.name)} network`}
+          aria-expanded={open}
           onClick={() => setOpen(value => !value)}
         >
-          <span className={s.label}>{currentLabel}</span>
+          <span className={s.label}>{displayLabel(currentChain.name)}</span>
           <span className={s.addon}>
-            <i className="material-icons">arrow_drop_down</i>
+            <ChevronDown aria-hidden="true" />
           </span>
         </button>
         {open ? (
           <ul className={s.menu}>
             {orderedChains.map(({ name }) => {
-              const label = name === "mainnet" ? "phoenix" : name;
               const isActive = name === currentChain.name;
               return (
                 <li key={name}>
                   <button
                     type="button"
+                    aria-label={networkLabel(name)}
                     className={[s.option, isActive ? s.active : ""]
                       .filter(Boolean)
                       .join(" ")}
@@ -80,7 +84,7 @@ const SelectNetworks = (props: Props) => {
                       changeChain(name);
                     }}
                   >
-                    {label}
+                    {displayLabel(name)}
                   </button>
                 </li>
               );

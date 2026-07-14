@@ -3,15 +3,15 @@
 .select {
   width: 100px;
   height: 36px;
-  padding: 0 41px 0 10px !important;
-  border-radius: 3px !important;
-  border: 1px solid hsla(0, 0%, 100%, 0.3) !important;
-  font-size: 13px !important;
-  color: #fff !important;
-  font-weight: 300 !important;
-  letter-spacing: -0.2px;
+  padding: 0 34px 0 12px !important;
+  border-radius: variables.$radius !important;
+  border: 1px solid variables.$line !important;
+  font-size: 12px !important;
+  color: variables.$app-fg !important;
+  font-weight: 600 !important;
+  letter-spacing: 0;
   text-overflow: ellipsis;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.035);
   appearance: none;
   text-transform: capitalize;
   line-height: 34px;
@@ -21,8 +21,8 @@
     text-transform: capitalize;
   }
   @media (max-width: variables.$breakpoint) {
-    width: 80px;
-    height: 28px !important;
+    width: 88px;
+    height: 34px !important;
     font-size: 11px !important;
     line-height: 26px;
   }
@@ -30,31 +30,18 @@
 
 .addon {
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  right: 1px;
-  display: block;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  display: flex;
   align-items: center;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 34px;
-  border-left: 1px solid hsla(0, 0%, 100%, 0.3) !important;
-  background: transparent;
-  text-align: center;
-  color: #fff !important;
-  line-height: 34px;
+  justify-content: center;
+  width: 20px;
+  color: variables.$muted;
   pointer-events: none;
-  @media (max-width: variables.$breakpoint) {
-    width: 27px !important;
-  }
-  i {
-    font-size: 18px;
-    vertical-align: middle;
-    margin-top: -2px;
-    @media (max-width: variables.$breakpoint) {
-      height: 24px;
-    }
+
+  svg {
+    width: 16px;
+    height: 16px;
   }
 }

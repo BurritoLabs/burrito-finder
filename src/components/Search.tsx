@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Search as SearchIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentChain } from "../contexts/ChainsContext";
 import { getEndpointByKeyword } from "../scripts/utility";
@@ -31,8 +32,8 @@ const Search = ({ className }: Props) => {
           placeholder={"Search Block / Tx / Account"}
           autoFocus
         />
-        <button className={s.button} type="submit">
-          <i className="material-icons">search</i>
+        <button className={s.button} type="submit" aria-label="Search">
+          <SearchIcon aria-hidden="true" />
         </button>
       </div>
     </form>

@@ -2,12 +2,13 @@
 
 .header {
   position: relative;
-  background: rgba(12, 20, 17, 0.86);
-  height: 56px;
-  border-bottom: 1px solid rgba(234, 245, 235, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  z-index: 40;
+  min-height: 72px;
+  background: rgb(15, 27, 22);
+  border-bottom: 1px solid variables.$line;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
   @media (max-width: variables.$breakpoint) {
-    height: 56px;
+    min-height: 124px;
   }
 }
 
@@ -16,36 +17,39 @@
   margin: 0 auto;
   max-width: 1440px;
   position: relative;
-  height: 56px;
-  display: flex;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(280px, 640px) minmax(
+      190px,
+      1fr
+    );
   align-items: center;
+  gap: 24px;
+  padding: 0 40px;
+
+  @media (max-width: variables.$breakpoint) {
+    min-height: 124px;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 56px 52px;
+    gap: 4px 16px;
+    padding: 0 16px 12px;
+  }
 }
 
 .logo {
   display: flex;
   align-items: center;
-  height: 56px;
+  min-width: 0;
+  height: 72px;
   @media (max-width: variables.$breakpoint) {
-    display: block;
-    height: 45px;
-    line-height: 45px;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
+    height: 56px;
   }
   a {
-    display: block;
-    padding: 0 40px;
-    height: 56px;
+    height: 24px;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     text-decoration: none;
-    @media (max-width: variables.$breakpoint) {
-      padding: 0 15px;
-    }
   }
   a:hover {
     text-decoration: none;
@@ -53,18 +57,12 @@
 }
 
 .search {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 330px;
-  width: 34%;
+  width: 100%;
   max-width: 640px;
-  margin-left: -320px;
+  justify-self: center;
   @media (max-width: variables.$breakpoint) {
-    top: 54px;
-    transform: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
     max-width: none;
-    right: 0;
-    width: 100%;
   }
 }

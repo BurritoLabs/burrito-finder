@@ -17,21 +17,26 @@ body {
   line-height: 1.5;
   margin: 0;
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   color: variables.$app-fg;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       1600px 900px at 12% -20%,
-      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.065),
       transparent 70%
     ),
     radial-gradient(
       1400px 800px at 88% -10%,
-      rgba(82, 196, 26, 0.035),
+      rgba(104, 216, 63, 0.055),
       transparent 72%
     ),
-    linear-gradient(180deg, #0e1714 0%, #0c1411 55%, #08110f 100%);
-  background-color: #0c1411;
+    linear-gradient(180deg, #14231d 0%, #101b17 55%, #0d1815 100%);
+  background-color: #101b17;
+  font-feature-settings: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   word-break: break-word;
 
@@ -48,11 +53,16 @@ hr {
 }
 
 a {
-  color: variables.$link-bg;
+  color: var(--chain-accent, variables.$link-bg);
   text-decoration: none;
   &:hover {
     text-decoration: underline;
   }
+}
+
+:focus-visible {
+  outline: 2px solid var(--chain-accent, variables.$brand);
+  outline-offset: 2px;
 }
 
 strong,
@@ -63,7 +73,7 @@ strong,
 h1,
 h2 {
   font-size: inherit;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 h1,

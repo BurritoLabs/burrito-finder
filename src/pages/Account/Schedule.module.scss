@@ -1,9 +1,9 @@
-@use 'sass:math';
+@use "sass:math";
 @use "../../styles/mixins";
 @use "../../styles/variables";
 
-$border: #ebeff8;
-$releasing: #459cf4;
+$border: rgba(255, 255, 255, 0.14);
+$releasing: #38bdf8;
 
 .component {
   margin-top: 5px;

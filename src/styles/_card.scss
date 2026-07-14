@@ -1,20 +1,19 @@
-@use "sass:color";
 @use "forms";
 @use "mixins";
 @use "variables";
 
-@use 'sass:math';
+@use "sass:math";
 
 forms.$border: 1px solid variables.$line;
-$box-shadow: color.adjust(black, $alpha: -0.95);
-$padding: 25px;
+$box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+$padding: 24px;
 $padding-small: 20px;
 
 .card {
-  background: rgba(255, 255, 255, 0.04);
+  background: variables.$panel;
 
   @media (max-width: variables.$breakpoint - 1) {
-    box-shadow: 0 8px 24px 0 $box-shadow;
+    box-shadow: $box-shadow;
     border: forms.$border;
     border-radius: variables.$radius;
 
@@ -27,7 +26,7 @@ $padding-small: 20px;
   @media (min-width: variables.$breakpoint) {
     border: forms.$border;
     border-radius: variables.$radius;
-    box-shadow: 0 8px 24px 0 $box-shadow;
+    box-shadow: $box-shadow;
   }
 
   & & {
@@ -38,8 +37,8 @@ $padding-small: 20px;
 .card-header {
   @include mixins.flex(space-between);
 
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 700;
 
   .card-actions {
     @include mixins.flex();

@@ -1,11 +1,11 @@
 @use "../styles/variables.scss";
 
 .wrapper {
-  width: 160px;
+  width: 132px;
   height: 36px;
   @media (max-width: variables.$breakpoint) {
-    width: 100px;
-    height: 28px;
+    width: 116px;
+    height: 34px;
   }
 }
 
@@ -18,29 +18,47 @@
 .selectButton {
   width: 100%;
   height: 100%;
-  padding: 0 41px 0 10px;
-  border-radius: 3px;
-  border: 1px solid hsla(0, 0%, 100%, 0.3);
-  font-size: 13px;
-  color: #fff;
-  font-weight: 300;
-  letter-spacing: -0.2px;
+  padding: 0 34px 0 12px;
+  border-radius: variables.$radius;
+  border: 1px solid variables.$line;
+  font-size: 12px;
+  color: variables.$app-fg;
+  font-weight: 600;
+  letter-spacing: 0;
   text-transform: capitalize;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.035);
   text-align: left;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   @media (max-width: variables.$breakpoint) {
     font-size: 11px;
-    padding: 0 27px 0 10px;
+    padding: 0 30px 0 10px;
+  }
+
+  &:hover {
+    border-color: rgba(var(--chain-rgb), 0.46);
+    background: rgba(var(--chain-rgb), 0.08);
   }
 }
 
 .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 999px;
+    background: var(--chain-accent);
+    box-shadow: 0 0 0 3px rgba(var(--chain-rgb), 0.12);
+  }
 }
 
 .menu {
@@ -48,18 +66,27 @@
   top: 100%;
   right: 0;
   width: 100%;
-  background: #0c1411;
-  border: 0;
-  border-radius: 0 0 2px 2px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  margin-top: 8px;
+  background: #0f1b16;
+  border: 1px solid variables.$line;
+  border-radius: variables.$radius;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
   z-index: 20;
   padding: 0;
   list-style: none;
 }
 
 .menu li {
-  line-height: 28px;
-  height: 28px;
+  line-height: 36px;
+  height: 36px;
+
+  &:first-child .option {
+    border-radius: 7px 7px 0 0;
+  }
+
+  &:last-child .option {
+    border-radius: 0 0 7px 7px;
+  }
 }
 
 .option {
@@ -67,8 +94,8 @@
   width: 100%;
   text-align: left;
   padding: 0 10px;
-  line-height: 28px;
-  height: 28px;
+  line-height: 36px;
+  height: 36px;
   font-size: 12px;
   color: variables.$app-fg;
   text-transform: capitalize;
@@ -77,45 +104,33 @@
   min-height: 0;
   @media (max-width: variables.$breakpoint) {
     font-size: 10px;
-    line-height: 28px;
-    height: 28px;
+    line-height: 36px;
+    height: 36px;
   }
   &:hover {
-    background: rgba(82, 196, 26, 0.18);
+    background: rgba(var(--chain-rgb), 0.1);
   }
 }
 
 .active {
-  background: rgba(82, 196, 26, 0.28);
+  color: var(--chain-accent);
+  background: rgba(var(--chain-rgb), 0.14);
 }
 
 .addon {
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  right: 1px;
-  display: block;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  display: flex;
   align-items: center;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 34px;
-  border-left: 1px solid hsla(0, 0%, 100%, 0.3) !important;
-  background: transparent;
-  text-align: center;
-  color: #fff !important;
-  line-height: 34px;
+  justify-content: center;
+  width: 20px;
+  color: variables.$muted;
   pointer-events: none;
-  @media (max-width: variables.$breakpoint) {
-    width: 27px !important;
-  }
-  i {
-    font-size: 18px;
-    vertical-align: middle;
-    margin-top: -2px;
-    @media (max-width: variables.$breakpoint) {
-      height: 24px;
-    }
+
+  svg {
+    width: 16px;
+    height: 16px;
   }
 }

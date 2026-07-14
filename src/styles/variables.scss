@@ -1,22 +1,27 @@
-$app-fg: #eaf5eb;
-$app-bg: #52c41a;
+$app-fg: #f0faf1;
+$app-bg: #08110f;
 $brand: #52c41a;
 $link: #7fe35a;
 $link-bg: #52c41a;
-$line: rgba(234, 245, 235, 0.12);
-$bg-hover: rgba(255, 255, 255, 0.04);
+$muted: #8fa49a;
+$soft: #c8d9d0;
+$panel: rgba(255, 255, 255, 0.026);
+$panel-strong: rgba(6, 14, 12, 0.82);
+$line: rgba(255, 255, 255, 0.14);
+$line-soft: rgba(255, 255, 255, 0.075);
+$bg-hover: rgba(255, 255, 255, 0.05);
 $a-bg: rgba(82, 196, 26, 0.12);
 
 $green: #52c41a;
 $red: #ff5561;
 $orange: #fd9a02;
-$navy: #0c1411;
-$sky: #7fe35a;
-$table-head: rgba(82, 196, 26, 0.08);
+$navy: #08110f;
+$sky: #38bdf8;
+$table-head: rgba(255, 255, 255, 0.026);
 /* Sizes */
 $breakpoint: 960px;
 $breakpoint-large: 1024px;
 $gutter: 20px;
 $gutter-large: 30px;
-$radius: 5px;
+$radius: 8px;
 $max-width: (1180px + (2 * $gutter-large));

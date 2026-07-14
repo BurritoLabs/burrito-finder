@@ -1,9 +1,20 @@
 @use "../styles/variables";
 
 .main {
+  --chain-rgb: 56, 189, 248;
+  --chain-accent: #38bdf8;
+  --chain-accent-strong: #0284c7;
+  --chain-accent-soft: #bae6fd;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  &[data-chain="mainnet"] {
+    --chain-rgb: 249, 115, 22;
+    --chain-accent: #f97316;
+    --chain-accent-strong: #ea580c;
+    --chain-accent-soft: #fed7aa;
+  }
 }
 
 .content {
@@ -15,8 +26,7 @@
   flex: 1;
   -webkit-text-size-adjust: 100%;
   @media (max-width: variables.$breakpoint) {
-    padding: 50px 15px;
-    padding-top: 85px;
+    padding: 28px 16px 40px;
   }
 }
 

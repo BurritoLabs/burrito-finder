@@ -1,4 +1,4 @@
-@use 'sass:math';
+@use "sass:math";
 @use "../../styles/mixins";
 @use "../../styles/variables";
 
@@ -18,7 +18,9 @@
 .button {
   @include mixins.flex();
 
-  border: 1px solid #eee;
+  border: 1px solid variables.$line;
+  color: variables.$soft;
+  background: rgba(255, 255, 255, 0.035);
   border-radius: 50%;
   margin-top: math.div(30px - 24px, 2);
   width: 24px;

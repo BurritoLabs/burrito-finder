@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import { useCurrency } from "../contexts/CurrencyContext";
 import { useDenoms } from "../queries/oracle";
 import { getCookie } from "../scripts/cookie";
@@ -33,7 +34,7 @@ const SelectCurrency = (props: Props) => {
         })}
       </select>
       <div className={s.addon}>
-        <i className="material-icons">arrow_drop_down</i>
+        <ChevronDown aria-hidden="true" />
       </div>
     </div>
   );

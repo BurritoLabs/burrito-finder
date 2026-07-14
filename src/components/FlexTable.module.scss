@@ -3,7 +3,8 @@
 
 .table {
   border: solid 1px variables.$line;
-  border-radius: 5px;
+  border-radius: variables.$radius;
+  overflow: hidden;
   word-break: break-all;
   width: 100%;
   min-width: 800px;
