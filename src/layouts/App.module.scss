@@ -30,6 +30,12 @@
   }
 }
 
+@media (max-width: variables.$breakpoint - 1) {
+  .main {
+    background: #0f1b16;
+  }
+}
+
 .loadingOverlay {
   position: fixed;
   inset: 0;

@@ -8,6 +8,17 @@ import s from "./SelectNetworks.module.scss";
 type Props = {
   className?: string;
 };
+
+const NETWORKS = {
+  classic: { name: "Classic", ticker: "LUNC" },
+  mainnet: { name: "Phoenix", ticker: "LUNA" }
+} as const;
+
+type PublicNetwork = keyof typeof NETWORKS;
+
+const isPublicNetwork = (name: string): name is PublicNetwork =>
+  name in NETWORKS;
+
 const SelectNetworks = (props: Props) => {
   const { className } = props;
   const chains = useChains();
@@ -24,19 +35,17 @@ const SelectNetworks = (props: Props) => {
     navigate(`${name}/${params["*"]}`);
   };
 
-  const orderedChains = [...chains].sort((a, b) => {
-    const order = ["classic", "mainnet"];
-    const aIndex = order.indexOf(a.name);
-    const bIndex = order.indexOf(b.name);
-    if (aIndex === -1 && bIndex === -1) return a.name.localeCompare(b.name);
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
-    return aIndex - bIndex;
-  });
+  const orderedChains = chains
+    .filter(chain => isPublicNetwork(chain.name))
+    .sort(
+      (a, b) =>
+        ["classic", "mainnet"].indexOf(a.name) -
+        ["classic", "mainnet"].indexOf(b.name)
+    );
 
-  const displayLabel = (name: string) => (name === "mainnet" ? "LUNA" : "LUNC");
-  const networkLabel = (name: string) =>
-    name === "mainnet" ? "Phoenix (LUNA)" : "Classic (LUNC)";
+  const currentNetwork = isPublicNetwork(currentChain.name)
+    ? NETWORKS[currentChain.name]
+    : { name: currentChain.name, ticker: currentChain.chainID };
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -58,11 +67,11 @@ const SelectNetworks = (props: Props) => {
         <button
           type="button"
           className={s.selectButton}
-          aria-label={`${networkLabel(currentChain.name)} network`}
+          aria-label={`${currentNetwork.name} (${currentNetwork.ticker}) network`}
           aria-expanded={open}
           onClick={() => setOpen(value => !value)}
         >
-          <span className={s.label}>{displayLabel(currentChain.name)}</span>
+          <span className={s.label}>{currentNetwork.ticker}</span>
           <span className={s.addon}>
             <ChevronDown aria-hidden="true" />
           </span>
@@ -70,12 +79,13 @@ const SelectNetworks = (props: Props) => {
         {open ? (
           <ul className={s.menu}>
             {orderedChains.map(({ name }) => {
+              const network = NETWORKS[name as PublicNetwork];
               const isActive = name === currentChain.name;
               return (
                 <li key={name}>
                   <button
                     type="button"
-                    aria-label={networkLabel(name)}
+                    aria-label={`${network.name} (${network.ticker})`}
                     className={[s.option, isActive ? s.active : ""]
                       .filter(Boolean)
                       .join(" ")}
@@ -84,7 +94,8 @@ const SelectNetworks = (props: Props) => {
                       changeChain(name);
                     }}
                   >
-                    {displayLabel(name)}
+                    <span>{network.name}</span>
+                    <span className={s.optionTicker}>{network.ticker}</span>
                   </button>
                 </li>
               );

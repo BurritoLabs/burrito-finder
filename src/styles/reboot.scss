@@ -8,12 +8,16 @@
 }
 
 html {
+  min-height: 100%;
+  background: #0f1b16;
+
   @media (max-width: variables.$breakpoint - 1) {
     overflow-x: hidden;
   }
 }
 
 body {
+  min-height: 100vh;
   line-height: 1.5;
   margin: 0;
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
@@ -34,6 +38,8 @@ body {
     ),
     linear-gradient(180deg, #14231d 0%, #101b17 55%, #0d1815 100%);
   background-color: #101b17;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   font-feature-settings: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -42,6 +48,7 @@ body {
 
   @media (max-width: variables.$breakpoint - 1) {
     overflow-x: hidden;
+    background: #0f1b16;
   }
 }
 

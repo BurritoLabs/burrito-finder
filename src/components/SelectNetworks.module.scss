@@ -65,15 +65,16 @@
   position: absolute;
   top: 100%;
   right: 0;
-  width: 100%;
+  width: 172px;
   margin-top: 8px;
   background: #0f1b16;
   border: 1px solid variables.$line;
   border-radius: variables.$radius;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
-  z-index: 20;
+  z-index: 100;
   padding: 0;
   list-style: none;
+  overflow: hidden;
 }
 
 .menu li {
@@ -90,10 +91,13 @@
 }
 
 .option {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   width: 100%;
   text-align: left;
-  padding: 0 10px;
+  padding: 0 12px;
   line-height: 36px;
   height: 36px;
   font-size: 12px;
@@ -103,7 +107,7 @@
   border: 0;
   min-height: 0;
   @media (max-width: variables.$breakpoint) {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 36px;
     height: 36px;
   }
@@ -112,9 +116,19 @@
   }
 }
 
+.optionTicker {
+  color: variables.$muted;
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .active {
   color: var(--chain-accent);
   background: rgba(var(--chain-rgb), 0.14);
+
+  .optionTicker {
+    color: inherit;
+  }
 }
 
 .addon {

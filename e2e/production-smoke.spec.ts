@@ -39,6 +39,14 @@ test("bundled chain config keeps the Finder available when the registry is down"
   });
   await expect(networkButtons).toHaveCount(1);
   await expect(networkButtons.first()).toBeVisible();
+  await networkButtons.first().click();
+  await expect(
+    page.getByRole("button", { name: "Classic (LUNC)", exact: true })
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Phoenix (LUNA)", exact: true })
+  ).toHaveCount(1);
+  await expect(page.getByRole("list").getByRole("button")).toHaveCount(2);
 });
 
 test("Classic validator resolves IBC labels without runtime errors", async ({
