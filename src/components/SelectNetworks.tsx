@@ -11,13 +11,19 @@ type Props = {
 
 const NETWORKS = {
   classic: { name: "Classic", ticker: "LUNC" },
+  "classic-testnet": { name: "Rebel Testnet", ticker: "LUNC" },
   mainnet: { name: "Phoenix", ticker: "LUNA" },
   testnet: { name: "Pisco Testnet", ticker: "LUNA" }
 } as const;
 
 type PublicNetwork = keyof typeof NETWORKS;
 
-const NETWORK_ORDER: PublicNetwork[] = ["classic", "mainnet", "testnet"];
+const NETWORK_ORDER: PublicNetwork[] = [
+  "classic",
+  "classic-testnet",
+  "mainnet",
+  "testnet"
+];
 
 const isPublicNetwork = (name: string): name is PublicNetwork =>
   name in NETWORKS;

@@ -1,4 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import {
+  isClassicMainnetChainID,
+  isClassicTestnetChainID
+} from "../contexts/ChainsContext";
 import { MINTSCAN_LCD_URL } from "./mintscan";
 
 const DEFAULT_TIMEOUT = 8000;
@@ -10,14 +14,27 @@ export const CLASSIC_LCD_ENDPOINTS = [
   "https://api-lunc-lcd.binodes.com"
 ];
 
+export const CLASSIC_TESTNET_LCD_ENDPOINTS = [
+  "https://lcd.terra-classic.hexxagon.dev",
+  "https://lcd.luncblaze.com"
+];
+
 const unique = (values: string[]) => Array.from(new Set(values));
 
 export const getClassicLcdFallbackBases = (primary?: string) =>
   unique([primary, ...CLASSIC_LCD_ENDPOINTS].filter(Boolean) as string[]);
 
+export const getClassicTestnetLcdFallbackBases = (primary?: string) =>
+  unique(
+    [primary, ...CLASSIC_TESTNET_LCD_ENDPOINTS].filter(Boolean) as string[]
+  );
+
 export const getLcdFallbackBases = (primary?: string, chainID?: string) => {
-  if (chainID?.startsWith("columbus")) {
+  if (chainID && isClassicMainnetChainID(chainID)) {
     return getClassicLcdFallbackBases(primary);
+  }
+  if (chainID && isClassicTestnetChainID(chainID)) {
+    return getClassicTestnetLcdFallbackBases(primary);
   }
   if (chainID === "phoenix-1") {
     return unique([primary, MINTSCAN_LCD_URL].filter(Boolean) as string[]);

@@ -15,7 +15,10 @@ import MsgBox from "../../components/MsgBox";
 import Copy from "../../components/Copy";
 import Icon from "../../components/Icon";
 import { useLogfinderActionRuleSet } from "../../hooks/useLogfinder";
-import { useCurrentChain } from "../../contexts/ChainsContext";
+import {
+  isClassicTestnetChainID,
+  useCurrentChain
+} from "../../contexts/ChainsContext";
 import { useGetQueryURL } from "../../queries/query";
 import format from "../../scripts/format";
 import Pending from "./Pending";
@@ -29,6 +32,7 @@ import {
   MINTSCAN_PROXY_URL,
   normalizeMintscanTx
 } from "../../queries/mintscan";
+import { fetchClassicTestnetTx } from "../../queries/classicTestnet";
 
 const TxComponent = ({ hash }: { hash: string }) => {
   const ruleSet = useLogfinderActionRuleSet();
@@ -188,7 +192,8 @@ export default Tx;
 const INTERVAL = 3000;
 
 const usePollTxHash = (txhash: string) => {
-  const { chainID } = useCurrentChain();
+  const { chainID, lcd } = useCurrentChain();
+  const isClassicTestnet = isClassicTestnetChainID(chainID);
 
   const [stored, setStored] = useState<TxInfo>();
   const [progress, setProgress] = useState<number>(0);
@@ -206,6 +211,11 @@ const usePollTxHash = (txhash: string) => {
     queryKey: [chainID, txhash, "tx"],
 
     queryFn: async () => {
+      if (isClassicTestnet) {
+        const data = await fetchClassicTestnetTx(lcd, chainID, txhash);
+        return { data };
+      }
+
       try {
         const response = await apiClient.get<TxInfo>(txURL);
         if (response.data) return response;
@@ -240,7 +250,7 @@ const usePollTxHash = (txhash: string) => {
     queryFn: () => apiClient.get<TxInfo>(mempoolURL),
     refetchInterval: INTERVAL,
     refetchOnWindowFocus: false,
-    enabled: refetchMempool
+    enabled: refetchMempool && !isClassicTestnet
   });
 
   // if tx not exists(null or no height), start polling mempool tx
@@ -252,7 +262,7 @@ const usePollTxHash = (txhash: string) => {
     }
 
     if (!txQuery.isFetching && !txQuery.data?.data) {
-      setRefetchMempool(true);
+      setRefetchMempool(!isClassicTestnet);
     }
 
     if (mempoolQuery.data?.data) {
@@ -261,7 +271,13 @@ const usePollTxHash = (txhash: string) => {
     }
 
     setProgress(state => (state + 0.0333) % 1);
-  }, [mempoolQuery.data, txQuery.data, txQuery.isFetching, txhash]);
+  }, [
+    isClassicTestnet,
+    mempoolQuery.data,
+    txQuery.data,
+    txQuery.isFetching,
+    txhash
+  ]);
 
   return {
     data: stored,

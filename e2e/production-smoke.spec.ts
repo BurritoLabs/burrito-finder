@@ -44,12 +44,32 @@ test("bundled chain config keeps the Finder available when the registry is down"
     page.getByRole("button", { name: "Classic (LUNC)", exact: true })
   ).toHaveCount(1);
   await expect(
+    page.getByRole("button", { name: "Rebel Testnet (LUNC)", exact: true })
+  ).toHaveCount(1);
+  await expect(
     page.getByRole("button", { name: "Phoenix (LUNA)", exact: true })
   ).toHaveCount(1);
   await expect(
     page.getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
   ).toHaveCount(1);
-  await expect(page.getByRole("list").getByRole("button")).toHaveCount(3);
+  await expect(page.getByRole("list").getByRole("button")).toHaveCount(4);
+  await page
+    .getByRole("button", { name: "Rebel Testnet (LUNC)", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/classic-testnet\/$/);
+  await expect(
+    page.getByRole("button", {
+      name: "Rebel Testnet (LUNC) network",
+      exact: true
+    })
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", {
+      name: "Rebel Testnet (LUNC) network",
+      exact: true
+    })
+    .click();
   await page
     .getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
     .click();
@@ -60,6 +80,30 @@ test("bundled chain config keeps the Finder available when the registry is down"
       exact: true
     })
   ).toBeVisible();
+});
+
+test("Rebel testnet block and transaction use live LCD data", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  const height = "31616646";
+  const hash =
+    "B3A531CC8FF46A63D189F15354997502AF7B6758A21EC81B446DD6043B745F56";
+
+  await page.goto(`/classic-testnet/blocks/${height}`);
+  await expect(page.getByText("rebel-2", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("tera bitz test node 1", { exact: true })
+  ).toBeVisible();
+  await expect(page.getByText(hash, { exact: true })).toBeVisible();
+
+  await page.goto(`/classic-testnet/tx/${hash}`);
+  await expect(
+    page.getByRole("heading", { name: "Transaction Details" })
+  ).toBeVisible();
+  await expect(page.getByText("rebel-2", { exact: true })).toBeVisible();
+  await expect(page.getByText(height, { exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test("Classic validator resolves IBC labels without runtime errors", async ({

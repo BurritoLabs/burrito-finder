@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import format from "../../scripts/format";
-import { useFCDURL } from "../../contexts/ChainsContext";
+import { useFCDURL, useSupportsFCD } from "../../contexts/ChainsContext";
 import useRequest from "../../hooks/useRequest";
 import Icon from "../../components/Icon";
 import AmountCard from "./AmountCard";
@@ -12,8 +12,10 @@ const OldVesting = ({ address }: { address: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(isOpen => !isOpen);
   const fcdURL = useFCDURL();
+  const supportsFCD = useSupportsFCD();
   const { data: bank } = useRequest<Account>({
-    url: `${fcdURL}/v1/bank/${address}`
+    url: `${fcdURL}/v1/bank/${address}`,
+    enabled: supportsFCD
   });
 
   if (!bank?.vesting || !bank?.vesting.length) {

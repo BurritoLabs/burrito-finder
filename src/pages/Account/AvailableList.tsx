@@ -1,6 +1,10 @@
 import { Coin } from "@terra-money/terra.js";
 import { useMemo } from "react";
-import { useFCDURL, useIsClassic } from "../../contexts/ChainsContext";
+import {
+  useFCDURL,
+  useIsClassic,
+  useSupportsFCD
+} from "../../contexts/ChainsContext";
 import { useCurrency } from "../../contexts/CurrencyContext";
 import useRequest from "../../hooks/useRequest";
 import { useDenoms } from "../../queries/oracle";
@@ -28,9 +32,10 @@ const AvailableList = ({
   const denom = denoms?.includes(currency) ? currency : DEFAULT_CURRENCY;
   const fcdURL = useFCDURL();
   const isClassic = useIsClassic();
+  const supportsFCD = useSupportsFCD();
   const { data, isLoading } = useRequest<CurrencyData[]>({
     url: `${fcdURL}/v1/market/swaprate/${denom}`,
-    enabled: isClassic && pricesEnabled
+    enabled: isClassic && pricesEnabled && supportsFCD
   });
 
   const cachedUstcPrice = useMemo(() => {
@@ -235,8 +240,8 @@ const AvailableList = ({
             denom === "uusd"
               ? amount.div(1e6).multipliedBy(resolvedUstcPrice)
               : rate
-              ? amount.div(rate).div(1e6).multipliedBy(resolvedUstcPrice)
-              : undefined;
+                ? amount.div(rate).div(1e6).multipliedBy(resolvedUstcPrice)
+                : undefined;
           return usdValue ? usdValue.gte(1) : false;
         }
       }

@@ -34,6 +34,7 @@ interface ChainOption {
   chainID: string;
   lcd: string;
   api?: string;
+  rpc?: string;
   mantle?: string;
   hive?: string;
 }

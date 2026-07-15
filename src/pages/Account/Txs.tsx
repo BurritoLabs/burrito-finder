@@ -15,7 +15,11 @@ import Icon from "../../components/Icon";
 import Finder from "../../components/Finder";
 import Loading from "../../components/Loading";
 import Coin from "../../components/Coin";
-import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
+import {
+  isClassicTestnetChainID,
+  useCurrentChain,
+  useIsClassic
+} from "../../contexts/ChainsContext";
 import {
   fromISOTime,
   sliceMsgType,
@@ -115,6 +119,7 @@ const Txs = ({
   >({ 0: undefined });
   const isClassic = useIsClassic();
   const isPhoenix = chainID === "phoenix-1";
+  const isClassicTestnet = isClassicTestnetChainID(chainID);
   const pageSize = 30;
   const fcdLimit = 100;
   const contractLimit = pageSize;
@@ -124,45 +129,65 @@ const Txs = ({
   const { data: fcdData, isLoading: fcdLoading } = useRequest<{
     next: number;
     txs: TxInfo[];
-  }>({ url, params });
+  }>({ url, params, enabled: !isClassicTestnet });
 
   const shouldUseLcd =
-    isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0);
+    isClassicTestnet ||
+    (isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0));
   const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
   const mintscanCursor = mintscanCursors[offset];
   const { data: lcdData, isLoading: lcdLoading } = useQuery({
-    queryKey: ["phoenix-txs", lcd, address, offset, mintscanCursor],
+    queryKey: [
+      "lcd-account-txs",
+      chainID,
+      lcd,
+      address,
+      offset,
+      mintscanCursor
+    ],
 
     queryFn: async () => {
-      try {
-        const { data: mintscanData } = await apiClient.get<{
-          transactions?: any[];
-          pagination?: { searchAfter?: string };
-        }>(`${MINTSCAN_PROXY_URL}/accounts/${address}/transactions`, {
-          params: {
-            take: contractLimit,
-            ...(mintscanCursor ? { searchAfter: mintscanCursor } : {})
-          },
-          timeout: 8000
-        });
-        const txs = (mintscanData.transactions ?? []).map(tx =>
-          normalizeMintscanTx(tx, chainID)
-        );
-        const searchAfter = mintscanData.pagination?.searchAfter;
-        return {
-          txs,
-          searchAfter,
-          next: searchAfter ? offset + contractLimit : undefined
-        };
-      } catch {
-        // Fall through to public LCD event search.
+      if (!isClassicTestnet) {
+        try {
+          const { data: mintscanData } = await apiClient.get<{
+            transactions?: any[];
+            pagination?: { searchAfter?: string };
+          }>(`${MINTSCAN_PROXY_URL}/accounts/${address}/transactions`, {
+            params: {
+              take: contractLimit,
+              ...(mintscanCursor ? { searchAfter: mintscanCursor } : {})
+            },
+            timeout: 8000
+          });
+          const txs = (mintscanData.transactions ?? []).map(tx =>
+            normalizeMintscanTx(tx, chainID)
+          );
+          const searchAfter = mintscanData.pagination?.searchAfter;
+          return {
+            txs,
+            searchAfter,
+            next: searchAfter ? offset + contractLimit : undefined
+          };
+        } catch {
+          // Fall through to public LCD event search.
+        }
       }
 
       const fetchByEvent = async (eventKey: string) => {
         const search = new URLSearchParams();
         search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
+        if (isClassicTestnet) {
+          search.set("query", `${eventKey}='${address}'`);
+          const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
+          try {
+            const { data } = await apiClient.get(endpoint, { timeout: 8000 });
+            return data;
+          } catch {
+            return { txs: [], tx_responses: [], pagination: { total: "0" } };
+          }
+        }
         search.set("events", `${eventKey}='${address}'`);
         const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
         try {
@@ -412,7 +437,7 @@ const Txs = ({
     <Card title="Transactions" bordered headerClassName={s.cardTitle}>
       {!isEmpty(txsRow) ? (
         <div className={s.exportCsvWrapper}>
-          <CsvExport address={address} />
+          {!isClassicTestnet ? <CsvExport address={address} /> : null}
         </div>
       ) : null}
 

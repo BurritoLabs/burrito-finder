@@ -1,12 +1,13 @@
 import { TxInfo } from "@terra-money/terra.js";
 import { pick, pickBy } from "lodash";
+import { isClassicMainnetChainID } from "../../contexts/ChainsContext";
 
 interface Transaction extends TxInfo {
   chainId: string;
 }
 
 export const transformTx = (tx: any, network: string): TxResponse => {
-  if (network.startsWith("columbus") && !tx?.tx?.body) {
+  if (isClassicMainnetChainID(network) && !tx?.tx?.body) {
     // old fcd
     return tx;
   }

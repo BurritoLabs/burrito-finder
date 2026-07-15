@@ -2,7 +2,12 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dictionary } from "lodash";
-import { useCurrentChain } from "../contexts/ChainsContext";
+import {
+  isClassicChainID,
+  isClassicMainnetChainID,
+  isClassicTestnetChainID,
+  useCurrentChain
+} from "../contexts/ChainsContext";
 import { parseCommonJsArray } from "../scripts/cjsRegistry";
 import {
   axiosGetWithEndpointFallback,
@@ -398,7 +403,7 @@ const queryContractSmart = async <T>(
 
 export const useLaunchpadCw20Contracts = () => {
   const { lcd, chainID } = useCurrentChain();
-  const isClassic = chainID.startsWith("columbus");
+  const isClassic = isClassicMainnetChainID(chainID);
 
   return useQuery({
     queryKey: [
@@ -446,7 +451,8 @@ export const useLaunchpadCw20Contracts = () => {
 export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
   const chain = useCurrentChain();
   const { lcd, chainID } = chain;
-  const isClassic = chainID.startsWith("columbus");
+  const isClassic = isClassicChainID(chainID);
+  const isClassicTestnet = isClassicTestnetChainID(chainID);
   const fallbackBases = getLcdFallbackBases(lcd, chainID);
   const { data } = useQuery({
     queryKey: ["IBCWhitelist", chain],
@@ -509,28 +515,30 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
 
     queryFn: async () => {
       const entries: [string, IBCWhitelist][] = [];
-      try {
-        const aggregate = await fetchFinderAccountAssets({
-          network: isClassic ? "classic" : "mainnet",
-          ibcDenoms: missingHashes.map(hash => `ibc/${hash}`)
-        });
-        aggregate.ibc.forEach(asset => {
-          if (asset.status !== "ok" || !asset.metadata) return;
-          entries.push([
-            asset.hash,
-            {
-              denom: asset.metadata.denom,
-              path: asset.metadata.path,
-              base_denom: asset.metadata.baseDenom,
-              symbol: asset.metadata.symbol,
-              name: asset.metadata.name,
-              icon: asset.metadata.icon,
-              decimals: asset.metadata.decimals
-            }
-          ]);
-        });
-      } catch {
-        // Per-denom LCD fallback below handles API outages.
+      if (!isClassicTestnet) {
+        try {
+          const aggregate = await fetchFinderAccountAssets({
+            network: isClassic ? "classic" : "mainnet",
+            ibcDenoms: missingHashes.map(hash => `ibc/${hash}`)
+          });
+          aggregate.ibc.forEach(asset => {
+            if (asset.status !== "ok" || !asset.metadata) return;
+            entries.push([
+              asset.hash,
+              {
+                denom: asset.metadata.denom,
+                path: asset.metadata.path,
+                base_denom: asset.metadata.baseDenom,
+                symbol: asset.metadata.symbol,
+                name: asset.metadata.name,
+                icon: asset.metadata.icon,
+                decimals: asset.metadata.decimals
+              }
+            ]);
+          });
+        } catch {
+          // Per-denom LCD fallback below handles API outages.
+        }
       }
 
       const resolvedHashes = new Set(entries.map(([hash]) => hash));
@@ -581,6 +589,7 @@ const pickChainAssets = <T>(
       key.toLowerCase() === loweredName || key.toLowerCase() === loweredChain
   );
   if (match) return data[match];
+  if (isClassicTestnetChainID(chainID)) return undefined;
   return (
     data.classic ?? data["columbus-5"] ?? data.mainnet ?? data["phoenix-1"]
   );
@@ -600,7 +609,7 @@ export const useWhitelist = (contracts?: string[]) => {
     queryKey: ["hexxagon-cw20-tokens", chainID],
 
     queryFn: async () => {
-      if (!chainID.startsWith("columbus")) return {};
+      if (!isClassicMainnetChainID(chainID)) return {};
       const tokens = await fetchHexxagonArray<HexxagonCw20Token>(
         "cw20/tokens/mainnet/terra.js"
       );
@@ -695,7 +704,7 @@ export const useContracts = () => {
     queryKey: ["hexxagon-cw20-contracts", chainID],
 
     queryFn: async () => {
-      if (!chainID.startsWith("columbus")) return {};
+      if (!isClassicMainnetChainID(chainID)) return {};
       const contracts = await fetchHexxagonArray<HexxagonCw20Contract>(
         "cw20/contracts/mainnet/terra.js"
       );

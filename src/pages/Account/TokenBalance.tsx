@@ -3,7 +3,11 @@ import BigNumber from "bignumber.js";
 import Card from "../../components/Card";
 import Info from "../../components/Info";
 import Loading from "../../components/Loading";
-import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
+import {
+  isClassicTestnetChainID,
+  useCurrentChain,
+  useIsClassic
+} from "../../contexts/ChainsContext";
 import { useInitialBankBalance } from "../../queries/bank";
 import useTokenBalance from "../../hooks/cw20/useTokenBalance";
 import { isIbcDenom } from "../../scripts/utility";
@@ -27,8 +31,9 @@ const TokenBalance = ({ address }: { address: string }) => {
     ibcBalance?.map(({ denom }) => denom) ?? []
   );
 
-  const { name } = useCurrentChain();
+  const { name, chainID } = useCurrentChain();
   const isClassic = useIsClassic();
+  const isClassicTestnet = isClassicTestnetChainID(chainID);
   const cwFallbackIcon =
     "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
   useEffect(() => {
@@ -64,7 +69,7 @@ const TokenBalance = ({ address }: { address: string }) => {
             <AvailableList
               list={nativeBlanace}
               showLowValueCoins={!hideLowValueAssets}
-              pricesEnabled={pricesEnabled}
+              pricesEnabled={pricesEnabled && !isClassicTestnet}
             />
           </div>
         ) : (
@@ -172,7 +177,7 @@ const TokenBalance = ({ address }: { address: string }) => {
           </div>
         </Card>
       ) : null}
-      {isClassic ? <OldVesting address={address} /> : null}
+      {isClassic && !isClassicTestnet ? <OldVesting address={address} /> : null}
     </>
   );
 };

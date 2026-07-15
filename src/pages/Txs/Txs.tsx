@@ -13,7 +13,11 @@ import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
 import s from "./Txs.module.scss";
 import TaxRateAmount from "../Tx/TaxRateAmount";
 
-const getRow = (response: TxInfo, chainID: string, isClassic?: boolean) => {
+const getRow = (
+  response: TxInfo | TxResponse,
+  chainID: string,
+  isClassic?: boolean
+) => {
   const transformed = transformTx(response, chainID);
   const { txhash, tx, height, timestamp, logs } = transformed;
   const fee = get(tx, `value.fee.amount[0]`);
@@ -38,7 +42,7 @@ const getRow = (response: TxInfo, chainID: string, isClassic?: boolean) => {
   ];
 };
 
-const Txs = ({ txs }: { txs: TxInfo[] }) => {
+const Txs = ({ txs }: { txs: Array<TxInfo | TxResponse> }) => {
   const pageSize = 30;
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const isClassic = useIsClassic();

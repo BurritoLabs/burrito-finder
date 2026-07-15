@@ -19,6 +19,12 @@ export const FALLBACK_CHAINS: ChainOption[] = [
     mantle: "https://columbus-mantle.terra.dev"
   },
   {
+    name: "classic-testnet",
+    chainID: "rebel-2",
+    lcd: "https://lcd.terra-classic.hexxagon.dev",
+    rpc: "https://rpc.luncblaze.com"
+  },
+  {
     name: "testnet",
     chainID: "pisco-1",
     lcd: "https://pisco-lcd.terra.dev",
@@ -33,14 +39,30 @@ export const FALLBACK_CHAINS: ChainOption[] = [
   }
 ];
 
+const mergeBundledChains = (chains: ChainOption[]) => {
+  const bundledByName = new Map(
+    FALLBACK_CHAINS.map(chain => [chain.name, chain] as const)
+  );
+  const merged = chains.map(chain => {
+    const bundled = bundledByName.get(chain.name);
+    if (!bundled) return chain;
+    bundledByName.delete(chain.name);
+    return {
+      ...bundled,
+      ...chain,
+      ...(chain.name === "mainnet" ? { lcd: bundled.lcd } : {})
+    };
+  });
+
+  return [...merged, ...bundledByName.values()];
+};
+
 const normalizeChains = (data: Record<string, ChainOption>) =>
-  Object.values(data)
-    .filter(chain => chain?.name && chain?.chainID && chain?.lcd)
-    .map(chain =>
-      chain.name === "mainnet"
-        ? { ...chain, lcd: "https://terra-lcd.publicnode.com" }
-        : chain
-    );
+  mergeBundledChains(
+    Object.values(data).filter(
+      chain => chain?.name && chain?.chainID && chain?.lcd
+    )
+  );
 
 export const getInitialChains = () => {
   if (typeof window === "undefined") return FALLBACK_CHAINS;
@@ -48,7 +70,9 @@ export const getInitialChains = () => {
     const cached = JSON.parse(
       window.localStorage.getItem(CHAIN_CACHE_KEY) ?? "null"
     ) as { chains?: ChainOption[] } | null;
-    return cached?.chains?.length ? cached.chains : FALLBACK_CHAINS;
+    return cached?.chains?.length
+      ? mergeBundledChains(cached.chains)
+      : FALLBACK_CHAINS;
   } catch {
     return FALLBACK_CHAINS;
   }
@@ -107,7 +131,21 @@ export const useFCDURL = () => {
   return chain.api ?? chain.lcd.replace("lcd", "fcd");
 };
 
+export const useSupportsFCD = () => {
+  const { chainID } = useCurrentChain();
+  return chainID !== "rebel-2";
+};
+
+export const isClassicChainID = (chainID: string) =>
+  chainID === "columbus-5" || chainID === "rebel-2";
+
+export const isClassicMainnetChainID = (chainID: string) =>
+  chainID === "columbus-5";
+
+export const isClassicTestnetChainID = (chainID: string) =>
+  chainID === "rebel-2";
+
 export const useIsClassic = () => {
   const { chainID } = useCurrentChain();
-  return chainID.startsWith("columbus");
+  return isClassicChainID(chainID);
 };

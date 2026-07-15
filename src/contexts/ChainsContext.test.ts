@@ -36,6 +36,27 @@ describe("chain registry fallback", () => {
     expect(chains.find(chain => chain.name === "mainnet")?.lcd).toBe(
       "https://terra-lcd.publicnode.com"
     );
+    expect(
+      chains.find(chain => chain.name === "classic-testnet")
+    ).toMatchObject({
+      chainID: "rebel-2",
+      lcd: "https://lcd.terra-classic.hexxagon.dev"
+    });
     expect(getInitialChains()).toEqual(chains);
+  });
+
+  test("adds bundled networks to an older cached registry", () => {
+    window.localStorage.setItem(
+      "finder:chains:v1",
+      JSON.stringify({
+        chains: FALLBACK_CHAINS.filter(
+          chain => chain.name !== "classic-testnet"
+        )
+      })
+    );
+
+    expect(
+      getInitialChains().find(chain => chain.name === "classic-testnet")
+    ).toMatchObject({ chainID: "rebel-2" });
   });
 });

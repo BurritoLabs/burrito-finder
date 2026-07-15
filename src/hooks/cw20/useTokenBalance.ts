@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Dictionary } from "ramda";
 import axios from "axios";
 import alias from "./alias";
-import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
+import {
+  isClassicTestnetChainID,
+  useCurrentChain,
+  useIsClassic
+} from "../../contexts/ChainsContext";
 import {
   useContracts,
   useLaunchpadCw20Contracts,
@@ -119,6 +123,7 @@ const useTokenBalance = (
     };
   }, [contracts, whitelist, isClassic]);
   const { mantle, hive, lcd, chainID } = useCurrentChain();
+  const isClassicTestnet = isClassicTestnetChainID(chainID);
 
   useEffect(() => {
     if (!address) {
@@ -128,10 +133,8 @@ const useTokenBalance = (
 
     if (address && Object.keys(mergedWhitelist).length) {
       const whitelistSignature = buildWhitelistSignature(mergedWhitelist);
-      const cacheKey = `cw20balance:v2:${address}:${
-        isClassic ? "classic" : "mainnet"
-      }:${whitelistSignature}`;
-      const invalidKey = `cw20invalid:v2:${isClassic ? "classic" : "mainnet"}`;
+      const cacheKey = `cw20balance:v2:${address}:${chainID}:${whitelistSignature}`;
+      const invalidKey = `cw20invalid:v2:${chainID}`;
       const load = async () => {
         try {
           setResult(undefined);
@@ -170,26 +173,28 @@ const useTokenBalance = (
           const entries = Object.entries(mergedWhitelist).filter(
             ([contract]) => !invalidContracts[contract]
           );
-          const graphUri = isClassic ? undefined : hive ?? mantle;
+          const graphUri = isClassic ? undefined : (hive ?? mantle);
           let parsed: Dictionary<string> = {};
 
-          try {
-            const aggregate = await fetchFinderAccountAssets({
-              network: isClassic ? "classic" : "mainnet",
-              address,
-              contracts: entries.map(([contract]) => contract)
-            });
-            const metadata: Dictionary<Partial<Token>> = {};
-            aggregate.cw20.forEach(asset => {
-              if (asset.status !== "ok") return;
-              if (asset.balance !== undefined) {
-                parsed[asset.contract] = asset.balance;
-              }
-              if (asset.metadata) metadata[asset.contract] = asset.metadata;
-            });
-            setResolvedMetadata(metadata);
-          } catch {
-            // The existing graph/LCD path below remains the client fallback.
+          if (!isClassicTestnet) {
+            try {
+              const aggregate = await fetchFinderAccountAssets({
+                network: isClassic ? "classic" : "mainnet",
+                address,
+                contracts: entries.map(([contract]) => contract)
+              });
+              const metadata: Dictionary<Partial<Token>> = {};
+              aggregate.cw20.forEach(asset => {
+                if (asset.status !== "ok") return;
+                if (asset.balance !== undefined) {
+                  parsed[asset.contract] = asset.balance;
+                }
+                if (asset.metadata) metadata[asset.contract] = asset.metadata;
+              });
+              setResolvedMetadata(metadata);
+            } catch {
+              // The existing graph/LCD path below remains the client fallback.
+            }
           }
 
           const graphEntries = entries.filter(
