@@ -31,28 +31,16 @@
 .container::before {
   content: "";
   position: absolute;
-  inset: -20vh -18vw;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      1100px 740px at 70% 26%,
-      rgba(var(--chain-rgb), 0.16),
-      transparent 62%
-    ),
-    radial-gradient(
-      980px 620px at 52% 44%,
-      rgba(var(--chain-rgb), 0.08),
-      transparent 66%
-    ),
-    radial-gradient(
-      820px 520px at 18% 18%,
-      rgba(255, 255, 255, 0.05),
-      transparent 62%
-    );
-  filter: blur(12px);
-  opacity: 0.9;
-  animation: burritoSystemBreath 7.5s ease-in-out infinite;
+  background: radial-gradient(
+    ellipse 68% 58% at 52% 38%,
+    rgba(var(--chain-rgb), 0.105) 0%,
+    rgba(var(--chain-rgb), 0.045) 42%,
+    rgba(var(--chain-rgb), 0.012) 62%,
+    transparent 80%
+  );
 }
 
 .container::after {
@@ -68,16 +56,6 @@
     rgba(0, 0, 0, 0.34) 100%
   );
   opacity: 0.5;
-}
-
-@keyframes burritoSystemBreath {
-  0%,
-  100% {
-    opacity: 0.82;
-  }
-  50% {
-    opacity: 1;
-  }
 }
 
 .content {
@@ -129,11 +107,5 @@
       height: 48px;
       font-size: 15px;
     }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .container::before {
-    animation: none;
   }
 }
