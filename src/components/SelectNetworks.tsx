@@ -10,10 +10,14 @@ type Props = {
 };
 
 const NETWORKS = {
-  classic: { name: "Classic", ticker: "LUNC" },
-  "classic-testnet": { name: "Rebel Testnet", ticker: "LUNC" },
-  mainnet: { name: "Phoenix", ticker: "LUNA" },
-  testnet: { name: "Pisco Testnet", ticker: "LUNA" }
+  classic: { name: "Classic", shortName: "Classic", ticker: "LUNC" },
+  "classic-testnet": {
+    name: "Rebel Testnet",
+    shortName: "Rebel",
+    ticker: "LUNC"
+  },
+  mainnet: { name: "Phoenix", shortName: "Phoenix", ticker: "LUNA" },
+  testnet: { name: "Pisco Testnet", shortName: "Pisco", ticker: "LUNA" }
 } as const;
 
 type PublicNetwork = keyof typeof NETWORKS;
@@ -54,7 +58,11 @@ const SelectNetworks = (props: Props) => {
 
   const currentNetwork = isPublicNetwork(currentChain.name)
     ? NETWORKS[currentChain.name]
-    : { name: currentChain.name, ticker: currentChain.chainID };
+    : {
+        name: currentChain.name,
+        shortName: currentChain.name,
+        ticker: currentChain.chainID
+      };
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -80,7 +88,11 @@ const SelectNetworks = (props: Props) => {
           aria-expanded={open}
           onClick={() => setOpen(value => !value)}
         >
-          <span className={s.label}>{currentNetwork.ticker}</span>
+          <span className={s.label}>
+            <span className={s.statusDot} aria-hidden="true" />
+            <span className={s.networkName}>{currentNetwork.shortName}</span>
+            <span className={s.currentTicker}>{currentNetwork.ticker}</span>
+          </span>
           <span className={s.addon}>
             <ChevronDown aria-hidden="true" />
           </span>

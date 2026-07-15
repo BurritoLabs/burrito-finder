@@ -1,11 +1,14 @@
 @use "../styles/variables.scss";
 
 .wrapper {
-  width: 132px;
-  height: 36px;
+  width: 158px;
+  height: 38px;
   @media (max-width: variables.$breakpoint) {
-    width: 116px;
-    height: 34px;
+    width: 142px;
+    height: 36px;
+  }
+  @media (max-width: 360px) {
+    width: 100px;
   }
 }
 
@@ -18,46 +21,84 @@
 .selectButton {
   width: 100%;
   height: 100%;
-  padding: 0 34px 0 12px;
+  padding: 0 10px 0 12px;
   border-radius: variables.$radius;
-  border: 1px solid variables.$line;
+  border: 1px solid rgba(255, 255, 255, 0.11);
   font-size: 12px;
   color: variables.$app-fg;
   font-weight: 600;
   letter-spacing: 0;
-  text-transform: capitalize;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(5, 13, 10, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 5px 16px rgba(0, 0, 0, 0.16);
   text-align: left;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+
   @media (max-width: variables.$breakpoint) {
     font-size: 11px;
-    padding: 0 30px 0 10px;
+    padding: 0 9px 0 10px;
   }
 
   &:hover {
-    border-color: rgba(var(--chain-rgb), 0.46);
-    background: rgba(var(--chain-rgb), 0.08);
+    border-color: rgba(var(--chain-rgb), 0.32);
+    background: rgba(var(--chain-rgb), 0.07);
+  }
+
+  &[aria-expanded="true"] {
+    border-color: rgba(var(--chain-rgb), 0.42);
+    background: rgba(var(--chain-rgb), 0.09);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.045),
+      0 7px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    border-color: rgba(var(--chain-rgb), 0.55);
+    box-shadow:
+      0 0 0 3px rgba(var(--chain-rgb), 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.045);
   }
 }
 
 .label {
-  display: inline-flex;
+  min-width: 0;
+  flex: 1;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   white-space: nowrap;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--chain-accent);
+  box-shadow: 0 0 0 3px rgba(var(--chain-rgb), 0.1);
+}
+
+.networkName {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
 
-  &::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    flex: 0 0 7px;
-    border-radius: 999px;
-    background: var(--chain-accent);
-    box-shadow: 0 0 0 3px rgba(var(--chain-rgb), 0.12);
+.currentTicker {
+  margin-left: auto;
+  color: variables.$muted;
+  font-size: 9px;
+  font-weight: 600;
+
+  @media (max-width: 360px) {
+    display: none;
   }
 }
 
@@ -132,19 +173,22 @@
 }
 
 .addon {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 8px;
+  flex: 0 0 18px;
+  margin-left: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
+  width: 18px;
   color: variables.$muted;
   pointer-events: none;
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+    transition: transform 160ms ease;
   }
+}
+
+.selectButton[aria-expanded="true"] .addon svg {
+  transform: rotate(180deg);
 }
