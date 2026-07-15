@@ -9,7 +9,8 @@
   display: flex;
   flex-direction: column;
 
-  &[data-chain="mainnet"] {
+  &[data-chain="mainnet"],
+  &[data-chain="testnet"] {
     --chain-rgb: 249, 115, 22;
     --chain-accent: #f97316;
     --chain-accent-strong: #ea580c;

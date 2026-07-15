@@ -11,10 +11,13 @@ type Props = {
 
 const NETWORKS = {
   classic: { name: "Classic", ticker: "LUNC" },
-  mainnet: { name: "Phoenix", ticker: "LUNA" }
+  mainnet: { name: "Phoenix", ticker: "LUNA" },
+  testnet: { name: "Pisco Testnet", ticker: "LUNA" }
 } as const;
 
 type PublicNetwork = keyof typeof NETWORKS;
+
+const NETWORK_ORDER: PublicNetwork[] = ["classic", "mainnet", "testnet"];
 
 const isPublicNetwork = (name: string): name is PublicNetwork =>
   name in NETWORKS;
@@ -39,8 +42,8 @@ const SelectNetworks = (props: Props) => {
     .filter(chain => isPublicNetwork(chain.name))
     .sort(
       (a, b) =>
-        ["classic", "mainnet"].indexOf(a.name) -
-        ["classic", "mainnet"].indexOf(b.name)
+        NETWORK_ORDER.indexOf(a.name as PublicNetwork) -
+        NETWORK_ORDER.indexOf(b.name as PublicNetwork)
     );
 
   const currentNetwork = isPublicNetwork(currentChain.name)

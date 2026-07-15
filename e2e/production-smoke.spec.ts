@@ -46,7 +46,20 @@ test("bundled chain config keeps the Finder available when the registry is down"
   await expect(
     page.getByRole("button", { name: "Phoenix (LUNA)", exact: true })
   ).toHaveCount(1);
-  await expect(page.getByRole("list").getByRole("button")).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
+  ).toHaveCount(1);
+  await expect(page.getByRole("list").getByRole("button")).toHaveCount(3);
+  await page
+    .getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/testnet\/$/);
+  await expect(
+    page.getByRole("button", {
+      name: "Pisco Testnet (LUNA) network",
+      exact: true
+    })
+  ).toBeVisible();
 });
 
 test("Classic validator resolves IBC labels without runtime errors", async ({
