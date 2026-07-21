@@ -10,14 +10,34 @@ type Props = {
 };
 
 const NETWORKS = {
-  classic: { name: "Classic", shortName: "Classic", ticker: "LUNC" },
+  classic: {
+    name: "Classic",
+    ticker: "LUNC",
+    logoSrc: "/system/lunc.svg",
+    accentRgb: "56, 189, 248",
+    testnet: false
+  },
   "classic-testnet": {
     name: "Rebel Testnet",
-    shortName: "Rebel",
-    ticker: "LUNC"
+    ticker: "LUNC",
+    logoSrc: "/system/lunc.svg",
+    accentRgb: "56, 189, 248",
+    testnet: true
   },
-  mainnet: { name: "Phoenix", shortName: "Phoenix", ticker: "LUNA" },
-  testnet: { name: "Pisco Testnet", shortName: "Pisco", ticker: "LUNA" }
+  mainnet: {
+    name: "Phoenix",
+    ticker: "LUNA",
+    logoSrc: "/system/luna.svg",
+    accentRgb: "249, 115, 22",
+    testnet: false
+  },
+  testnet: {
+    name: "Pisco Testnet",
+    ticker: "LUNA",
+    logoSrc: "/system/luna.svg",
+    accentRgb: "249, 115, 22",
+    testnet: true
+  }
 } as const;
 
 type PublicNetwork = keyof typeof NETWORKS;
@@ -60,8 +80,10 @@ const SelectNetworks = (props: Props) => {
     ? NETWORKS[currentChain.name]
     : {
         name: currentChain.name,
-        shortName: currentChain.name,
-        ticker: currentChain.chainID
+        ticker: currentChain.chainID,
+        logoSrc: "/system/luna.svg",
+        accentRgb: "249, 115, 22",
+        testnet: currentChain.name.includes("testnet")
       };
 
   useEffect(() => {
@@ -88,11 +110,23 @@ const SelectNetworks = (props: Props) => {
           aria-expanded={open}
           onClick={() => setOpen(value => !value)}
         >
-          <span className={s.label}>
-            <span className={s.statusDot} aria-hidden="true" />
-            <span className={s.networkName}>{currentNetwork.shortName}</span>
-            <span className={s.currentTicker}>{currentNetwork.ticker}</span>
+          <span
+            className={s.chainLogo}
+            style={
+              {
+                "--option-chain-rgb": currentNetwork.accentRgb
+              } as React.CSSProperties
+            }
+            aria-hidden="true"
+          >
+            <span>
+              <img src={currentNetwork.logoSrc} alt="" />
+            </span>
           </span>
+          <span className={s.currentTicker}>{currentNetwork.ticker}</span>
+          {currentNetwork.testnet ? (
+            <span className={s.testnetLabel}>Testnet</span>
+          ) : null}
           <span className={s.addon}>
             <ChevronDown aria-hidden="true" />
           </span>
@@ -110,13 +144,30 @@ const SelectNetworks = (props: Props) => {
                     className={[s.option, isActive ? s.active : ""]
                       .filter(Boolean)
                       .join(" ")}
+                    style={
+                      {
+                        "--option-chain-rgb": network.accentRgb
+                      } as React.CSSProperties
+                    }
                     onClick={() => {
                       setOpen(false);
                       changeChain(name);
                     }}
                   >
-                    <span>{network.name}</span>
-                    <span className={s.optionTicker}>{network.ticker}</span>
+                    <span className={s.chainLogo} aria-hidden="true">
+                      <span>
+                        <img src={network.logoSrc} alt="" />
+                      </span>
+                    </span>
+                    <span className={s.optionName}>
+                      <span>
+                        {network.ticker}
+                        {network.testnet ? (
+                          <span className={s.optionTestnet}>Testnet</span>
+                        ) : null}
+                      </span>
+                      <span>{network.name}</span>
+                    </span>
                   </button>
                 </li>
               );

@@ -1,14 +1,10 @@
 @use "../styles/variables.scss";
 
 .wrapper {
-  width: 158px;
-  height: 38px;
+  width: auto;
+  height: 32px;
   @media (max-width: variables.$breakpoint) {
-    width: 142px;
-    height: 36px;
-  }
-  @media (max-width: 360px) {
-    width: 100px;
+    height: 32px;
   }
 }
 
@@ -19,167 +15,171 @@
 }
 
 .selectButton {
-  width: 100%;
+  width: auto;
+  min-width: 86px;
   height: 100%;
-  padding: 0 10px 0 12px;
-  border-radius: variables.$radius;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  font-size: 12px;
-  color: variables.$app-fg;
+  padding: 0 9px 0 5px;
+  border-radius: 999px;
+  border: 1px solid variables.$line;
+  font-size: 11px;
+  color: rgba(234, 245, 235, 0.76);
   font-weight: 600;
   letter-spacing: 0;
-  background: rgba(5, 13, 10, 0.5);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 5px 16px rgba(0, 0, 0, 0.16);
-  text-align: left;
+  background: rgba(255, 255, 255, 0.026);
+  box-shadow: none;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 7px;
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
-    box-shadow 160ms ease;
-
-  @media (max-width: variables.$breakpoint) {
-    font-size: 11px;
-    padding: 0 9px 0 10px;
-  }
+    color 160ms ease;
 
   &:hover {
-    border-color: rgba(var(--chain-rgb), 0.32);
-    background: rgba(var(--chain-rgb), 0.07);
+    border-color: rgba(var(--chain-rgb), 0.38);
+    background: rgba(var(--chain-rgb), 0.08);
+    color: #fff;
   }
 
   &[aria-expanded="true"] {
     border-color: rgba(var(--chain-rgb), 0.42);
     background: rgba(var(--chain-rgb), 0.09);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.045),
-      0 7px 20px rgba(0, 0, 0, 0.22);
+    color: #fff;
   }
 
   &:focus-visible {
     outline: 0;
     border-color: rgba(var(--chain-rgb), 0.55);
-    box-shadow:
-      0 0 0 3px rgba(var(--chain-rgb), 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    box-shadow: 0 0 0 3px rgba(var(--chain-rgb), 0.12);
   }
 }
 
-.label {
-  min-width: 0;
-  flex: 1;
-  display: flex;
+.chainLogo {
+  --option-chain-rgb: var(--chain-rgb);
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
   align-items: center;
-  gap: 7px;
-  white-space: nowrap;
-}
+  justify-content: center;
+  padding: 1.5px;
+  border-radius: 999px;
+  background: rgba(var(--option-chain-rgb), 0.14);
+  box-shadow: 0 0 0 1px rgba(var(--option-chain-rgb), 0.22);
 
-.statusDot {
-  width: 6px;
-  height: 6px;
-  flex: 0 0 6px;
-  border-radius: 50%;
-  background: var(--chain-accent);
-  box-shadow: 0 0 0 3px rgba(var(--chain-rgb), 0.1);
-}
+  > span {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 1.5px;
+    border-radius: 999px;
+    background: #0c1411;
+  }
 
-.networkName {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
 .currentTicker {
-  margin-left: auto;
-  color: variables.$muted;
-  font-size: 9px;
+  line-height: 20px;
+  color: inherit;
+  font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
+}
 
-  @media (max-width: 360px) {
-    display: none;
-  }
+.testnetLabel,
+.optionTestnet {
+  color: rgba(234, 245, 235, 0.46);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .menu {
   position: absolute;
   top: 100%;
   right: 0;
-  width: 172px;
+  width: min(208px, calc(100vw - 32px));
   margin-top: 8px;
-  background: #0f1b16;
-  border: 1px solid variables.$line;
-  border-radius: variables.$radius;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+  background: rgba(8, 17, 15, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.35);
   z-index: 100;
-  padding: 0;
+  padding: 5px;
   list-style: none;
-  overflow: hidden;
 }
 
 .menu li {
-  line-height: 36px;
-  height: 36px;
-
-  &:first-child .option {
-    border-radius: 7px 7px 0 0;
-  }
-
-  &:last-child .option {
-    border-radius: 0 0 7px 7px;
-  }
+  line-height: normal;
 }
 
 .option {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 10px;
   width: 100%;
   text-align: left;
-  padding: 0 12px;
-  line-height: 36px;
-  height: 36px;
+  padding: 7px;
+  line-height: normal;
+  min-height: 40px;
   font-size: 12px;
-  color: variables.$app-fg;
-  text-transform: capitalize;
+  color: rgba(234, 245, 235, 0.68);
   background: transparent;
   border: 0;
-  min-height: 0;
-  @media (max-width: variables.$breakpoint) {
-    font-size: 12px;
-    line-height: 36px;
-    height: 36px;
-  }
+  border-radius: variables.$radius;
   &:hover {
-    background: rgba(var(--chain-rgb), 0.1);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.045);
   }
 }
 
-.optionTicker {
-  color: variables.$muted;
-  font-size: 10px;
-  font-weight: 600;
+.optionName {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  line-height: 1.1;
+
+  > span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  > span:last-child {
+    color: rgba(234, 245, 235, 0.44);
+    font-size: 10px;
+    font-weight: 500;
+  }
 }
 
 .active {
-  color: var(--chain-accent);
-  background: rgba(var(--chain-rgb), 0.14);
-
-  .optionTicker {
-    color: inherit;
-  }
+  color: #fff;
+  background: rgba(var(--option-chain-rgb), 0.1);
 }
 
 .addon {
-  flex: 0 0 18px;
-  margin-left: 5px;
+  flex: 0 0 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  color: variables.$muted;
+  width: 14px;
+  color: rgba(234, 245, 235, 0.48);
   pointer-events: none;
 
   svg {
