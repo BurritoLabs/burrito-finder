@@ -42,7 +42,12 @@ const getRow = (
   ];
 };
 
-const Txs = ({ txs }: { txs: Array<TxInfo | TxResponse> }) => {
+type Props = {
+  txs: Array<TxInfo | TxResponse>;
+  emptyMessage?: string;
+};
+
+const Txs = ({ txs, emptyMessage = "No more transactions" }: Props) => {
   const pageSize = 30;
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const isClassic = useIsClassic();
@@ -78,7 +83,7 @@ const Txs = ({ txs }: { txs: Array<TxInfo | TxResponse> }) => {
       ) : (
         <Card>
           <Info icon="info_outline" title="">
-            No more transactions
+            {emptyMessage}
           </Info>
         </Card>
       )}

@@ -90,7 +90,7 @@ const Block = () => {
         </div>
       </div>
 
-      <Txs txs={blockData.txs} />
+      <Txs txs={blockData.txs} emptyMessage="No transactions in this block" />
     </>
   );
 };

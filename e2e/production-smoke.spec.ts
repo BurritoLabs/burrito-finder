@@ -106,15 +106,26 @@ test("Rebel testnet block and transaction use live LCD data", async ({
   expect(errors).toEqual([]);
 });
 
-test("Phoenix block lookup uses live LCD data beyond the stale FCD height", async ({
+test("Phoenix block lookup shows live LCD transactions beyond the stale FCD height", async ({
   page
 }) => {
   const errors = collectRuntimeErrors(page);
-  const height = "22032765";
+  const height = "22034502";
+  const hash =
+    "CD1388F24646A9AAA20F6CDAE31A94D11EE5BC4BF5E56E8485A4860E5C4086DC";
 
   await page.goto(`/mainnet/blocks/${height}`);
   await expect(page.getByText("phoenix-1", { exact: true })).toBeVisible();
-  await expect(page.getByText(height, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: `Block#${height}` })
+  ).toBeVisible();
+  const transactionTable = page.getByRole("table");
+  await expect(
+    transactionTable.getByText(height, { exact: true })
+  ).toBeVisible();
+  await expect(
+    transactionTable.getByRole("link", { name: hash, exact: true })
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Search not found" })
   ).toHaveCount(0);
