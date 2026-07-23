@@ -14,7 +14,7 @@ import NotFound from "../../components/NotFound";
 import FetchError from "../../components/FetchError";
 import apiClient from "../../apiClient";
 import { useGetQueryURL } from "../../queries/query";
-import { fetchClassicTestnetBlock } from "../../queries/classicTestnet";
+import { fetchCosmosBlock } from "../../queries/classicTestnet";
 import s from "./Block.module.scss";
 
 const heightButton = (height: number) => (
@@ -41,8 +41,8 @@ const Block = () => {
   } = useQuery({
     queryKey: ["block", chainID, height],
     queryFn: async () => {
-      if (isClassicTestnetChainID(chainID)) {
-        return fetchClassicTestnetBlock(lcd, chainID, height ?? "");
+      if (isClassicTestnetChainID(chainID) || chainID === "phoenix-1") {
+        return fetchCosmosBlock(lcd, chainID, height ?? "");
       }
       const { data } = await apiClient.get<Block>(queryURL);
       return data;

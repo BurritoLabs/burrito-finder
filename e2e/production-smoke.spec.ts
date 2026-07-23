@@ -106,6 +106,21 @@ test("Rebel testnet block and transaction use live LCD data", async ({
   expect(errors).toEqual([]);
 });
 
+test("Phoenix block lookup uses live LCD data beyond the stale FCD height", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  const height = "22032765";
+
+  await page.goto(`/mainnet/blocks/${height}`);
+  await expect(page.getByText("phoenix-1", { exact: true })).toBeVisible();
+  await expect(page.getByText(height, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Search not found" })
+  ).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
 test("Classic validator resolves IBC labels without runtime errors", async ({
   page
 }) => {

@@ -1,6 +1,7 @@
 import {
   axiosGetWithEndpointFallback,
-  getClassicTestnetLcdFallbackBases
+  getClassicTestnetLcdFallbackBases,
+  getLcdFallbackBases
 } from "./endpointFallback";
 
 type ClassicTestnetTxPayload = {
@@ -82,12 +83,12 @@ export const fetchClassicTestnetTx = async (
   return normalizeClassicTestnetTx(data, chainID);
 };
 
-export const fetchClassicTestnetBlock = async (
+export const fetchCosmosBlock = async (
   lcd: string,
   chainID: string,
   height: string
 ): Promise<Block> => {
-  const fallbackBases = getClassicTestnetLcdFallbackBases(lcd);
+  const fallbackBases = getLcdFallbackBases(lcd, chainID);
   const [blockResponse, txResponse, validatorsResponse] = await Promise.all([
     axiosGetWithEndpointFallback<ClassicTestnetBlockPayload>(
       `${lcd}/cosmos/base/tendermint/v1beta1/blocks/${height}`,
@@ -144,3 +145,9 @@ export const fetchClassicTestnetBlock = async (
     txs: normalizeClassicTestnetTxs(txResponse.data, chainID)
   };
 };
+
+export const fetchClassicTestnetBlock = (
+  lcd: string,
+  chainID: string,
+  height: string
+) => fetchCosmosBlock(lcd, chainID, height);
