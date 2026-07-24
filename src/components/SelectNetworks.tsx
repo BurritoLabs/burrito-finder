@@ -93,8 +93,17 @@ const SelectNetworks = (props: Props) => {
         setOpen(false);
       }
     };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   return (
@@ -107,6 +116,7 @@ const SelectNetworks = (props: Props) => {
           type="button"
           className={s.selectButton}
           aria-label={`${currentNetwork.name} (${currentNetwork.ticker}) network`}
+          aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setOpen(value => !value)}
         >
@@ -132,7 +142,7 @@ const SelectNetworks = (props: Props) => {
           </span>
         </button>
         {open ? (
-          <ul className={s.menu}>
+          <ul className={s.menu} role="menu">
             {orderedChains.map(({ name }) => {
               const network = NETWORKS[name as PublicNetwork];
               const isActive = name === currentChain.name;
@@ -140,6 +150,7 @@ const SelectNetworks = (props: Props) => {
                 <li key={name}>
                   <button
                     type="button"
+                    role="menuitem"
                     aria-label={`${network.name} (${network.ticker})`}
                     className={[s.option, isActive ? s.active : ""]
                       .filter(Boolean)
