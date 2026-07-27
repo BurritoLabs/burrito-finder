@@ -72,13 +72,14 @@
   &::after {
     content: "";
     position: absolute;
-    top: 1px;
+    top: 50%;
     left: 1px;
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background: rgba(var(--chain-rgb), 0.6);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transform: translateY(-50%);
     transition:
       transform 0.2s ease,
       background 0.2s ease;
@@ -99,7 +100,7 @@
 }
 
 .toggle input:checked + .toggleTrack::after {
-  transform: translateX(16px);
+  transform: translate(16px, -50%);
   background: var(--chain-accent);
 }
 
