@@ -32,29 +32,46 @@ test("bundled chain config keeps the Finder available when the registry is down"
   const searchboxes = page.getByRole("searchbox", {
     name: "Search Block / Tx / Account"
   });
-  await expect(searchboxes).toHaveCount(2);
-  await expect(searchboxes.first()).toBeVisible();
+  await expect(searchboxes).toHaveCount(1);
+  await expect(searchboxes).toBeVisible();
   const networkButtons = page.getByRole("button", {
     name: "Classic (LUNC) network"
   });
   await expect(networkButtons).toHaveCount(1);
   await expect(networkButtons.first()).toBeVisible();
   await networkButtons.first().click();
+  const networkMenu = page.getByRole("menu");
+  await expect(networkMenu).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Classic (LUNC)", exact: true })
+    networkMenu.getByRole("menuitem", {
+      name: "Classic (LUNC)",
+      exact: true
+    })
   ).toHaveCount(1);
   await expect(
-    page.getByRole("button", { name: "Rebel Testnet (LUNC)", exact: true })
+    networkMenu.getByRole("menuitem", {
+      name: "Rebel Testnet (LUNC)",
+      exact: true
+    })
   ).toHaveCount(1);
   await expect(
-    page.getByRole("button", { name: "Phoenix (LUNA)", exact: true })
+    networkMenu.getByRole("menuitem", {
+      name: "Phoenix (LUNA)",
+      exact: true
+    })
   ).toHaveCount(1);
   await expect(
-    page.getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
+    networkMenu.getByRole("menuitem", {
+      name: "Pisco Testnet (LUNA)",
+      exact: true
+    })
   ).toHaveCount(1);
-  await expect(page.getByRole("list").getByRole("button")).toHaveCount(4);
-  await page
-    .getByRole("button", { name: "Rebel Testnet (LUNC)", exact: true })
+  await expect(networkMenu.getByRole("menuitem")).toHaveCount(4);
+  await networkMenu
+    .getByRole("menuitem", {
+      name: "Rebel Testnet (LUNC)",
+      exact: true
+    })
     .click();
   await expect(page).toHaveURL(/\/classic-testnet\/$/);
   await expect(
@@ -71,7 +88,11 @@ test("bundled chain config keeps the Finder available when the registry is down"
     })
     .click();
   await page
-    .getByRole("button", { name: "Pisco Testnet (LUNA)", exact: true })
+    .getByRole("menu")
+    .getByRole("menuitem", {
+      name: "Pisco Testnet (LUNA)",
+      exact: true
+    })
     .click();
   await expect(page).toHaveURL(/\/testnet\/$/);
   await expect(

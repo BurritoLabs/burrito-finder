@@ -36,6 +36,23 @@
   }
 }
 
+.home {
+  .inner {
+    grid-template-columns: minmax(190px, 1fr) auto;
+  }
+
+  @media (max-width: variables.$breakpoint) {
+    min-height: 56px;
+
+    .inner {
+      min-height: 56px;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: 56px;
+      padding-bottom: 0;
+    }
+  }
+}
+
 .logo {
   display: flex;
   align-items: center;
