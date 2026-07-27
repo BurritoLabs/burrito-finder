@@ -19,6 +19,7 @@ import {
   fetchFinderAccountAssets,
   proxyAssetIcon
 } from "../queries/finderAssets";
+import { fetchVerifiedTokenRegistry } from "../queries/tokenRegistry";
 import { runtimeEnv } from "../config/runtimeEnv";
 
 const fetchAsset = async <T>(path: string) => {
@@ -466,6 +467,16 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
     staleTime: 6 * 60 * 60 * 1000,
     retry: false
   });
+  const { data: verifiedRegistry } = useQuery({
+    queryKey: ["verified-token-registry", chainID],
+    queryFn: () => fetchVerifiedTokenRegistry(chainID),
+    staleTime: 5 * 60 * 1000,
+    retry: false
+  });
+  const verifiedIbcAssets =
+    verifiedRegistry?.ibc && Object.keys(verifiedRegistry.ibc).length
+      ? verifiedRegistry.ibc
+      : undefined;
 
   const base = useMemo(() => {
     const mintscanIbc = (mintscanAssets ?? []).reduce<IBCTokenList>(
@@ -497,9 +508,10 @@ export const useIBCWhitelist = (denoms?: string[]): IBCTokenList => {
     );
     return {
       ...mintscanIbc,
-      ...normalizedTerraIbc
+      ...normalizedTerraIbc,
+      ...(verifiedIbcAssets ?? {})
     };
-  }, [chain.chainID, chain.name, data, mintscanAssets]);
+  }, [chain.chainID, chain.name, data, mintscanAssets, verifiedIbcAssets]);
   const hashes = Array.from(
     new Set(
       (denoms ?? [])
@@ -639,6 +651,16 @@ export const useWhitelist = (contracts?: string[]) => {
 
     staleTime: 60 * 60 * 1000
   });
+  const { data: verifiedRegistry } = useQuery({
+    queryKey: ["verified-token-registry", chainID],
+    queryFn: () => fetchVerifiedTokenRegistry(chainID),
+    staleTime: 5 * 60 * 1000,
+    retry: false
+  });
+  const verifiedCw20Assets =
+    verifiedRegistry?.cw20 && Object.keys(verifiedRegistry.cw20).length
+      ? verifiedRegistry.cw20
+      : undefined;
 
   const base = useMemo(() => {
     const mintscanTokens = (mintscanCw20 ?? []).reduce<TokenList>(
@@ -668,9 +690,10 @@ export const useWhitelist = (contracts?: string[]) => {
     return {
       ...mintscanTokens,
       ...normalizedTerraTokens,
-      ...(hexxagonTokens ?? {})
+      ...(hexxagonTokens ?? {}),
+      ...(verifiedCw20Assets ?? {})
     };
-  }, [chainID, data, hexxagonTokens, mintscanCw20, name]);
+  }, [chainID, data, hexxagonTokens, mintscanCw20, name, verifiedCw20Assets]);
   const normalizedContracts = Array.from(
     new Set((contracts ?? []).map(normalizeAddress).filter(Boolean))
   );

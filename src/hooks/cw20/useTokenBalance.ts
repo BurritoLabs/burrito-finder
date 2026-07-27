@@ -126,9 +126,13 @@ const useTokenBalance = (
   const isClassicTestnet = isClassicTestnetChainID(chainID);
 
   useEffect(() => {
+    let active = true;
+
     if (!address) {
       setResult(undefined);
-      return;
+      return () => {
+        active = false;
+      };
     }
 
     if (address && Object.keys(mergedWhitelist).length) {
@@ -137,8 +141,10 @@ const useTokenBalance = (
       const invalidKey = `cw20invalid:v2:${chainID}`;
       const load = async () => {
         try {
-          setResult(undefined);
-          setResolvedMetadata({});
+          if (active) {
+            setResult(undefined);
+            setResolvedMetadata({});
+          }
           if (typeof window !== "undefined") {
             const cached = window.localStorage.getItem(cacheKey);
             if (cached) {
@@ -147,7 +153,7 @@ const useTokenBalance = (
                 data: Dictionary<string>;
               };
               if (parsed && Date.now() - parsed.ts < 5 * 60 * 1000) {
-                setResult(parsed.data);
+                if (active) setResult(parsed.data);
                 return;
               }
             }
@@ -191,7 +197,7 @@ const useTokenBalance = (
                 }
                 if (asset.metadata) metadata[asset.contract] = asset.metadata;
               });
-              setResolvedMetadata(metadata);
+              if (active) setResolvedMetadata(metadata);
             } catch {
               // The existing graph/LCD path below remains the client fallback.
             }
@@ -296,7 +302,7 @@ const useTokenBalance = (
               }
             );
             await Promise.all(workers);
-            if (typeof window !== "undefined") {
+            if (active && typeof window !== "undefined") {
               window.localStorage.setItem(
                 invalidKey,
                 JSON.stringify({ ts: Date.now(), data: invalidContracts })
@@ -305,6 +311,7 @@ const useTokenBalance = (
             parsed = { ...lcdResults, ...parsed };
           }
 
+          if (!active) return;
           setResult(parsed);
           if (typeof window !== "undefined") {
             window.localStorage.setItem(
@@ -313,12 +320,16 @@ const useTokenBalance = (
             );
           }
         } catch (error) {
-          setResult({});
+          if (active) setResult({});
         }
       };
 
       load();
     }
+
+    return () => {
+      active = false;
+    };
   }, [address, mergedWhitelist, lcd, mantle, hive, isClassic, chainID]);
 
   return {
