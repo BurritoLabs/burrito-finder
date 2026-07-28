@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { extname, join } from "node:path";
 
-const ALLOWED_ADVISORY = 1112030;
+const ALLOWED_ADVISORIES = new Set([1112030, 1124282]);
 const ALLOWED_PACKAGES = new Set([
   "@terra-money/react-base-components",
   "@terra-money/terra.js",
@@ -11,6 +11,8 @@ const ALLOWED_PACKAGES = new Set([
   "create-ecdh",
   "crypto-browserify",
   "elliptic",
+  "react-router",
+  "react-router-dom",
   "secp256k1",
   "tiny-secp256k1"
 ]);
@@ -20,6 +22,12 @@ const FORBIDDEN_TERRA_APIS = [
   "Wallet",
   "createAndSignTx",
   "signBytes"
+];
+const FORBIDDEN_REACT_ROUTER_RSC_APIS = [
+  "unstable_matchRSCServerRequest",
+  "unstable_RSCHydratedRouter",
+  "unstable_RSCStaticRouter",
+  "unstable_routeRSCServerRequest"
 ];
 
 const npmCli = process.env.npm_execpath;
@@ -46,7 +54,7 @@ const validatePackage = (name, trail = new Set()) => {
   for (const via of vulnerability.via ?? []) {
     if (typeof via === "string") {
       validatePackage(via, trail);
-    } else if (via.source !== ALLOWED_ADVISORY) {
+    } else if (!ALLOWED_ADVISORIES.has(via.source)) {
       unexpected.push(`${name}:${via.source}`);
     }
   }
@@ -67,8 +75,14 @@ collectSourceFiles("src");
 
 for (const path of sourceFiles) {
   const source = readFileSync(path, "utf8");
-  if (!source.includes("@terra-money/terra.js")) continue;
-  for (const api of FORBIDDEN_TERRA_APIS) {
+  if (source.includes("@terra-money/terra.js")) {
+    for (const api of FORBIDDEN_TERRA_APIS) {
+      if (new RegExp(`\\b${api}\\b`).test(source)) {
+        unexpected.push(`${path}:forbidden-${api}`);
+      }
+    }
+  }
+  for (const api of FORBIDDEN_REACT_ROUTER_RSC_APIS) {
     if (new RegExp(`\\b${api}\\b`).test(source)) {
       unexpected.push(`${path}:forbidden-${api}`);
     }
@@ -84,6 +98,6 @@ if (unexpected.length) {
 const count = Object.keys(vulnerabilities).length;
 console.log(
   count
-    ? `Production audit passed: 0 unreviewed advisories; GHSA-848j-6mx2-7j84 is isolated to ${count} approved read-only dependencies.`
+    ? `Production audit passed: 0 unreviewed advisories; ${count} approved dependencies are isolated from the affected signing and RSC server paths.`
     : "Production audit passed: 0 vulnerabilities."
 );
