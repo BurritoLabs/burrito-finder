@@ -56,6 +56,7 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                   ? renderIbcDenom(denom, ibcInfo, isClassic)
                   : format.denom(denom, isClassic);
                 const iconDenom = denom === "uluna" ? "Luna" : displayDenom;
+                const classicIconDenom = format.denom(denom, false);
                 const isMainnetLuna = !isClassic && denom === "uluna";
                 const isClassicNative = isClassic && !isIbc;
                 const lunaIcons = [
@@ -71,16 +72,16 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                   ...(isClassicNative
                     ? denom === "uluna"
                       ? [`${ASSET_URL}/icon/svg/LUNC.svg`]
-                      : []
+                      : [`${ASSET_URL}/icon/60/${classicIconDenom}.png`]
                     : isMainnetLuna || isIbc
-                    ? []
-                    : [
-                        `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
-                        `${ASSET_URL}/icon/60/${iconDenom}.png`,
-                        `${ASSET_URL}/icon/60/${String(
-                          iconDenom
-                        ).toLowerCase()}.png`
-                      ])
+                      ? []
+                      : [
+                          `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
+                          `${ASSET_URL}/icon/60/${iconDenom}.png`,
+                          `${ASSET_URL}/icon/60/${String(
+                            iconDenom
+                          ).toLowerCase()}.png`
+                        ])
                 ].filter(Boolean) as string[];
                 iconCandidates.push(fallbackIcon);
 

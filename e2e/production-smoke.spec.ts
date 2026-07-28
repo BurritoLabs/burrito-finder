@@ -163,6 +163,14 @@ test("Classic validator resolves IBC labels without runtime errors", async ({
 
   await expect(page.getByText("BNB (channel-19)")).toBeVisible();
   await expect(page.getByText("WHALE (channel-84)")).toBeVisible();
+  const ustcRow = page
+    .getByRole("row")
+    .filter({ hasText: "USTC" })
+    .first();
+  await expect(ustcRow.locator("img")).toHaveAttribute(
+    "src",
+    /\/icon\/60\/UST\.png$/
+  );
   await expect(page.locator("body")).not.toContainText("IBC 077EE5");
   await expect(page.locator("body")).not.toContainText("Value is undefined");
   expect(errors).toEqual([]);
