@@ -6,7 +6,7 @@ import { isIbcDenom } from "../scripts/utility";
 import { renderIbcDenom } from "../scripts/ibc";
 import s from "./Denom.module.scss";
 
-const Denom = ({ denom }: { denom: string }) => {
+const Denom = ({ denom, label }: { denom: string; label?: string }) => {
   const isClassic = useIsClassic();
   const isIbc = isIbcDenom(denom);
   const isFactory = denom.startsWith("factory/");
@@ -18,11 +18,13 @@ const Denom = ({ denom }: { denom: string }) => {
     factoryMetadata?.display ||
     factoryMetadata?.name;
   const factorySuffix = denom.includes("/") ? denom.split("/").pop() : denom;
-  const render = isIbc
-    ? renderIbcDenom(denom, ibc, isClassic)
-    : isFactory
-    ? factoryLabel || factorySuffix
-    : format.denom(denom, isClassic);
+  const render =
+    label ??
+    (isIbc
+      ? renderIbcDenom(denom, ibc, isClassic)
+      : isFactory
+        ? factoryLabel || factorySuffix
+        : format.denom(denom, isClassic));
   const path = ibc?.path?.split("/");
 
   return (

@@ -205,6 +205,14 @@ test("Phoenix validator keeps self-delegation when LCD delegation is unavailable
     .getByRole("heading", { name: "Self-delegation" })
     .locator("..");
   await expect(selfDelegation.locator("small")).toHaveText(/^\.\d{6} Luna$/);
+  const ampRoarRow = page
+    .getByRole("row")
+    .filter({ hasText: "ampROAR" })
+    .first();
+  await expect(ampRoarRow.locator("img")).toHaveAttribute(
+    "src",
+    /\/v1\/finder\/icon\?url=.*amproar\.png/
+  );
   expect(errors).toEqual([]);
 });
 

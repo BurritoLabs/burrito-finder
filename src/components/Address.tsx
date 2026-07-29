@@ -26,8 +26,7 @@ const formatAccAddress = (
   truncate?: boolean,
   className?: string
 ) => {
-  const cwFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
+  const cwFallbackIcon = "/system/cw20.svg";
   const token = whitelist?.[address];
   const contract = contracts?.[address];
   const renderAddress = truncate ? format.truncate(address, [8, 8]) : address;

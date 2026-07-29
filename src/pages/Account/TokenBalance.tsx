@@ -34,8 +34,7 @@ const TokenBalance = ({ address }: { address: string }) => {
   const { name, chainID } = useCurrentChain();
   const isClassic = useIsClassic();
   const isClassicTestnet = isClassicTestnetChainID(chainID);
-  const cwFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
+  const cwFallbackIcon = "/system/cw20.svg";
   useEffect(() => {
     setDeferTokens(true);
     setPricesEnabled(false);

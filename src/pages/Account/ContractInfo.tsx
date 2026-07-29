@@ -16,8 +16,7 @@ const ContractInfo = ({ address }: { address: string }) => {
 
   const whitelist = token || contract || nft;
   const icon = whitelist?.icon;
-  const cwFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
+  const cwFallbackIcon = "/system/cw20.svg";
   const iconCandidates = [icon, cwFallbackIcon].filter(Boolean) as string[];
 
   const tokenInfoQuery = btoa(JSON.stringify({ token_info: {} }));

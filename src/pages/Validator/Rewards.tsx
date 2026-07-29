@@ -12,7 +12,10 @@ import { useIsClassic } from "../../contexts/ChainsContext";
 import format from "../../scripts/format";
 import { ASSET_URL, isIbcDenom } from "../../scripts/utility";
 import { renderIbcDenom } from "../../scripts/ibc";
-import { useIBCWhitelist } from "../../hooks/useTerraAssets";
+import {
+  useIBCWhitelist,
+  useMintscanNativeWhitelist
+} from "../../hooks/useTerraAssets";
 import s from "./Rewards.module.scss";
 
 const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
@@ -23,6 +26,7 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
     [list]
   );
   const ibcWhitelist = useIBCWhitelist(ibcDenoms);
+  const nativeWhitelist = useMintscanNativeWhitelist();
   const ibcFallbackIcon = "/system/ibc.svg";
   const fallbackIcon =
     "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='32' fill='%23304036'/><path d='M32 18a14 14 0 100 28 14 14 0 000-28z' fill='%235a6b65'/></svg>";
@@ -49,11 +53,15 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
               )
               .map(({ denom, amount }, index) => {
                 const isIbc = isIbcDenom(denom);
+                const isFactory = denom.startsWith("factory/");
                 const hash = isIbc ? denom.replace("ibc/", "") : "";
                 const ibcInfo = isIbc ? ibcWhitelist?.[hash] : undefined;
+                const nativeInfo = isFactory
+                  ? nativeWhitelist[denom]
+                  : undefined;
                 const displayDenom = isIbc
                   ? renderIbcDenom(denom, ibcInfo, isClassic)
-                  : format.denom(denom, isClassic);
+                  : (nativeInfo?.symbol ?? format.denom(denom, isClassic));
                 const iconDenom = denom === "uluna" ? "Luna" : displayDenom;
                 const classicIconDenom = format.denom(denom, false);
                 const isMainnetLuna = !isClassic && denom === "uluna";
@@ -66,6 +74,7 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                 ];
                 const iconCandidates = [
                   ...(isIbc ? [ibcFallbackIcon] : []),
+                  ...(nativeInfo?.icon ? [nativeInfo.icon] : []),
                   ...(isMainnetLuna ? lunaIcons : []),
                   ...(isClassicNative
                     ? denom === "uluna"
@@ -81,18 +90,22 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                           ).toLowerCase()}.png`
                         ])
                 ].filter(Boolean) as string[];
-                iconCandidates.push(fallbackIcon);
+                iconCandidates.push(
+                  isFactory ? "/system/cw20.svg" : fallbackIcon
+                );
 
                 return (
                   <tr key={index}>
                     <td>
                       <span className={s.denom}>
                         <Image urls={iconCandidates} size={18} />
-                        <Denom denom={denom} />
+                        <Denom denom={denom} label={nativeInfo?.symbol} />
                       </span>
                     </td>
                     <td className="text-right">
-                      <Amount>{amount.toString()}</Amount>
+                      <Amount decimals={nativeInfo?.decimals}>
+                        {amount.toString()}
+                      </Amount>
                     </td>
                   </tr>
                 );

@@ -27,8 +27,7 @@ const Available = ({
 }: Props) => {
   const isClassic = useIsClassic();
   const isFactory = denom.startsWith("factory/");
-  const cwFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
+  const cwFallbackIcon = "/system/cw20.svg";
   if (isIbcDenom(denom)) {
     return <IBCUnit denom={denom} available={amount} />;
   }
@@ -45,7 +44,7 @@ const Available = ({
       fxRates={fxRates}
       icon={nativeInfo?.icon}
       decimals={nativeInfo?.decimals}
-      fallbackIcon={isFactory ? "/system/cw20.svg" : cwFallbackIcon}
+      fallbackIcon={cwFallbackIcon}
     />
   );
 };
