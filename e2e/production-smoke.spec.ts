@@ -221,6 +221,22 @@ test("Phoenix account resolves CW20 and IBC assets", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("Phoenix factory assets use the local default icon", async ({ page }) => {
+  const errors = collectRuntimeErrors(page);
+  await page.goto(
+    "/mainnet/address/terra164873kl0ntxaydh95u93jrahxzushpgea7p560"
+  );
+
+  const ampRoarCard = page
+    .getByRole("heading", { name: "ampROAR", exact: true })
+    .locator("xpath=ancestor::article[1]");
+  await expect(ampRoarCard.getByRole("img")).toHaveAttribute(
+    "src",
+    "/system/ibc.svg"
+  );
+  expect(errors).toEqual([]);
+});
+
 test("Phoenix CW20 balances survive aggregate API failure", async ({
   page
 }) => {

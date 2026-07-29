@@ -23,6 +23,8 @@ const Available = ({
   fxRates
 }: Props) => {
   const isClassic = useIsClassic();
+  const isFactory = denom.startsWith("factory/");
+  const defaultAssetIcon = "/system/ibc.svg";
   const cwFallbackIcon =
     "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
   if (isIbcDenom(denom)) {
@@ -39,6 +41,7 @@ const Available = ({
       ustcPrice={ustcPrice}
       lunaPrice={lunaPrice}
       fxRates={fxRates}
+      icon={isFactory ? defaultAssetIcon : undefined}
       fallbackIcon={cwFallbackIcon}
     />
   );
