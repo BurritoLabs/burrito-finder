@@ -9,6 +9,7 @@ import Image from "../../components/Image";
 import Card from "../../components/Card";
 import Amount from "../../components/Amount";
 import useDenomMetadata from "../../hooks/useDenomMetadata";
+import { proxyAssetIcon } from "../../queries/finderAssets";
 import s from "./AmountCard.module.scss";
 
 type Props = {
@@ -54,6 +55,9 @@ const AmountCard = ({
   const isFactory = !!rawDenom && rawDenom.startsWith("factory/");
   const metadata = useDenomMetadata(isFactory);
   const factoryMeta = isFactory ? metadata?.get(rawDenom ?? "") : undefined;
+  const factoryMetadataIcon = isFactory
+    ? proxyAssetIcon(factoryMeta?.uri)
+    : undefined;
   const factoryLabel =
     factoryMeta?.symbol ||
     factoryMeta?.display ||
@@ -77,12 +81,17 @@ const AmountCard = ({
       : [];
   const iconCandidates = [
     icon,
+    factoryMetadataIcon,
     ...lunaIconCandidates,
-    iconLink,
-    `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
-    `${ASSET_URL}/icon/60/${iconDenom}.png`,
-    `${ASSET_URL}/icon/svg/${String(iconDenom).toUpperCase()}.svg`,
-    `${ASSET_URL}/icon/60/${String(iconDenom).toLowerCase()}.png`,
+    ...(isFactory
+      ? []
+      : [
+          iconLink,
+          `${ASSET_URL}/icon/svg/${iconDenom}.svg`,
+          `${ASSET_URL}/icon/60/${iconDenom}.png`,
+          `${ASSET_URL}/icon/svg/${String(iconDenom).toUpperCase()}.svg`,
+          `${ASSET_URL}/icon/60/${String(iconDenom).toLowerCase()}.png`
+        ]),
     ...(isClassicStable
       ? [
           `${ASSET_URL}/icon/svg/USTC.svg`,
@@ -97,8 +106,8 @@ const AmountCard = ({
     ? baseLabel === "Luna" || baseLabel.toUpperCase() === "LUNC"
       ? "LUNC"
       : isFactory || baseLabel.toUpperCase().endsWith("C")
-      ? baseLabel
-      : baseLabel + "C"
+        ? baseLabel
+        : baseLabel + "C"
     : baseLabel;
   const displayDenom =
     formatDenom.length > 20

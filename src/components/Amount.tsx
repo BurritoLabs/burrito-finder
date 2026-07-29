@@ -5,6 +5,7 @@ import {
   IBCTokenList,
   useContracts,
   useIBCWhitelist,
+  useMintscanNativeWhitelist,
   useWhitelist
 } from "../hooks/useTerraAssets";
 import format from "../scripts/format";
@@ -55,11 +56,17 @@ const Amount = (props: Props) => {
   const whitelist = useWhitelist();
   const contracts = useContracts();
   const ibcWhitelist = useIBCWhitelist(denom ? [denom] : undefined);
+  const nativeWhitelist = useMintscanNativeWhitelist();
   const isClassic = useIsClassic();
 
   const hash = denom?.replace("ibc/", "");
+  const nativeInfo = denom?.startsWith("factory/")
+    ? nativeWhitelist[denom]
+    : undefined;
   const tokenDecimals =
-    whitelist?.[denom ?? ""]?.decimals ?? ibcWhitelist?.[hash ?? ""]?.decimals;
+    whitelist?.[denom ?? ""]?.decimals ??
+    ibcWhitelist?.[hash ?? ""]?.decimals ??
+    nativeInfo?.decimals;
 
   const [integer, decimal] = format
     .amount(children || "0", tokenDecimals ?? decimals)
@@ -73,16 +80,18 @@ const Amount = (props: Props) => {
       {integer}
       <small>
         .{decimal}
-        {data
-          ? ` ${renderIbcDenom(denom ?? "", data, isClassic)}`
-          : denom &&
-            ` ${renderDenom(
-              denom,
-              whitelist,
-              contracts,
-              ibcWhitelist,
-              isClassic
-            )}`}
+        {nativeInfo?.symbol
+          ? ` ${nativeInfo.symbol}`
+          : data
+            ? ` ${renderIbcDenom(denom ?? "", data, isClassic)}`
+            : denom &&
+              ` ${renderDenom(
+                denom,
+                whitelist,
+                contracts,
+                ibcWhitelist,
+                isClassic
+              )}`}
       </small>
     </span>
   );

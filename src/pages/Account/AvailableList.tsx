@@ -221,7 +221,8 @@ const AvailableList = ({
     if (!showLowValueCoins && !isClassic) {
       return list.filter(coin => {
         const amount = new BigNumber(coin.amount.toString());
-        return amount.div(1e6).gte(0.01);
+        const decimals = nativeWhitelist[coin.denom]?.decimals ?? 6;
+        return amount.div(new BigNumber(10).pow(decimals)).gte(0.01);
       });
     }
     if (showLowValueCoins) return list;
@@ -259,6 +260,7 @@ const AvailableList = ({
     pricesEnabled,
     props.data,
     isClassic,
+    nativeWhitelist,
     resolvedUstcPrice
   ]);
   return (

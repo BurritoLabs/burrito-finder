@@ -101,7 +101,7 @@ const useTokenBalance = (
   const { data: launchpadContracts = [] } = useLaunchpadCw20Contracts();
   const whitelist = useWhitelist(isClassic ? launchpadContracts : undefined);
   const contracts = useContracts();
-  const mergedWhitelist = useMemo(() => {
+  const mergedWhitelist = useMemo<Tokens>(() => {
     if (isClassic) {
       return whitelist ?? {};
     }
@@ -181,6 +181,7 @@ const useTokenBalance = (
           );
           const graphUri = isClassic ? undefined : (hive ?? mantle);
           let parsed: Dictionary<string> = {};
+          const aggregateHandled = new Set<string>();
 
           if (!isClassicTestnet) {
             try {
@@ -191,6 +192,7 @@ const useTokenBalance = (
               });
               const metadata: Dictionary<Partial<Token>> = {};
               aggregate.cw20.forEach(asset => {
+                aggregateHandled.add(asset.contract);
                 if (asset.status !== "ok") return;
                 if (asset.balance !== undefined) {
                   parsed[asset.contract] = asset.balance;
@@ -204,7 +206,8 @@ const useTokenBalance = (
           }
 
           const graphEntries = entries.filter(
-            ([contract]) => parsed[contract] === undefined
+            ([contract]) =>
+              parsed[contract] === undefined && !aggregateHandled.has(contract)
           );
           const chunks = chunkEntries(graphEntries, 49);
           const queries = chunks.map(chunk =>
@@ -262,7 +265,8 @@ const useTokenBalance = (
           }
 
           const missingBalanceEntries = entries.filter(
-            ([contract]) => parsed[contract] === undefined
+            ([contract]) =>
+              parsed[contract] === undefined && !aggregateHandled.has(contract)
           );
           if (lcd && missingBalanceEntries.length) {
             const lcdResults: Dictionary<string> = {};
@@ -338,12 +342,21 @@ const useTokenBalance = (
     list:
       result &&
       mergedWhitelist &&
-      Object.entries(result).map(([token, balance]) => ({
-        ...mergedWhitelist[token],
-        ...(resolvedMetadata[token] ?? {}),
-        balance,
-        address: token
-      }))
+      Object.entries(result).map(([token, balance]) => {
+        const base = mergedWhitelist[token];
+        const resolved = resolvedMetadata[token];
+        return {
+          ...base,
+          ...resolved,
+          symbol: resolved?.symbol ?? base?.symbol,
+          name: resolved?.name ?? base?.name,
+          protocol: resolved?.protocol ?? base?.protocol,
+          icon: resolved?.icon ?? base?.icon,
+          decimals: resolved?.decimals ?? base?.decimals,
+          balance,
+          address: token
+        };
+      })
   };
 };
 

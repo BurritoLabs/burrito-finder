@@ -231,8 +231,19 @@ test("Phoenix account resolves CW20 and IBC assets", async ({ page }) => {
 
 test("Phoenix factory assets use their native-chain icon", async ({ page }) => {
   const errors = collectRuntimeErrors(page);
+  const address = "terra164873kl0ntxaydh95u93jrahxzushpgea7p560";
+  const balanceQuery = btoa(JSON.stringify({ balance: { address } }));
+  const redundantBalanceRequests: string[] = [];
+  page.on("request", request => {
+    if (
+      request.url().includes(`/smart/${balanceQuery}`) ||
+      request.url().includes(`/smart/${encodeURIComponent(balanceQuery)}`)
+    ) {
+      redundantBalanceRequests.push(request.url());
+    }
+  });
   await page.goto(
-    "/mainnet/address/terra164873kl0ntxaydh95u93jrahxzushpgea7p560"
+    `/mainnet/address/${address}`
   );
 
   const ampRoarCard = page
@@ -242,6 +253,22 @@ test("Phoenix factory assets use their native-chain icon", async ({ page }) => {
     "src",
     /\/v1\/finder\/icon\?url=.*amproar\.png/
   );
+  const solidCard = page
+    .getByRole("heading", { name: "SOLID", exact: true })
+    .locator("xpath=ancestor::article[1]");
+  await expect(solidCard.getByRole("img")).toHaveAttribute(
+    "src",
+    /\/v1\/finder\/icon\?url=.*solid\.png/
+  );
+  const transactionTable = page
+    .getByRole("table")
+    .filter({ hasText: "Tx hash" });
+  const firstTransactionRow = transactionTable.locator("tbody tr").first();
+  await expect(firstTransactionRow).toBeVisible();
+  const firstTransactionText = await firstTransactionRow.innerText();
+  const height = firstTransactionText.match(/(\d{8})\(phoenix-1\)/)?.[1];
+  expect(Number(height)).toBeGreaterThan(20_000_000);
+  expect(redundantBalanceRequests).toEqual([]);
   expect(errors).toEqual([]);
 });
 
@@ -271,7 +298,9 @@ test("Phoenix account tolerates unavailable price feeds", async ({ page }) => {
     "/mainnet/address/terra104dnzgzzx7hjt32sml9zspqfmvr7fdae8l6vy8"
   );
 
-  await expect(page.getByText("Luna", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "LUNA", exact: true }).first()
+  ).toBeVisible();
   await expect(page.locator("body")).not.toContainText("NaN");
   expect(errors).toEqual([]);
 });

@@ -23,8 +23,13 @@ import { plus } from "../../scripts/math";
 import {
   useContracts,
   useIBCWhitelist,
+  useMintscanNativeWhitelist,
   useWhitelist
 } from "../../hooks/useTerraAssets";
+import {
+  MINTSCAN_PROXY_URL,
+  normalizeMintscanTx
+} from "../../queries/mintscan";
 import { useLogfinderAmountRuleSet } from "../../hooks/useLogfinder";
 import { renderDenom } from "../../components/Amount";
 import { toLogFinderTransaction, transformTx } from "../Tx/transform";
@@ -218,6 +223,7 @@ const CsvExport = ({ address }: { address: string }) => {
   const whitelist = useWhitelist();
   const contracts = useContracts();
   const ibcWhitelist = useIBCWhitelist();
+  const nativeWhitelist = useMintscanNativeWhitelist();
   const isClassic = useIsClassic();
   const [txs, setTxs] = useState<TxResponse[]>([]);
   const [loading, setLoading] = useState(false);
@@ -225,6 +231,8 @@ const CsvExport = ({ address }: { address: string }) => {
   const fcdURL = useFCDURL();
   const { chainID } = useCurrentChain();
   const fetchLimit = 5;
+  const exportLimit = fetchLimit * 100;
+  const isPhoenix = chainID === "phoenix-1";
 
   const rules = useLogfinderAmountRuleSet();
   const logMatcher = useMemo(() => createLogMatcherForAmounts(rules), [rules]);
@@ -237,38 +245,62 @@ const CsvExport = ({ address }: { address: string }) => {
         setError(false);
         setTxs([]);
 
-        const limit = 100; // Either 100 or 10
+        const limit = 100;
         let offset: number | undefined = 0;
         let allTxs: TxResponse[] = [];
+        let hadError = false;
 
-        // max tx number = fetchLimit * 100
-        let fetchCount = 0;
+        if (isPhoenix) {
+          let searchAfter: string | undefined;
+          while (allTxs.length < exportLimit) {
+            try {
+              const result = await apiClient.get<{
+                transactions?: any[];
+                pagination?: { searchAfter?: string };
+              }>(`${MINTSCAN_PROXY_URL}/accounts/${address}/transactions`, {
+                params: {
+                  take: 20,
+                  ...(searchAfter ? { searchAfter } : {})
+                },
+                timeout: 8000
+              });
+              const page = (result.data.transactions ?? []).map(tx =>
+                normalizeMintscanTx(tx, chainID)
+              );
+              allTxs = allTxs.concat(page);
+              searchAfter = result.data.pagination?.searchAfter;
+              if (!searchAfter || page.length === 0) break;
+            } catch {
+              hadError = true;
+              break;
+            }
+          }
+        } else {
+          let fetchCount = 0;
 
-        // fetch latest fetchLimit * 100 transactions
-        while (fetchCount < fetchLimit) {
-          const params: Params = { offset, limit, account: address };
-          try {
-            const result = await apiClient.get(fcdURL + "/v1/txs", {
-              params: params
-            });
+          while (fetchCount < fetchLimit) {
+            const params: Params = { offset, limit, account: address };
+            try {
+              const result = await apiClient.get(fcdURL + "/v1/txs", {
+                params
+              });
 
-            if (result.data === null) {
-              setError(true);
-              fetchCount++;
-            } else {
+              if (result.data === null) {
+                hadError = true;
+                break;
+              }
               allTxs = allTxs.concat(result.data.txs);
               offset = result.data.next;
-              fetchCount = offset ? fetchCount + 1 : (fetchCount = fetchLimit);
+              fetchCount = offset ? fetchCount + 1 : fetchLimit;
+            } catch {
+              hadError = true;
+              break;
             }
-          } catch {
-            setError(true);
-            fetchCount = fetchLimit;
           }
         }
 
-        if (!error) {
-          setTxs(allTxs);
-        }
+        setError(hadError);
+        setTxs(allTxs.slice(0, exportLimit));
         setLoading(false);
       }
     };
@@ -332,11 +364,14 @@ const CsvExport = ({ address }: { address: string }) => {
         const { denom = "", amount } = amountData;
         const hash = denom.replace("ibc/", "");
         const tokenDecimals =
-          whitelist?.[denom]?.decimals || ibcWhitelist?.[hash]?.decimals;
+          whitelist?.[denom]?.decimals ??
+          ibcWhitelist?.[hash]?.decimals ??
+          nativeWhitelist[denom]?.decimals;
 
         rows.push({
           ...baseTxData,
           currency:
+            nativeWhitelist[denom]?.symbol ??
             renderDenom(denom, whitelist, contracts, ibcWhitelist, isClassic) ??
             "",
           amount: format.amount(amount, tokenDecimals), // amount in is positive (received)
@@ -350,11 +385,14 @@ const CsvExport = ({ address }: { address: string }) => {
         const { denom = "", amount } = amountData;
         const hash = denom.replace("ibc/", "");
         const tokenDecimals =
-          whitelist?.[denom]?.decimals || ibcWhitelist?.[hash]?.decimals;
+          whitelist?.[denom]?.decimals ??
+          ibcWhitelist?.[hash]?.decimals ??
+          nativeWhitelist[denom]?.decimals;
 
         rows.push({
           ...baseTxData,
           currency:
+            nativeWhitelist[denom]?.symbol ??
             renderDenom(denom, whitelist, contracts, ibcWhitelist, isClassic) ??
             "",
           amount: `-${format.amount(amount, tokenDecimals)}`, // amount in is negative (spent)
@@ -421,7 +459,7 @@ const CsvExport = ({ address }: { address: string }) => {
         {error && !loading && (
           <span className={s.error}>(Something went wrong...)</span>
         )}
-        <span> (Latest {fetchLimit * 100} transactions)</span>
+        <span> (Latest {exportLimit} transactions)</span>
       </>
     );
   } catch {

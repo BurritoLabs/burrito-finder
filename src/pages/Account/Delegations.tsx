@@ -13,7 +13,11 @@ import Amount from "../../components/Amount";
 import s from "./Account.module.scss";
 import format from "../../scripts/format";
 import { useIsClassic } from "../../contexts/ChainsContext";
-import { useIBCWhitelist, useWhitelist } from "../../hooks/useTerraAssets";
+import {
+  useIBCWhitelist,
+  useMintscanNativeWhitelist,
+  useWhitelist
+} from "../../hooks/useTerraAssets";
 
 const Delegations = ({ address }: { address: string }) => {
   const [hideLowValueRewards, setHideLowValueRewards] = useState(true);
@@ -23,6 +27,17 @@ const Delegations = ({ address }: { address: string }) => {
   const isClassic = useIsClassic();
   const whitelist = useWhitelist();
   const ibcWhitelist = useIBCWhitelist();
+  const nativeWhitelist = useMintscanNativeWhitelist();
+
+  const rewardDecimals = (denom: string) => {
+    const hash = denom.replace("ibc/", "");
+    return (
+      whitelist?.[denom]?.decimals ??
+      ibcWhitelist?.[hash]?.decimals ??
+      nativeWhitelist[denom]?.decimals ??
+      6
+    );
+  };
 
   if (!delegation || !validators || !rewards) {
     return null;
@@ -40,11 +55,7 @@ const Delegations = ({ address }: { address: string }) => {
       const stakingRewards = rewards?.rewards[validator_address]?.toArray();
       const filteredRewards = stakingRewards?.filter(({ denom, amount }) => {
         if (!hideLowValueRewards) return true;
-        const hash = denom?.replace("ibc/", "");
-        const decimals =
-          whitelist?.[denom ?? ""]?.decimals ??
-          ibcWhitelist?.[hash ?? ""]?.decimals ??
-          6;
+        const decimals = rewardDecimals(denom);
         const min = new BigNumber(10).pow(decimals).multipliedBy(0.01);
         return new BigNumber(amount.toString()).gte(min);
       });
@@ -71,7 +82,9 @@ const Delegations = ({ address }: { address: string }) => {
             <ul>
               {orderedRewards.map(({ denom, amount }, index) => (
                 <li key={index}>
-                  <Amount denom={denom}>{amount.toString()}</Amount>
+                  <Amount denom={denom} decimals={rewardDecimals(denom)}>
+                    {amount.toString()}
+                  </Amount>
                 </li>
               ))}
             </ul>

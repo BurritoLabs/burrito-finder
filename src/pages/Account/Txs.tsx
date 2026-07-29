@@ -123,17 +123,20 @@ const Txs = ({
   const pageSize = 30;
   const fcdLimit = 100;
   const contractLimit = pageSize;
+  const mintscanLimit = 20;
 
   const params = { offset, limit: fcdLimit, account: address };
   const url = useGetQueryURL("/v1/txs");
   const { data: fcdData, isLoading: fcdLoading } = useRequest<{
     next: number;
     txs: TxInfo[];
-  }>({ url, params, enabled: !isClassicTestnet });
+  }>({
+    url,
+    params,
+    enabled: !isClassicTestnet && !isPhoenix
+  });
 
-  const shouldUseLcd =
-    isClassicTestnet ||
-    (isPhoenix && !fcdLoading && (!fcdData?.txs || fcdData.txs.length === 0));
+  const shouldUseLcd = isClassicTestnet || isPhoenix;
   const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
   const mintscanCursor = mintscanCursors[offset];
@@ -155,7 +158,7 @@ const Txs = ({
             pagination?: { searchAfter?: string };
           }>(`${MINTSCAN_PROXY_URL}/accounts/${address}/transactions`, {
             params: {
-              take: contractLimit,
+              take: mintscanLimit,
               ...(mintscanCursor ? { searchAfter: mintscanCursor } : {})
             },
             timeout: 8000
@@ -167,7 +170,7 @@ const Txs = ({
           return {
             txs,
             searchAfter,
-            next: searchAfter ? offset + contractLimit : undefined
+            next: searchAfter ? offset + mintscanLimit : undefined
           };
         } catch {
           // Fall through to public LCD event search.

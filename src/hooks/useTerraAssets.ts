@@ -156,6 +156,22 @@ const safeIcon = (value?: string) => {
   return proxyAssetIcon(trimmed);
 };
 
+const mergeTokenLists = (...lists: Array<TokenList | undefined>): TokenList =>
+  lists.reduce<TokenList>((merged, list) => {
+    Object.entries(list ?? {}).forEach(([address, token]) => {
+      const current = merged[address];
+      merged[address] = {
+        ...current,
+        ...Object.fromEntries(
+          Object.entries(token).filter(
+            ([, value]) => value !== undefined && value !== null && value !== ""
+          )
+        )
+      } as Whitelist;
+    });
+    return merged;
+  }, {});
+
 export const useMintscanNativeWhitelist = (): NativeTokenList => {
   const { chainID } = useCurrentChain();
   const { data } = useQuery({
@@ -724,12 +740,12 @@ export const useWhitelist = (contracts?: string[]) => {
         { ...token, icon: safeIcon(token.icon) }
       ])
     );
-    return {
-      ...mintscanTokens,
-      ...normalizedTerraTokens,
-      ...(hexxagonTokens ?? {}),
-      ...(verifiedCw20Assets ?? {})
-    };
+    return mergeTokenLists(
+      normalizedTerraTokens,
+      hexxagonTokens,
+      mintscanTokens,
+      verifiedCw20Assets
+    );
   }, [chainID, data, hexxagonTokens, mintscanCw20, name, verifiedCw20Assets]);
   const normalizedContracts = Array.from(
     new Set((contracts ?? []).map(normalizeAddress).filter(Boolean))
