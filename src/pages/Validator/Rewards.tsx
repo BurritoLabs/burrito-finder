@@ -23,8 +23,7 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
     [list]
   );
   const ibcWhitelist = useIBCWhitelist(ibcDenoms);
-  const ibcFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/IBC.svg";
+  const ibcFallbackIcon = "/system/ibc.svg";
   const fallbackIcon =
     "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='32' fill='%23304036'/><path d='M32 18a14 14 0 100 28 14 14 0 000-28z' fill='%235a6b65'/></svg>";
 
@@ -66,7 +65,6 @@ const Rewards = ({ title, list }: { title: string; list: Coin[] }) => {
                   `${ASSET_URL}/icon/60/LUNA.png`
                 ];
                 const iconCandidates = [
-                  ibcInfo?.icon,
                   ...(isIbc ? [ibcFallbackIcon] : []),
                   ...(isMainnetLuna ? lunaIcons : []),
                   ...(isClassicNative

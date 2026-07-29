@@ -163,6 +163,14 @@ test("Classic validator resolves IBC labels without runtime errors", async ({
 
   await expect(page.getByText("BNB (channel-19)")).toBeVisible();
   await expect(page.getByText("WHALE (channel-84)")).toBeVisible();
+  const bnbRow = page
+    .getByRole("row")
+    .filter({ hasText: "BNB (channel-19)" })
+    .first();
+  await expect(bnbRow.locator("img")).toHaveAttribute(
+    "src",
+    "/system/ibc.svg"
+  );
   const ustcRow = page
     .getByRole("row")
     .filter({ hasText: "USTC" })
@@ -173,6 +181,30 @@ test("Classic validator resolves IBC labels without runtime errors", async ({
   );
   await expect(page.locator("body")).not.toContainText("IBC 077EE5");
   await expect(page.locator("body")).not.toContainText("Value is undefined");
+  expect(errors).toEqual([]);
+});
+
+test("Phoenix validator keeps self-delegation when LCD delegation is unavailable", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  await page.route(
+    "**/cosmos/staking/v1beta1/validators/*/delegations/*",
+    route =>
+      route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "temporarily unavailable" })
+      })
+  );
+  await page.goto(
+    "/mainnet/validator/terravaloper1q8w4u2wyhx574m70gwe8km5za2ptanny9mnqy3"
+  );
+
+  const selfDelegation = page
+    .getByRole("heading", { name: "Self-delegation" })
+    .locator("..");
+  await expect(selfDelegation.locator("small")).toHaveText(/^\.\d{6} Luna$/);
   expect(errors).toEqual([]);
 });
 
@@ -215,7 +247,7 @@ test("Phoenix account tolerates unavailable price feeds", async ({ page }) => {
     "/mainnet/address/terra104dnzgzzx7hjt32sml9zspqfmvr7fdae8l6vy8"
   );
 
-  await expect(page.getByText("arbLUNA", { exact: true })).toBeVisible();
+  await expect(page.getByText("Luna", { exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("NaN");
   expect(errors).toEqual([]);
 });

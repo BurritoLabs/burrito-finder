@@ -30,6 +30,12 @@ const Header = ({ address }: { address: string }) => {
   useIsClassic();
   const [keybasePicture, setKeybasePicture] = useState<string>();
   const keybaseIdentity = validator?.description.identity;
+  const resolvedSelfDelegationAmount =
+    selfDelegationAmount ?? terraValidator?.self;
+  const selfDelegationTotal =
+    selfDelegationAmount != null
+      ? validator?.tokens
+      : (terraValidator?.tokens ?? validator?.tokens);
 
   const votingPowerRate = useMemo(() => {
     const bondedTokens = stakingPool?.bonded_tokens?.amount;
@@ -40,14 +46,16 @@ const Header = ({ address }: { address: string }) => {
   }, [stakingPool?.bonded_tokens?.amount, validator?.tokens]);
 
   const selfDelegationRate = useMemo(() => {
-    if (!validator?.tokens || selfDelegationAmount == null) {
+    if (!selfDelegationTotal || resolvedSelfDelegationAmount == null) {
       return undefined;
     }
 
-    const total = new BigNumber(validator.tokens.toString());
+    const total = new BigNumber(selfDelegationTotal.toString());
     if (total.isZero()) return undefined;
-    return new BigNumber(selfDelegationAmount.toString()).div(total).toNumber();
-  }, [selfDelegationAmount, validator?.tokens]);
+    return new BigNumber(resolvedSelfDelegationAmount.toString())
+      .div(total)
+      .toNumber();
+  }, [resolvedSelfDelegationAmount, selfDelegationTotal]);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,9 +136,9 @@ const Header = ({ address }: { address: string }) => {
             <h1>Self-delegation</h1>
             <p>{renderPercent(selfDelegationRate)}</p>
             <hr />
-            {selfDelegationAmount != null ? (
+            {resolvedSelfDelegationAmount != null ? (
               <Amount fontSize={14} denom="uluna">
-                {selfDelegationAmount.toString()}
+                {resolvedSelfDelegationAmount.toString()}
               </Amount>
             ) : (
               <span style={{ fontSize: 14 }}>-</span>

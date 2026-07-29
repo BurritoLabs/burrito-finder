@@ -13,8 +13,7 @@ const IBCUnit = ({ denom = "", available }: Props) => {
   const hash = denom.replace("ibc/", "");
   const data = useIBCWhitelist([denom]);
   const tokenInfo = data?.[hash];
-  const ibcFallbackIcon =
-    "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/IBC.svg";
+  const ibcFallbackIcon = "/system/ibc.svg";
   const baseDenom = tokenInfo?.base_denom;
   const factoryAddress = baseDenom?.startsWith("factory/")
     ? baseDenom.split("/")[1]
@@ -29,7 +28,7 @@ const IBCUnit = ({ denom = "", available }: Props) => {
       amount={available}
       hash={hash}
       path={tokenInfo?.path}
-      icon={tokenInfo?.icon ?? ibcFallbackIcon}
+      icon={ibcFallbackIcon}
       denom={tokenInfo?.symbol ?? "IBC"}
       rawDenom={tokenInfo?.base_denom ?? denom}
       decimals={tokenInfo?.decimals ?? 6}
