@@ -1,5 +1,6 @@
 import React from "react";
 import { useIsClassic } from "../../contexts/ChainsContext";
+import { NativeToken } from "../../hooks/useTerraAssets";
 import format from "../../scripts/format";
 import { isIbcDenom } from "../../scripts/utility";
 import AmountCard from "./AmountCard";
@@ -12,6 +13,7 @@ type Props = {
   ustcPrice?: number;
   lunaPrice?: number;
   fxRates?: Record<string, number>;
+  nativeInfo?: NativeToken;
 };
 
 const Available = ({
@@ -20,11 +22,11 @@ const Available = ({
   response,
   ustcPrice,
   lunaPrice,
-  fxRates
+  fxRates,
+  nativeInfo
 }: Props) => {
   const isClassic = useIsClassic();
   const isFactory = denom.startsWith("factory/");
-  const defaultAssetIcon = "/system/ibc.svg";
   const cwFallbackIcon =
     "https://raw.githubusercontent.com/terra-money/assets/master/icon/svg/CW.svg";
   if (isIbcDenom(denom)) {
@@ -33,7 +35,7 @@ const Available = ({
 
   return (
     <AmountCard
-      denom={format.denom(denom, isClassic)}
+      denom={nativeInfo?.symbol ?? format.denom(denom, isClassic)}
       rawDenom={denom}
       isClassic={isClassic}
       amount={amount}
@@ -41,8 +43,9 @@ const Available = ({
       ustcPrice={ustcPrice}
       lunaPrice={lunaPrice}
       fxRates={fxRates}
-      icon={isFactory ? defaultAssetIcon : undefined}
-      fallbackIcon={cwFallbackIcon}
+      icon={nativeInfo?.icon}
+      decimals={nativeInfo?.decimals}
+      fallbackIcon={isFactory ? "/system/cw20.svg" : cwFallbackIcon}
     />
   );
 };

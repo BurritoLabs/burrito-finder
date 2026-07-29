@@ -221,7 +221,7 @@ test("Phoenix account resolves CW20 and IBC assets", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("Phoenix factory assets use the local default icon", async ({ page }) => {
+test("Phoenix factory assets use their native-chain icon", async ({ page }) => {
   const errors = collectRuntimeErrors(page);
   await page.goto(
     "/mainnet/address/terra164873kl0ntxaydh95u93jrahxzushpgea7p560"
@@ -232,7 +232,7 @@ test("Phoenix factory assets use the local default icon", async ({ page }) => {
     .locator("xpath=ancestor::article[1]");
   await expect(ampRoarCard.getByRole("img")).toHaveAttribute(
     "src",
-    "/system/ibc.svg"
+    /\/v1\/finder\/icon\?url=.*amproar\.png/
   );
   expect(errors).toEqual([]);
 });

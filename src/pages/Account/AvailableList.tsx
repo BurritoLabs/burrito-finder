@@ -7,6 +7,7 @@ import {
 } from "../../contexts/ChainsContext";
 import { useCurrency } from "../../contexts/CurrencyContext";
 import useRequest from "../../hooks/useRequest";
+import { useMintscanNativeWhitelist } from "../../hooks/useTerraAssets";
 import { useDenoms } from "../../queries/oracle";
 import { DEFAULT_CURRENCY } from "../../scripts/utility";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +34,7 @@ const AvailableList = ({
   const fcdURL = useFCDURL();
   const isClassic = useIsClassic();
   const supportsFCD = useSupportsFCD();
+  const nativeWhitelist = useMintscanNativeWhitelist();
   const { data, isLoading } = useRequest<CurrencyData[]>({
     url: `${fcdURL}/v1/market/swaprate/${denom}`,
     enabled: isClassic && pricesEnabled && supportsFCD
@@ -272,6 +274,7 @@ const AvailableList = ({
             ustcPrice={resolvedUstcPrice}
             lunaPrice={resolvedLunaPrice}
             fxRates={fxUsdRates}
+            nativeInfo={nativeWhitelist[denom]}
           />
         );
       })}

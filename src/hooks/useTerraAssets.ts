@@ -41,6 +41,14 @@ export default useTerraAssets;
 
 export type TokenList = Dictionary<Whitelist>;
 export type IBCTokenList = Dictionary<IBCWhitelist>;
+export type NativeToken = {
+  denom: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  icon?: string;
+};
+export type NativeTokenList = Dictionary<NativeToken>;
 export type ContractList = Dictionary<Contracts>;
 export type NFTContractList = Dictionary<NFTContracts>;
 
@@ -146,6 +154,35 @@ const safeIcon = (value?: string) => {
   }
   if (!/^https:\/\//i.test(trimmed)) return undefined;
   return proxyAssetIcon(trimmed);
+};
+
+export const useMintscanNativeWhitelist = (): NativeTokenList => {
+  const { chainID } = useCurrentChain();
+  const { data } = useQuery({
+    queryKey: ["mintscan-native-assets", chainID],
+    queryFn: fetchMintscanAssets,
+    enabled: chainID === "phoenix-1",
+    staleTime: 6 * 60 * 60 * 1000,
+    retry: false
+  });
+
+  return useMemo(
+    () =>
+      (data ?? []).reduce<NativeTokenList>((acc, asset) => {
+        const denom = asset.denom?.trim();
+        const symbol = asset.symbol?.trim();
+        if (asset.type !== "native" || !denom || !symbol) return acc;
+        acc[denom] = {
+          denom,
+          symbol,
+          name: asset.name?.trim() || symbol,
+          decimals: parseDecimals(asset.decimals) ?? 6,
+          icon: safeIcon(asset.image)
+        };
+        return acc;
+      }, {}),
+    [data]
+  );
 };
 
 const parseDecimals = (value: number | string | undefined) => {
