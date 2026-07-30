@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { useParams } from "react-router-dom";
-import { ContractInfo as Props } from "@terra-money/terra.js";
+import { ContractInfo as TerraContractInfo } from "@terra-money/terra.js";
 import Flex from "../../components/Flex";
 import Card from "../../components/Card";
 import Table from "../../components/Table";
@@ -14,6 +14,8 @@ import Delegations from "./Delegations";
 import ContractInfo from "./ContractInfo";
 import TokenBalance from "./TokenBalance";
 import s from "./Contract.module.scss";
+
+type Props = Partial<TerraContractInfo>;
 
 const Contract = ({ admin, code_id, init_msg, label }: Props) => {
   const { address = "" } = useParams();

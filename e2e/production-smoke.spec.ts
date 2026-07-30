@@ -167,20 +167,43 @@ test("Classic validator resolves IBC labels without runtime errors", async ({
     .getByRole("row")
     .filter({ hasText: "BNB (channel-19)" })
     .first();
-  await expect(bnbRow.locator("img")).toHaveAttribute(
-    "src",
-    "/system/ibc.svg"
-  );
-  const ustcRow = page
-    .getByRole("row")
-    .filter({ hasText: "USTC" })
-    .first();
+  await expect(bnbRow.locator("img")).toHaveAttribute("src", "/system/ibc.svg");
+  const ustcRow = page.getByRole("row").filter({ hasText: "USTC" }).first();
   await expect(ustcRow.locator("img")).toHaveAttribute(
     "src",
     /\/icon\/60\/UST\.png$/
   );
   await expect(page.locator("body")).not.toContainText("IBC 077EE5");
   await expect(page.locator("body")).not.toContainText("Value is undefined");
+  expect(errors).toEqual([]);
+});
+
+test("Classic 32-byte contract address loads balances and history", async ({
+  page
+}) => {
+  const errors = collectRuntimeErrors(page);
+  const address =
+    "terra19h62lw77rluxf6yg4szcclcgk9tsalx72cv7dlzvzs8gy20g70js7c9jkc";
+
+  await page.goto(`/classic/address/${address}`);
+
+  await expect(
+    page.getByRole("heading", { name: "Smart Contract" })
+  ).toBeVisible();
+  await expect(page.getByText("8214", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "LUNC", exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Search not found" })
+  ).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("table")
+      .filter({ hasText: "Tx hash" })
+      .locator("tbody tr")
+      .first()
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -242,9 +265,7 @@ test("Phoenix factory assets use their native-chain icon", async ({ page }) => {
       redundantBalanceRequests.push(request.url());
     }
   });
-  await page.goto(
-    `/mainnet/address/${address}`
-  );
+  await page.goto(`/mainnet/address/${address}`);
 
   const ampRoarCard = page
     .getByRole("heading", { name: "ampROAR", exact: true })
@@ -330,11 +351,14 @@ test("Phoenix transaction renders canonical actions", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("Success", { exact: true })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("Unknown");
-  await expect(page.getByRole("link", { name: "ORNE" })).toBeVisible();
+  const internalOrneLink = page.locator(
+    'a[href="/mainnet/address/terra19p20mfnvwh9yvyr7aus3a6z6g6uk28fv4jhx9kmnc2m7krg27q2qkfenjw"]'
+  );
+  await expect(internalOrneLink).toBeVisible();
   await expect(page.getByText("1.013236 Luna", { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 
-  await page.getByRole("link", { name: "ORNE" }).click();
+  await internalOrneLink.click();
   await expect(page).toHaveURL(
     /\/mainnet\/address\/terra19p20mfnvwh9yvyr7aus3a6z6g6uk28fv4jhx9kmnc2m7krg27q2qkfenjw$/
   );

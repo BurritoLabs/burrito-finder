@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { AccAddress, ValAddress } from "../../libs/address";
-import apiClient from "../../apiClient";
 import { useTns } from "../../libs/tns";
 import { isTnsName } from "../../libs/tnsName";
 import { getEndpointByKeyword } from "../../scripts/utility";
@@ -14,6 +13,10 @@ import {
   useNFTContracts,
   useWhitelist
 } from "../../hooks/useTerraAssets";
+import {
+  axiosGetWithEndpointFallback,
+  getLcdFallbackBases
+} from "../../queries/endpointFallback";
 import Account from "./Account";
 import Contract from "./Contract";
 
@@ -28,36 +31,35 @@ const Address = () => {
     !!contracts?.[normalizedAddress] ||
     !!nfts?.[normalizedAddress];
   const isValidAccountAddress = AccAddress.validate(address.trim());
-  const { name, lcd } = useCurrentChain();
-  const shouldCheckAccount = isValidAccountAddress && !isKnownContractBase;
-  const { data: accountKind, isLoading: isAccountKindLoading } = useQuery({
-    queryKey: ["addressAccountKind", normalizedAddress, lcd],
+  const isDeterministicContract = AccAddress.isContract(address.trim());
+  const { name, lcd, chainID } = useCurrentChain();
+  const shouldProbeContract =
+    isValidAccountAddress && !isKnownContractBase && !isDeterministicContract;
+  const { data: isProbedContract, isLoading: isContractProbeLoading } =
+    useQuery({
+      queryKey: ["addressContractKind", normalizedAddress, lcd, chainID],
 
-    queryFn: async () => {
-      const { status } = await apiClient.get(
-        `${lcd}/cosmos/auth/v1beta1/accounts/${normalizedAddress}`,
-        { validateStatus: status => status === 200 || status === 404 }
-      );
+      queryFn: async () => {
+        try {
+          await axiosGetWithEndpointFallback(
+            `${lcd}/cosmwasm/wasm/v1/contract/${normalizedAddress}`,
+            {},
+            getLcdFallbackBases(lcd, chainID)
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      },
 
-      return status === 200 ? "account" : "unknown";
-    },
-
-    enabled: shouldCheckAccount,
-    retry: false
-  });
-  const dynamicWhitelist = useWhitelist(
-    accountKind === "unknown" ? [normalizedAddress] : []
-  );
+      enabled: shouldProbeContract,
+      retry: false
+    });
   const isKnownContract =
-    isKnownContractBase || !!dynamicWhitelist?.[normalizedAddress];
-  const shouldCheckContract =
-    isKnownContract ||
-    (isValidAccountAddress &&
-      (!shouldCheckAccount ||
-        (!isAccountKindLoading && accountKind !== "account")));
+    isKnownContractBase || isDeterministicContract || isProbedContract === true;
   const { data: contractInfo, isLoading } = useContractInfo(
     address,
-    shouldCheckContract
+    isKnownContract
   );
   const [resolvedAddress, setResolvedAddress] = useState("");
   const navigate = useNavigate();
@@ -89,10 +91,10 @@ const Address = () => {
 
   if (resolvedAddress !== address) return <Loading />;
 
-  return isAccountKindLoading || isLoading ? (
+  return isContractProbeLoading || isLoading ? (
     <Loading />
-  ) : contractInfo ? (
-    <Contract {...contractInfo} />
+  ) : contractInfo || isKnownContract ? (
+    <Contract {...(contractInfo ?? {})} />
   ) : (
     <Account />
   );
