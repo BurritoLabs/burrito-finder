@@ -40,6 +40,10 @@ import {
   MINTSCAN_PROXY_URL,
   normalizeMintscanTx
 } from "../../queries/mintscan";
+import {
+  axiosGetWithEndpointFallback,
+  getLcdFallbackBases
+} from "../../queries/endpointFallback";
 
 type Fee = {
   denom: string;
@@ -127,16 +131,21 @@ const Txs = ({
 
   const params = { offset, limit: fcdLimit, account: address };
   const url = useGetQueryURL("/v1/txs");
-  const { data: fcdData, isLoading: fcdLoading } = useRequest<{
+  const {
+    data: fcdData,
+    isLoading: fcdLoading,
+    isError: fcdError
+  } = useRequest<{
     next: number;
     txs: TxInfo[];
   }>({
     url,
     params,
-    enabled: !isClassicTestnet && !isPhoenix
+    enabled: !isClassicTestnet && !isPhoenix && !(isClassic && !!isContract)
   });
 
-  const shouldUseLcd = isClassicTestnet || isPhoenix;
+  const shouldUseLcd =
+    isClassicTestnet || isPhoenix || (isClassic && (!!isContract || fcdError));
   const shouldUseClassicContractRpc = isClassic && isContract && !!rpc;
 
   const mintscanCursor = mintscanCursors[offset];
@@ -151,7 +160,7 @@ const Txs = ({
     ],
 
     queryFn: async () => {
-      if (!isClassicTestnet) {
+      if (isPhoenix) {
         try {
           const { data: mintscanData } = await apiClient.get<{
             transactions?: any[];
@@ -181,11 +190,15 @@ const Txs = ({
         const search = new URLSearchParams();
         search.set("pagination.limit", String(contractLimit));
         search.set("pagination.offset", String(offset));
-        if (isClassicTestnet) {
+        if (isClassic) {
           search.set("query", `${eventKey}='${address}'`);
           const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
           try {
-            const { data } = await apiClient.get(endpoint, { timeout: 8000 });
+            const { data } = await axiosGetWithEndpointFallback<any>(
+              endpoint,
+              { timeout: 8000 },
+              getLcdFallbackBases(lcd, chainID)
+            );
             return data;
           } catch {
             return { txs: [], tx_responses: [], pagination: { total: "0" } };
@@ -194,22 +207,33 @@ const Txs = ({
         search.set("events", `${eventKey}='${address}'`);
         const endpoint = `${lcd}/cosmos/tx/v1beta1/txs?${search.toString()}`;
         try {
-          const { data } = await apiClient.get(endpoint);
+          const { data } = await axiosGetWithEndpointFallback<any>(
+            endpoint,
+            {},
+            getLcdFallbackBases(lcd, chainID)
+          );
           return data;
         } catch {
           const unquoted = new URLSearchParams(search);
           unquoted.set("events", `${eventKey}=${address}`);
           const fallbackEndpoint = `${lcd}/cosmos/tx/v1beta1/txs?${unquoted.toString()}`;
-          const { data } = await apiClient.get(fallbackEndpoint);
+          const { data } = await axiosGetWithEndpointFallback<any>(
+            fallbackEndpoint,
+            {},
+            getLcdFallbackBases(lcd, chainID)
+          );
           return data;
         }
       };
 
-      const [sender, recipient] = await Promise.all([
-        fetchByEvent("message.sender"),
-        fetchByEvent("transfer.recipient")
-      ]);
-      const messageRecipient = await fetchByEvent("message.recipient");
+      const payloads =
+        isClassic && isContract
+          ? [await fetchByEvent("wasm._contract_address")]
+          : await Promise.all([
+              fetchByEvent("message.sender"),
+              fetchByEvent("transfer.recipient"),
+              fetchByEvent("message.recipient")
+            ]);
 
       const toTxs = (payload: any) =>
         (payload?.tx_responses ?? []).map((resp: any, index: number) => ({
@@ -217,11 +241,7 @@ const Txs = ({
           tx: payload?.txs?.[index]
         }));
 
-      const merged = [
-        ...toTxs(sender),
-        ...toTxs(recipient),
-        ...toTxs(messageRecipient)
-      ];
+      const merged = payloads.flatMap(toTxs);
       const unique = new Map<string, any>();
       merged.forEach(tx => {
         if (tx?.txhash) {
@@ -233,9 +253,9 @@ const Txs = ({
         (a, b) => Number(b.height) - Number(a.height)
       );
 
-      const senderTotal = Number(sender?.pagination?.total ?? 0);
-      const recipientTotal = Number(recipient?.pagination?.total ?? 0);
-      const total = Math.max(senderTotal, recipientTotal);
+      const total = Math.max(
+        ...payloads.map(payload => Number(payload?.pagination?.total ?? 0))
+      );
       const next =
         total > offset + contractLimit ? offset + contractLimit : undefined;
 
