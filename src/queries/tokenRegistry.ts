@@ -15,6 +15,14 @@ type VerifiedRegistryAsset = {
   logoUrl?: string | null;
   baseDenom?: string;
   path?: string;
+  verificationStatus?: string;
+  verificationMethod?: string;
+  originChainId?: string;
+  originDenom?: string;
+  issuer?: string;
+  transport?: string;
+  provenanceLabel?: string;
+  source?: string;
 };
 
 type RegistryResponse = {
@@ -43,6 +51,20 @@ const validDecimals = (value?: number | null) =>
 
 const cleanText = (value?: string | null) => value?.trim() || undefined;
 
+const provenanceFields = (asset: VerifiedRegistryAsset) =>
+  Object.fromEntries(
+    [
+      ["verificationStatus", cleanText(asset.verificationStatus)],
+      ["verificationMethod", cleanText(asset.verificationMethod)],
+      ["originChainId", cleanText(asset.originChainId)],
+      ["originDenom", cleanText(asset.originDenom)],
+      ["issuer", cleanText(asset.issuer)],
+      ["transport", cleanText(asset.transport)],
+      ["provenanceLabel", cleanText(asset.provenanceLabel)],
+      ["source", cleanText(asset.source)]
+    ].filter((entry): entry is [string, string] => Boolean(entry[1]))
+  );
+
 export const mapVerifiedRegistryAssets = (
   assets: VerifiedRegistryAsset[]
 ): VerifiedTokenRegistry => {
@@ -60,7 +82,8 @@ export const mapVerifiedRegistryAssets = (
         name: cleanText(asset.name) ?? symbol,
         protocol: cleanText(asset.name) ?? symbol,
         decimals: validDecimals(asset.decimals),
-        icon: proxyAssetIcon(cleanText(asset.logoUrl))
+        icon: proxyAssetIcon(cleanText(asset.logoUrl)),
+        ...provenanceFields(asset)
       };
       return;
     }
@@ -79,7 +102,8 @@ export const mapVerifiedRegistryAssets = (
         name: cleanText(asset.name) ?? symbol,
         decimals: validDecimals(asset.decimals),
         icon: proxyAssetIcon(cleanText(asset.logoUrl)),
-        path: cleanText(asset.path)
+        path: cleanText(asset.path),
+        ...provenanceFields(asset)
       };
     }
   });

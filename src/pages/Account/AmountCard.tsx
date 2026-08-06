@@ -30,6 +30,8 @@ type Props = {
   assetId?: string;
   usdValue?: number;
   showUsdValue?: boolean;
+  provenanceLabel?: string;
+  issuer?: string;
   ustcPrice?: number;
   lunaPrice?: number;
   fxRates?: Record<string, number>;
@@ -47,6 +49,8 @@ const AmountCard = ({
   assetId,
   usdValue,
   showUsdValue,
+  provenanceLabel,
+  issuer,
   ...props
 }: Props) => {
   const {
@@ -145,9 +149,21 @@ const AmountCard = ({
         <h1 className={s.denom} title={formatDenom}>
           {displayDenom}
         </h1>
-        {(visibleName || displayAssetId) && (
+        {(visibleName || provenanceLabel || displayAssetId) && (
           <span className={s.details}>
             {visibleName && <span className={s.assetName}>{visibleName}</span>}
+            {provenanceLabel && (
+              <span
+                className={s.provenance}
+                title={
+                  issuer
+                    ? `${provenanceLabel}, issued by ${issuer}`
+                    : provenanceLabel
+                }
+              >
+                {provenanceLabel}
+              </span>
+            )}
             {displayAssetId && (
               <span className={s.assetId} title={assetId}>
                 {displayAssetId}

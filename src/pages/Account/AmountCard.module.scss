@@ -76,6 +76,12 @@
   flex: 0 1 auto;
 }
 
+.provenance {
+  flex: 0 0 auto;
+  color: variables.$brand;
+  opacity: 0.86;
+}
+
 .assetId {
   flex: 1 1 auto;
   opacity: 0.65;

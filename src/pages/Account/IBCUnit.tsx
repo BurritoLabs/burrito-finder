@@ -39,6 +39,12 @@ const IBCUnit = ({ denom = "", available, usdValue, showUsdValue }: Props) => {
       decimals={tokenInfo?.decimals ?? 6}
       usdValue={usdValue}
       showUsdValue={showUsdValue}
+      provenanceLabel={
+        tokenInfo?.provenanceLabel
+          ? `${tokenInfo.provenanceLabel}${tokenInfo.transport === "ibc" ? " via IBC" : ""}`
+          : undefined
+      }
+      issuer={tokenInfo?.issuer}
       linkTo={
         contractAddress ? `/${name}/address/${contractAddress}` : undefined
       }

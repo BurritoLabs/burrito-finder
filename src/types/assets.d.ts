@@ -5,6 +5,14 @@ interface Whitelist {
   icon?: string;
   decimals?: number;
   name?: string;
+  verificationStatus?: string;
+  verificationMethod?: string;
+  originChainId?: string;
+  originDenom?: string;
+  issuer?: string;
+  transport?: string;
+  provenanceLabel?: string;
+  source?: string;
 }
 
 interface IBCWhitelist {
@@ -15,6 +23,14 @@ interface IBCWhitelist {
   name: string;
   icon?: string;
   decimals?: number;
+  verificationStatus?: string;
+  verificationMethod?: string;
+  originChainId?: string;
+  originDenom?: string;
+  issuer?: string;
+  transport?: string;
+  provenanceLabel?: string;
+  source?: string;
 }
 
 interface Contracts {

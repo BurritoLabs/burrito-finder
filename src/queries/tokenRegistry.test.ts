@@ -59,4 +59,38 @@ describe("verified Burrito token registry", () => {
     });
     expect(registry.cw20).toEqual({});
   });
+
+  test("preserves Noble USDC provenance after registry mapping", () => {
+    const hash = "B".repeat(64);
+    const registry = mapVerifiedRegistryAssets([
+      {
+        chainId: "columbus-5",
+        type: "ibc",
+        assetKey: `ibc/${hash}`,
+        name: "USD Coin (Noble)",
+        symbol: "USDC",
+        decimals: 6,
+        baseDenom: "uusdc",
+        path: "transfer/channel-113",
+        verificationStatus: "trace_verified",
+        verificationMethod: "ibc_trace_hash",
+        originChainId: "noble-1",
+        originDenom: "uusdc",
+        issuer: "Circle",
+        transport: "ibc",
+        provenanceLabel: "Noble",
+        source: "cosmos_chain_registry"
+      }
+    ]);
+
+    expect(registry.ibc[hash]).toMatchObject({
+      symbol: "USDC",
+      name: "USD Coin (Noble)",
+      path: "transfer/channel-113",
+      verificationStatus: "trace_verified",
+      originChainId: "noble-1",
+      issuer: "Circle",
+      provenanceLabel: "Noble"
+    });
+  });
 });
