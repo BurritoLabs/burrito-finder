@@ -22,7 +22,7 @@
   border-radius: 999px;
   border: 1px solid variables.$line;
   font-size: 11px;
-  color: rgba(234, 245, 235, 0.76);
+  color: var(--bui-color-text-secondary);
   font-weight: 600;
   letter-spacing: 0;
   background: rgba(255, 255, 255, 0.026);
@@ -39,13 +39,13 @@
   &:hover {
     border-color: rgba(var(--chain-rgb), 0.38);
     background: rgba(var(--chain-rgb), 0.08);
-    color: #fff;
+    color: var(--bui-color-text);
   }
 
   &[aria-expanded="true"] {
     border-color: rgba(var(--chain-rgb), 0.42);
     background: rgba(var(--chain-rgb), 0.09);
-    color: #fff;
+    color: var(--bui-color-text);
   }
 
   &:focus-visible {
@@ -134,12 +134,12 @@
   line-height: normal;
   min-height: 40px;
   font-size: 12px;
-  color: rgba(234, 245, 235, 0.68);
+  color: var(--bui-color-text-secondary);
   background: transparent;
   border: 0;
   border-radius: variables.$radius;
   &:hover {
-    color: #fff;
+    color: var(--bui-color-text);
     background: rgba(255, 255, 255, 0.045);
   }
 }
@@ -162,14 +162,14 @@
   }
 
   > span:last-child {
-    color: rgba(234, 245, 235, 0.44);
+    color: var(--bui-color-text-muted);
     font-size: 10px;
     font-weight: 500;
   }
 }
 
 .active {
-  color: #fff;
+  color: var(--bui-color-text);
   background: rgba(var(--option-chain-rgb), 0.1);
 }
 
@@ -179,7 +179,7 @@
   align-items: center;
   justify-content: center;
   width: 14px;
-  color: rgba(234, 245, 235, 0.48);
+  color: var(--bui-color-text-muted);
   pointer-events: none;
 
   svg {

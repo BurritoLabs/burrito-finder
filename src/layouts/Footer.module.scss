@@ -2,7 +2,7 @@
 
 .footer {
   border-top: 1px solid variables.$line;
-  color: rgba(234, 245, 235, 0.68);
+  color: var(--bui-color-text-secondary);
   font-size: 12px;
 }
 
@@ -22,7 +22,7 @@
   }
 
   a {
-    color: rgba(234, 245, 235, 0.78);
+    color: var(--bui-color-text-secondary);
   }
 
   @media (max-width: variables.$breakpoint) {
