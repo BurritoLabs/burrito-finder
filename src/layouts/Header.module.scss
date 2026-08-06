@@ -4,12 +4,19 @@
   position: relative;
   z-index: 40;
   min-height: 72px;
-  background: rgb(15, 27, 22);
+  background: var(--bui-color-glass);
   border-bottom: 1px solid variables.$line;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
   @media (max-width: variables.$breakpoint) {
     min-height: 124px;
   }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
 }
 
 .inner {

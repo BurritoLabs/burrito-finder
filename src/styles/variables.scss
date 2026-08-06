@@ -1,23 +1,23 @@
-$app-fg: #f0faf1;
-$app-bg: #08110f;
+$app-fg: var(--bui-color-text);
+$app-bg: var(--bui-color-canvas);
 $brand: #52c41a;
-$link: #7fe35a;
-$link-bg: #52c41a;
-$muted: #8fa49a;
-$soft: #c8d9d0;
-$panel: rgba(255, 255, 255, 0.026);
-$panel-strong: rgba(6, 14, 12, 0.82);
-$line: rgba(255, 255, 255, 0.14);
-$line-soft: rgba(255, 255, 255, 0.075);
-$bg-hover: rgba(255, 255, 255, 0.05);
-$a-bg: rgba(82, 196, 26, 0.12);
+$link: var(--bui-color-brand-text);
+$link-bg: var(--bui-color-brand);
+$muted: var(--bui-color-text-muted);
+$soft: var(--bui-color-text-secondary);
+$panel: var(--bui-color-surface);
+$panel-strong: var(--bui-color-surface-raised);
+$line: var(--bui-color-border-strong);
+$line-soft: var(--bui-color-border);
+$bg-hover: var(--bui-color-surface-hover);
+$a-bg: var(--bui-color-brand-soft);
 
 $green: #52c41a;
 $red: #ff5561;
 $orange: #fd9a02;
 $navy: #08110f;
 $sky: #38bdf8;
-$table-head: rgba(255, 255, 255, 0.026);
+$table-head: var(--bui-color-surface-raised);
 /* Sizes */
 $breakpoint: 960px;
 $breakpoint-large: 1024px;

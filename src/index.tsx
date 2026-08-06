@@ -4,6 +4,8 @@ import type { ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BurritoThemeProvider } from "@burritolabs/ui";
+import "@burritolabs/ui/tokens.css";
 import "./index.scss";
 import App from "./layouts/App";
 import {
@@ -41,18 +43,20 @@ const Root = () => {
   }, []);
 
   return (
-    <BrowserRouter>
-      <CurrencyProvider>
-        <QueryClientProvider client={queryClient}>
-          <ChainsProvider value={chains}>
-            <Routes>
-              <Route path="/*" element={<App />} />
-              <Route path=":network/*" element={<App />} />
-            </Routes>
-          </ChainsProvider>
-        </QueryClientProvider>
-      </CurrencyProvider>
-    </BrowserRouter>
+    <BurritoThemeProvider>
+      <BrowserRouter>
+        <CurrencyProvider>
+          <QueryClientProvider client={queryClient}>
+            <ChainsProvider value={chains}>
+              <Routes>
+                <Route path="/*" element={<App />} />
+                <Route path=":network/*" element={<App />} />
+              </Routes>
+            </ChainsProvider>
+          </QueryClientProvider>
+        </CurrencyProvider>
+      </BrowserRouter>
+    </BurritoThemeProvider>
   );
 };
 

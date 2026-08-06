@@ -5,6 +5,7 @@ import Search from "../components/Search";
 import { Link, useLocation } from "react-router-dom";
 import FinderLogo from "../components/FinderLogo";
 import SelectOptions from "../components/SelectOptions";
+import { BurritoThemeSwitcher } from "@burritolabs/ui";
 
 const Header = () => {
   const { pathname } = useLocation();
@@ -19,7 +20,10 @@ const Header = () => {
           </Link>
         </div>
         {!isHome && <Search className={s.search} />}
-        <SelectOptions variant="header" />
+        <div className={s.actions}>
+          <BurritoThemeSwitcher />
+          <SelectOptions variant="header" />
+        </div>
       </div>
     </div>
   );

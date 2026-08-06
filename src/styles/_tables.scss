@@ -45,6 +45,6 @@ td {
   }
 
   .table-light & {
-    border-color: color.adjust(variables.$line, $alpha: -0.95);
+    border-color: color-mix(in srgb, var(--bui-color-border) 5%, transparent);
   }
 }
