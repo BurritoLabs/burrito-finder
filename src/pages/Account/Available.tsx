@@ -14,6 +14,8 @@ type Props = {
   lunaPrice?: number;
   fxRates?: Record<string, number>;
   nativeInfo?: NativeToken;
+  usdValue?: number;
+  showUsdValue?: boolean;
 };
 
 const Available = ({
@@ -23,13 +25,22 @@ const Available = ({
   ustcPrice,
   lunaPrice,
   fxRates,
-  nativeInfo
+  nativeInfo,
+  usdValue,
+  showUsdValue
 }: Props) => {
   const isClassic = useIsClassic();
   const isFactory = denom.startsWith("factory/");
   const cwFallbackIcon = "/system/cw20.svg";
   if (isIbcDenom(denom)) {
-    return <IBCUnit denom={denom} available={amount} />;
+    return (
+      <IBCUnit
+        denom={denom}
+        available={amount}
+        usdValue={usdValue}
+        showUsdValue={showUsdValue}
+      />
+    );
   }
 
   return (

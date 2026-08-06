@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import Card from "../../components/Card";
 import Info from "../../components/Info";
@@ -12,6 +12,7 @@ import { useInitialBankBalance } from "../../queries/bank";
 import useTokenBalance from "../../hooks/cw20/useTokenBalance";
 import { isIbcDenom } from "../../scripts/utility";
 import { useIBCWhitelist } from "../../hooks/useTerraAssets";
+import { useMarketAssetUsdPrices } from "../../queries/marketAssetPrices";
 import AmountCard from "./AmountCard";
 import Available from "./Available";
 import AvailableList from "./AvailableList";
@@ -35,6 +36,28 @@ const TokenBalance = ({ address }: { address: string }) => {
   const isClassic = useIsClassic();
   const isClassicTestnet = isClassicTestnetChainID(chainID);
   const cwFallbackIcon = "/system/cw20.svg";
+  const tokenPriceAssets = useMemo(
+    () => [
+      ...(ibcBalance?.map(({ denom }) => {
+        const hash = denom.replace("ibc/", "");
+        return {
+          id: `native:${denom}`,
+          decimals: ibcWhitelist?.[hash]?.decimals ?? 6
+        };
+      }) ?? []),
+      ...(tokens.list
+        ?.filter(token => token.balance !== "0" && token.address)
+        .map(token => ({
+          id: `cw20:${token.address}`,
+          decimals: token.decimals ?? 6
+        })) ?? [])
+    ],
+    [ibcBalance, ibcWhitelist, tokens.list]
+  );
+  const { data: marketAssetPrices = {} } = useMarketAssetUsdPrices(
+    tokenPriceAssets,
+    pricesEnabled && !isClassicTestnet
+  );
   useEffect(() => {
     setDeferTokens(true);
     setPricesEnabled(false);
@@ -107,13 +130,22 @@ const TokenBalance = ({ address }: { address: string }) => {
                 const value = new BigNumber(balance.amount.toString()).div(
                   new BigNumber(10).pow(decimals)
                 );
+                const usdPrice =
+                  marketAssetPrices[`native:${balance.denom}`.toLowerCase()];
                 return {
                   key: balance.denom,
                   type: "ibc" as const,
                   value,
                   denom: balance.denom,
                   amount: balance.amount.toString(),
-                  decimals
+                  decimals,
+                  usdValue:
+                    usdPrice === undefined
+                      ? undefined
+                      : value.multipliedBy(usdPrice).toNumber(),
+                  name: undefined,
+                  icon: undefined,
+                  address: undefined
                 };
               }) ?? []),
               ...(tokens?.list
@@ -123,6 +155,9 @@ const TokenBalance = ({ address }: { address: string }) => {
                   const value = new BigNumber(t.balance).div(
                     new BigNumber(10).pow(decimals)
                   );
+                  const usdPrice = t.address
+                    ? marketAssetPrices[`cw20:${t.address}`.toLowerCase()]
+                    : undefined;
                   return {
                     key: t.address ?? t.symbol,
                     type: "cw20" as const,
@@ -130,8 +165,13 @@ const TokenBalance = ({ address }: { address: string }) => {
                     denom: t.symbol,
                     amount: t.balance,
                     decimals,
+                    usdValue:
+                      usdPrice === undefined
+                        ? undefined
+                        : value.multipliedBy(usdPrice).toNumber(),
                     icon: t.icon,
-                    address: t.address
+                    address: t.address,
+                    name: t.name
                   };
                 }) ?? [])
             ]
@@ -139,13 +179,20 @@ const TokenBalance = ({ address }: { address: string }) => {
                 if (!hideLowValueTokens) return true;
                 return item.value.gte(0.01);
               })
-              .sort((a, b) => b.value.comparedTo(a.value) ?? 0)
+              .sort((a, b) => {
+                if (a.usdValue !== undefined || b.usdValue !== undefined) {
+                  return (b.usdValue ?? -1) - (a.usdValue ?? -1);
+                }
+                return b.value.comparedTo(a.value) ?? 0;
+              })
               .map(item =>
                 item.type === "ibc" ? (
                   <Available
                     key={item.key}
                     denom={item.denom}
                     amount={item.amount}
+                    usdValue={item.usdValue}
+                    showUsdValue
                   />
                 ) : (
                   <AmountCard
@@ -154,6 +201,10 @@ const TokenBalance = ({ address }: { address: string }) => {
                     amount={item.amount}
                     icon={item.icon ?? cwFallbackIcon}
                     fallbackIcon={cwFallbackIcon}
+                    name={item.name}
+                    assetId={item.address}
+                    usdValue={item.usdValue}
+                    showUsdValue
                     decimals={item.decimals}
                     linkTo={
                       item.address

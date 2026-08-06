@@ -17,6 +17,11 @@ import {
   getLcdFallbackBases
 } from "../../queries/endpointFallback";
 import { fetchFinderAccountAssets } from "../../queries/finderAssets";
+import {
+  includeActiveCw20Contracts,
+  loadActiveCw20Contracts,
+  savePositiveCw20Contracts
+} from "./activeBalanceCache";
 
 export interface Token {
   icon?: string;
@@ -98,10 +103,11 @@ const useTokenBalance = (
   >({});
 
   const isClassic = useIsClassic();
+  const { mantle, hive, lcd, chainID } = useCurrentChain();
   const { data: launchpadContracts = [] } = useLaunchpadCw20Contracts();
   const whitelist = useWhitelist(isClassic ? launchpadContracts : undefined);
   const contracts = useContracts();
-  const mergedWhitelist = useMemo<Tokens>(() => {
+  const baseWhitelist = useMemo<Tokens>(() => {
     if (isClassic) {
       return whitelist ?? {};
     }
@@ -122,7 +128,14 @@ const useTokenBalance = (
       ...(whitelist ?? {})
     };
   }, [contracts, whitelist, isClassic]);
-  const { mantle, hive, lcd, chainID } = useCurrentChain();
+  const activeContracts = useMemo(
+    () => loadActiveCw20Contracts(address, chainID),
+    [address, chainID]
+  );
+  const mergedWhitelist = useMemo(
+    () => includeActiveCw20Contracts(baseWhitelist, activeContracts),
+    [activeContracts, baseWhitelist]
+  );
   const isClassicTestnet = isClassicTestnetChainID(chainID);
 
   useEffect(() => {
@@ -316,6 +329,7 @@ const useTokenBalance = (
           }
 
           if (!active) return;
+          savePositiveCw20Contracts(address, chainID, parsed);
           setResult(parsed);
           if (typeof window !== "undefined") {
             window.localStorage.setItem(

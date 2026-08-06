@@ -26,6 +26,10 @@ type Props = {
   decimals?: number;
   isClassic?: boolean;
   rawDenom?: string;
+  name?: string;
+  assetId?: string;
+  usdValue?: number;
+  showUsdValue?: boolean;
   ustcPrice?: number;
   lunaPrice?: number;
   fxRates?: Record<string, number>;
@@ -39,6 +43,10 @@ const AmountCard = ({
   hash,
   linkTo,
   rawDenom,
+  name,
+  assetId,
+  usdValue,
+  showUsdValue,
   ...props
 }: Props) => {
   const {
@@ -113,6 +121,16 @@ const AmountCard = ({
     formatDenom.length > 20
       ? format.truncate(formatDenom, [8, 6])
       : formatDenom;
+  const displayName = (name || factoryMeta?.name)?.trim();
+  const visibleName =
+    displayName &&
+    displayName.toLowerCase() !== formatDenom.toLowerCase() &&
+    displayName.toLowerCase() !== "cw20 token"
+      ? displayName
+      : undefined;
+  const displayAssetId = assetId
+    ? format.truncate(assetId, [10, 8])
+    : undefined;
 
   const iconRender = (
     <div className={s.icon}>
@@ -123,14 +141,26 @@ const AmountCard = ({
   const tokenHeader = (
     <div className={s.token_wrapper}>
       {iconRender}
-      <h1 className={s.denom} title={formatDenom}>
-        {displayDenom}
-      </h1>
-      {hash && path && (
-        <span className={s.meta}>
-          {format.truncate(hash, [6, 6])} ({path})
-        </span>
-      )}
+      <div className={s.tokenIdentity}>
+        <h1 className={s.denom} title={formatDenom}>
+          {displayDenom}
+        </h1>
+        {(visibleName || displayAssetId) && (
+          <span className={s.details}>
+            {visibleName && <span className={s.assetName}>{visibleName}</span>}
+            {displayAssetId && (
+              <span className={s.assetId} title={assetId}>
+                {displayAssetId}
+              </span>
+            )}
+          </span>
+        )}
+        {hash && path && (
+          <span className={s.meta} title={`${hash} (${path})`}>
+            {format.truncate(hash, [6, 6])} ({path})
+          </span>
+        )}
+      </div>
     </div>
   );
 
@@ -150,17 +180,20 @@ const AmountCard = ({
               {lte(amount, 0) ? "0" : amount}
             </Amount>
             <span className={s.currency}>
-              {response &&
-                renderCurreny(
-                  denom,
-                  amount,
-                  response,
-                  isClassic,
-                  ustcPrice,
-                  rawDenom,
-                  lunaPrice,
-                  fxRates
-                )}
+              {response
+                ? renderCurreny(
+                    denom,
+                    amount,
+                    response,
+                    isClassic,
+                    ustcPrice,
+                    rawDenom,
+                    lunaPrice,
+                    fxRates
+                  )
+                : showUsdValue
+                  ? renderUsdValue(usdValue)
+                  : null}
             </span>
             <div className={s.button}>{button}</div>
           </section>
@@ -170,6 +203,12 @@ const AmountCard = ({
       </article>
     </Card>
   );
+};
+
+const renderUsdValue = (value?: number) => {
+  if (value === undefined || !Number.isFinite(value)) return "≈ --";
+  const decimals = value >= 0.01 ? 2 : value >= 0.000001 ? 6 : 8;
+  return `≈ $${new BigNumber(value).toFormat(decimals)}`;
 };
 
 export default AmountCard;

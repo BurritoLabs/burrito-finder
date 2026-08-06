@@ -2,15 +2,15 @@
 @use "../../styles/variables";
 
 .meta {
-  @media (max-width: variables.$breakpoint - 1) {
-    display: none;
-  }
-
-  font-size: 12px;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
   font-weight: normal;
   opacity: 0.5;
-  margin-left: 10px;
-  line-height: 36px;
+  line-height: 1.35;
 }
 
 .card {
@@ -40,12 +40,46 @@
 }
 
 .denom {
-  @include mixins.flex(center);
+  display: block;
   font-size: 16px;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.tokenIdentity {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.details {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  color: variables.$muted;
+  font-size: 11px;
+  line-height: 1.35;
+  overflow: hidden;
+}
+
+.assetName,
+.assetId {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetName {
+  flex: 0 1 auto;
+}
+
+.assetId {
+  flex: 1 1 auto;
+  opacity: 0.65;
+  font-family: monospace;
 }
 
 .action {
@@ -115,4 +149,16 @@
   border-radius: 50%;
   padding: 3px;
   margin-right: 5px;
+}
+
+@media (max-width: variables.$breakpoint - 1) {
+  .details {
+    display: block;
+    font-size: 10px;
+  }
+
+  .assetName,
+  .assetId {
+    display: block;
+  }
 }
