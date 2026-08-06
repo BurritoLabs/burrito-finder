@@ -37,7 +37,7 @@
   font-size: 18px;
   padding: 25px 30px;
   line-height: 1;
-  background-color: rgba(255, 255, 255, 0.026);
+  background-color: color-mix(in srgb, var(--bui-color-text) 2.6%, transparent);
 }
 
 .events {

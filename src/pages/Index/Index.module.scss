@@ -12,7 +12,7 @@
   background:
     radial-gradient(
       1600px 900px at 12% -20%,
-      rgba(255, 255, 255, 0.065),
+      color-mix(in srgb, var(--bui-color-text) 6.5%, transparent),
       transparent 70%
     ),
     radial-gradient(
@@ -20,8 +20,13 @@
       rgba(var(--chain-rgb), 0.055),
       transparent 72%
     ),
-    linear-gradient(180deg, #14231d 0%, #101b17 55%, #0d1815 100%);
-  background-color: #101b17;
+    linear-gradient(
+      180deg,
+      var(--bui-color-surface-raised) 0%,
+      var(--bui-color-canvas-subtle) 55%,
+      var(--bui-color-canvas) 100%
+    );
+  background-color: var(--bui-color-canvas);
 
   @media (max-width: variables.$breakpoint) {
     inset: 56px 0 0;
@@ -58,6 +63,10 @@
   opacity: 0.5;
 }
 
+:global(:root[data-theme="light"]) .container::after {
+  opacity: 0.1;
+}
+
 .content {
   position: relative;
   z-index: 1;
@@ -90,24 +99,24 @@
 
   > div {
     height: 48px;
-    border-color: rgba(225, 247, 233, 0.17);
-    background: rgba(255, 255, 255, 0.055);
+    border-color: var(--bui-color-border-strong);
+    background: var(--bui-color-surface);
   }
 
   input {
     height: 48px;
-    color: #eaf5eb;
+    color: var(--bui-color-text);
     font-size: 18px;
     font-weight: 400;
 
     &::placeholder {
-      color: #9fb2a8;
+      color: var(--bui-color-text-muted);
       opacity: 1;
     }
   }
 
   button svg {
-    color: #b9cbc1;
+    color: var(--bui-color-text-secondary);
   }
 
   button {

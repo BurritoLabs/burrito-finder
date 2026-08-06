@@ -31,7 +31,7 @@
   }
 
   th {
-    background: rgba(255, 255, 255, 0.026);
+    background: color-mix(in srgb, var(--bui-color-text) 2.6%, transparent);
     font-weight: normal;
     vertical-align: top;
     width: 150px;

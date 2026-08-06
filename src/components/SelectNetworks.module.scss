@@ -4,7 +4,8 @@
   width: auto;
   height: 32px;
   @media (max-width: variables.$breakpoint) {
-    height: 32px;
+    width: 44px;
+    height: 34px;
   }
 }
 
@@ -25,7 +26,7 @@
   color: var(--bui-color-text-secondary);
   font-weight: 600;
   letter-spacing: 0;
-  background: rgba(255, 255, 255, 0.026);
+  background: color-mix(in srgb, var(--bui-color-text) 2.6%, transparent);
   box-shadow: none;
   display: flex;
   align-items: center;
@@ -35,6 +36,13 @@
     border-color 160ms ease,
     background-color 160ms ease,
     color 160ms ease;
+
+  @media (max-width: variables.$breakpoint) {
+    width: 44px;
+    min-width: 44px;
+    padding: 0 6px 0 5px;
+    gap: 2px;
+  }
 
   &:hover {
     border-color: rgba(var(--chain-rgb), 0.38);
@@ -94,15 +102,25 @@
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
+
+  @media (max-width: variables.$breakpoint) {
+    display: none;
+  }
 }
 
 .testnetLabel,
 .optionTestnet {
-  color: rgba(234, 245, 235, 0.46);
+  color: color-mix(in srgb, var(--bui-color-text) 46%, transparent);
   font-size: 9px;
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
+}
+
+.testnetLabel {
+  @media (max-width: variables.$breakpoint) {
+    display: none;
+  }
 }
 
 .menu {
@@ -111,8 +129,8 @@
   right: 0;
   width: min(208px, calc(100vw - 32px));
   margin-top: 8px;
-  background: rgba(8, 17, 15, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bui-color-surface);
+  border: 1px solid var(--bui-color-border-strong);
   border-radius: 12px;
   box-shadow: 0 20px 46px rgba(0, 0, 0, 0.35);
   z-index: 100;
@@ -140,7 +158,7 @@
   border-radius: variables.$radius;
   &:hover {
     color: var(--bui-color-text);
-    background: rgba(255, 255, 255, 0.045);
+    background: color-mix(in srgb, var(--bui-color-text) 4.5%, transparent);
   }
 }
 

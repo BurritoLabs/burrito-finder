@@ -38,7 +38,7 @@
 
 .hero .text {
   font-size: 28px;
-  color: #eaf5eb;
+  color: var(--bui-color-text);
 }
 
 @media (max-width: variables.$breakpoint) {

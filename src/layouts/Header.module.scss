@@ -17,6 +17,10 @@
   align-items: center;
   justify-self: end;
   gap: 8px;
+
+  @media (max-width: variables.$breakpoint) {
+    gap: 6px;
+  }
 }
 
 .inner {

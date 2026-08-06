@@ -44,7 +44,7 @@ input {
   margin: 0;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.07);
+    background: color-mix(in srgb, var(--bui-color-text) 7%, transparent);
   }
 
   svg {
@@ -66,14 +66,14 @@ form {
   overflow: hidden;
   border: 1px solid variables.$line;
   border-radius: variables.$radius;
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--bui-color-text) 4%, transparent);
   transition:
     border-color 160ms ease,
     background 160ms ease,
     box-shadow 160ms ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.055);
+    background: color-mix(in srgb, var(--bui-color-text) 5.5%, transparent);
   }
 
   &:focus-within {

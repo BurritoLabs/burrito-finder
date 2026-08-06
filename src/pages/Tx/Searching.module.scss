@@ -84,7 +84,7 @@
     rgba(255, 255, 255, 0.4) 25%,
     transparent 25%,
     transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
+    color-mix(in srgb, var(--bui-color-text) 15%, transparent) 50%,
     rgba(255, 255, 255, 0.4) 75%,
     transparent 75%,
     transparent

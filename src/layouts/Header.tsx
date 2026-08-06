@@ -21,8 +21,8 @@ const Header = () => {
         </div>
         {!isHome && <Search className={s.search} />}
         <div className={s.actions}>
-          <BurritoThemeSwitcher />
           <SelectOptions variant="header" />
+          <BurritoThemeSwitcher />
         </div>
       </div>
     </div>

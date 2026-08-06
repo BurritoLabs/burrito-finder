@@ -78,7 +78,7 @@ input {
   appearance: none;
   border: 1px solid $border;
   border-radius: variables.$radius;
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--bui-color-text) 3.5%, transparent);
   color: variables.$app-fg;
   display: block;
   font-size: 14px;
@@ -93,7 +93,7 @@ input {
 
   &:focus {
     border-color: rgba(var(--chain-rgb), 0.72);
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--bui-color-text) 5%, transparent);
     box-shadow: 0 0 0 2px rgba(var(--chain-rgb), 0.16);
   }
 }
@@ -154,7 +154,7 @@ textarea.form-control {
   .input-group-append {
     @include mixins.flex();
 
-    background: rgba(255, 255, 255, 0.06);
+    background: color-mix(in srgb, var(--bui-color-text) 6%, transparent);
     border: 1px solid $border;
     border-left: 0;
     border-top-right-radius: variables.$radius;

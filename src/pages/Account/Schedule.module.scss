@@ -2,7 +2,7 @@
 @use "../../styles/mixins";
 @use "../../styles/variables";
 
-$border: rgba(255, 255, 255, 0.14);
+$border: color-mix(in srgb, var(--bui-color-text) 14%, transparent);
 $releasing: #38bdf8;
 
 .component {
