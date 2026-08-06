@@ -3,6 +3,10 @@
 @use "styles/reboot.scss";
 @use "styles/components";
 
+:root {
+  --finder-ui-build: 20260806;
+}
+
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;

@@ -15,6 +15,7 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:production-assets": "node scripts/audit-production-assets.mjs",
     "serve:e2e": "serve -s build -l 4173",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
