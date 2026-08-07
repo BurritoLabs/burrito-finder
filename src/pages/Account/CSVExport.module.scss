@@ -1,12 +1,12 @@
 @use "../../styles/variables.scss";
 
 .exportCsvButton {
-  color: variables.$link-bg;
+  color: variables.$link;
   text-decoration: underline;
 }
 
 .loading {
-  color: variables.$link-bg;
+  color: variables.$link;
 }
 
 .error {

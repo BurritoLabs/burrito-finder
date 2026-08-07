@@ -18,6 +18,19 @@
   }
 }
 
+:global(:root[data-theme="light"]) .main {
+  --chain-accent: var(--bui-color-info);
+  --chain-accent-strong: var(--bui-color-info);
+  --chain-accent-soft: var(--bui-color-info-soft);
+
+  &[data-chain="mainnet"],
+  &[data-chain="testnet"] {
+    --chain-accent: #c2410c;
+    --chain-accent-strong: #9a3412;
+    --chain-accent-soft: #ffedd5;
+  }
+}
+
 .content {
   width: 100%;
   max-width: 1440px;

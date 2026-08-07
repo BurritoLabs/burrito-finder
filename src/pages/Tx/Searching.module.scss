@@ -1,7 +1,7 @@
 @use "../../styles/variables.scss";
 
 .page {
-  background-color: #0c1411;
+  background-color: var(--bui-color-surface);
   border: 1px solid variables.$line;
   border-radius: variables.$radius;
   box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
@@ -18,11 +18,13 @@
 .progressTitle {
   font-size: 20px;
   font-weight: bold;
+  color: var(--bui-color-text);
 }
 .text {
   display: block;
   margin-top: 20px;
   font-size: 14px;
+  color: var(--bui-color-text-secondary);
 }
 .timer {
   display: block;
@@ -31,14 +33,14 @@
   font-weight: 500;
 }
 .progress {
-  background-color: variables.$a-bg;
+  background-color: var(--bui-color-surface-sunken);
   border-radius: 5px;
   box-shadow: none;
   height: 10px;
   margin-top: 5px;
 }
 .progressBar {
-  margin-top: 20px;
+  margin-top: 0;
   background-color: variables.$brand;
   border-radius: 5px;
   box-shadow: none;

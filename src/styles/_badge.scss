@@ -1,7 +1,7 @@
 @use "sass:color";
 @use "variables";
 
-@use 'sass:math';
+@use "sass:math";
 
 .badge {
   color: variables.$brand;
@@ -34,18 +34,22 @@
 
 .badge-primary {
   background: variables.$brand;
+  color: variables.$navy;
 }
 
 .badge-secondary {
   background: variables.$sky;
+  color: variables.$navy;
 }
 
 .badge-success {
   background: variables.$green;
+  color: variables.$navy;
 }
 
 .badge-warning {
   background: variables.$orange;
+  color: variables.$navy;
 }
 
 .badge-danger {

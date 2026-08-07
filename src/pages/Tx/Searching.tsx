@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import c from "classnames";
-import { intervalToDuration } from "date-fns";
 import { useCurrentChain } from "../../contexts/ChainsContext";
 import s from "./Searching.module.scss";
 
@@ -10,16 +9,19 @@ const Searching = ({ state, hash }: { state: number; hash: string }) => {
   const searching = "#52c41a";
   const failed = "#ff5561";
   const { chainID } = useCurrentChain();
-  const [now, setNow] = useState(new Date());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => {
-    setNow(new Date());
+    setElapsedSeconds(0);
+    const timer = window.setInterval(() => {
+      setElapsedSeconds(value => value + 1);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
   }, [chainID, hash]);
 
-  const { minutes, seconds } = intervalToDuration({
-    start: new Date(),
-    end: now
-  });
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = elapsedSeconds % 60;
 
   const fromNow = [minutes, seconds]
     .map(str => String(str).padStart(2, "0"))
