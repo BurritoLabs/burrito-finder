@@ -116,6 +116,10 @@
   }
 }
 
+:global(:root[data-theme="light"]) .toggle {
+  color: var(--bui-color-text-secondary);
+}
+
 .toggleTrack {
   position: relative;
   width: 34px;

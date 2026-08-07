@@ -35,6 +35,10 @@
   .main {
     background: #0f1b16;
   }
+
+  :global(:root[data-theme="light"]) .main {
+    background: var(--bui-color-canvas);
+  }
 }
 
 .loadingOverlay {

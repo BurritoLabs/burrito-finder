@@ -41,6 +41,14 @@ code {
   padding: 0 15px;
   vertical-align: middle;
 }
+
+:root[data-theme="light"] .type {
+  color: var(--bui-color-brand-text);
+}
+
+:root[data-theme="light"] .badge-success {
+  color: #0c1411;
+}
 html .bui-theme-toggle {
   width: 34px;
   height: 34px;

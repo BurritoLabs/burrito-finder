@@ -123,6 +123,11 @@
   }
 }
 
+:global(:root[data-theme="light"]) .currency {
+  color: var(--chain-accent-strong);
+  opacity: 1;
+}
+
 .button button {
   @media (max-width: variables.$breakpoint - 1) {
     margin-left: 5px;
