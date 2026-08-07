@@ -15,23 +15,7 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="manifest" href="/manifest.json" />
     <title>Burrito Finder</title>
-    <script>
-      (() => {
-        try {
-          const saved = localStorage.getItem("burrito:theme");
-          const preference = saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
-          const theme = preference === "system" ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : preference;
-          const root = document.documentElement;
-          root.dataset.themePreference = preference;
-          root.dataset.theme = theme;
-          root.style.colorScheme = theme;
-          document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#070D0B" : "#F5F8F5");
-        } catch (_) {
-          document.documentElement.dataset.themePreference = "system";
-          document.documentElement.dataset.theme = "dark";
-        }
-      })();
-    </script>
+    <script src="/theme-bootstrap.js"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
