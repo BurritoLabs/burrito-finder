@@ -21,7 +21,7 @@
   }
 
   &[class*="badge-"] {
-    color: white;
+    color: variables.$navy;
     font-weight: 500;
     text-transform: capitalize;
   }
@@ -54,6 +54,7 @@
 
 .badge-danger {
   background: variables.$red;
+  color: variables.$navy;
 }
 
 .badge-small {
