@@ -43,7 +43,7 @@
     ]
   },
   "dependencies": {
-    "@burritolabs/ui": "github:BurritoLabs/burrito-design-system#4c5a9ef",
+    "@burritolabs/ui": "github:BurritoLabs/burrito-design-system#e09b4f6",
     "@tanstack/react-query": "^5.101.2",
     "@terra-money/log-finder": "^1.1.6",
     "@terra-money/log-finder-ruleset": "^3.0.3",
