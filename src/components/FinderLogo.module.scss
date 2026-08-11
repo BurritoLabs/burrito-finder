@@ -20,7 +20,7 @@
   align-items: baseline;
   gap: 6px;
   font-size: 20px;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
   line-height: 1em;
 }
 
@@ -44,12 +44,12 @@
 @media (max-width: variables.$breakpoint) {
   .icon,
   .hero .icon {
-    height: 20px;
+    height: 24px;
   }
 
   .text,
   .hero .text {
-    gap: 5px;
-    font-size: 16px;
+    gap: 6px;
+    font-size: 20px;
   }
 }
