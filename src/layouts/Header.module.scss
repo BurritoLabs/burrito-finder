@@ -45,6 +45,11 @@
     gap: 4px 16px;
     padding: 0 16px 12px;
   }
+
+  @media (min-width: 960.01px) and (max-width: 1366px) {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
 }
 
 .home {
