@@ -89,6 +89,22 @@
   }
 }
 
+@media (pointer: coarse) and (max-width: 1366px) {
+  .header,
+  .inner {
+    min-height: 56px;
+  }
+
+  .inner {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .logo {
+    height: 56px;
+  }
+}
+
 .search {
   width: 100%;
   max-width: 640px;
