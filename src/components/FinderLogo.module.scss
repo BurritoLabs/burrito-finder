@@ -1,24 +1,64 @@
 .logo {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--bui-color-text);
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1;
+
+  > img {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 }
 
-.hero :global(.bui-brand-mark) {
+.wordmark {
+  display: block;
+  width: 133.2px;
+  height: 20px;
+  flex: 0 0 auto;
+  overflow: visible;
+
+  text {
+    font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+    font-size: 20px;
+    letter-spacing: 0;
+  }
+}
+
+.brand {
+  fill: var(--bui-color-text);
+  font-weight: 650;
+}
+
+.product {
+  fill: var(--bui-color-text-secondary);
+  font-weight: 400;
+}
+
+.hero > img {
   width: 34px;
   height: 34px;
 }
 
-.hero :global(.bui-brand-wordmark) {
-  font-size: 28px;
-  color: var(--bui-color-text);
+.hero .wordmark {
+  width: 186.48px;
+  height: 28px;
 }
 
 @media (max-width: 992px) {
-  .hero :global(.bui-brand-mark) {
+  .hero > img {
     width: 24px;
     height: 24px;
   }
 
-  .hero :global(.bui-brand-wordmark) {
-    font-size: 20px;
+  .hero .wordmark {
+    width: 133.2px;
+    height: 20px;
   }
 }

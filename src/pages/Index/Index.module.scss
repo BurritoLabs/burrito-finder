@@ -9,12 +9,23 @@
   overflow: hidden;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    180deg,
-    var(--bui-color-surface-raised) 0%,
-    var(--bui-color-canvas-subtle) 58%,
-    var(--bui-color-canvas) 100%
-  );
+  background:
+    radial-gradient(
+      1600px 900px at 12% -20%,
+      color-mix(in srgb, var(--bui-color-text) 5%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      1400px 800px at 88% -10%,
+      rgba(var(--chain-rgb), 0.07),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      var(--bui-color-surface-raised) 0%,
+      var(--bui-color-canvas-subtle) 55%,
+      var(--bui-color-canvas) 100%
+    );
   background-color: var(--bui-color-canvas);
 
   @media (max-width: variables.$breakpoint) {
@@ -25,26 +36,20 @@
 .container::before {
   content: "";
   position: absolute;
-  inset: -28%;
+  inset: -22%;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 58% 42% at 24% 32%,
-      rgba(var(--chain-rgb), 0.16) 0%,
-      rgba(var(--chain-rgb), 0.065) 42%,
-      transparent 74%
-    ),
-    radial-gradient(
-      ellipse 52% 46% at 76% 66%,
-      color-mix(in srgb, var(--bui-color-brand) 12%, transparent) 0%,
-      color-mix(in srgb, var(--bui-color-brand) 4%, transparent) 46%,
-      transparent 76%
-    );
-  filter: blur(18px) saturate(112%);
-  transform: translate3d(-2.5%, -1.5%, 0) scale(1.04) rotate(-1.5deg);
+  background: radial-gradient(
+    ellipse 58% 46% at 50% 43%,
+    rgba(var(--chain-rgb), 0.13) 0%,
+    rgba(var(--chain-rgb), 0.052) 44%,
+    rgba(var(--chain-rgb), 0.014) 64%,
+    transparent 79%
+  );
+  filter: blur(20px) saturate(108%);
+  transform: translate3d(-2%, -1%, 0) scale(1.04);
   transform-origin: center;
-  animation: ambientDrift 18s ease-in-out infinite alternate;
+  animation: lightDrift 16s ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -63,93 +68,26 @@
   opacity: 0.5;
 }
 
-.ambient {
-  position: absolute;
-  inset: -32%;
-  z-index: 0;
-  pointer-events: none;
-  transform: translate3d(2%, -2%, 0) scale(1.05);
-  animation: ambientOrbit 26s ease-in-out infinite alternate;
-  will-change: transform;
-
-  span {
-    position: absolute;
-    inset: 0;
-  }
-
-  span:first-child {
-    background:
-      radial-gradient(
-        ellipse 50% 34% at 68% 24%,
-        rgba(56, 189, 248, 0.1) 0%,
-        rgba(56, 189, 248, 0.035) 48%,
-        transparent 76%
-      ),
-      radial-gradient(
-        ellipse 58% 38% at 34% 74%,
-        rgba(34, 197, 94, 0.085) 0%,
-        rgba(34, 197, 94, 0.025) 52%,
-        transparent 78%
-      );
-    filter: blur(26px);
-  }
-
-  span:last-child {
-    background: radial-gradient(
-      ellipse 46% 28% at 52% 50%,
-      color-mix(in srgb, var(--bui-color-text) 5%, transparent) 0%,
-      transparent 72%
-    );
-    filter: blur(34px);
-    transform: rotate(7deg) scale(1.08);
-    animation: ambientPulse 14s ease-in-out infinite alternate;
-  }
-}
-
 :global(:root[data-theme="light"]) .container::after {
   opacity: 0.1;
 }
 
-@keyframes ambientDrift {
+@keyframes lightDrift {
   0% {
-    transform: translate3d(-2.5%, -1.5%, 0) scale(1.04) rotate(-1.5deg);
+    transform: translate3d(-2%, -1%, 0) scale(1.04);
   }
 
-  55% {
-    transform: translate3d(1.5%, 2.5%, 0) scale(1.09) rotate(1deg);
+  48% {
+    transform: translate3d(2.5%, 1%, 0) scale(1.08);
   }
 
   100% {
-    transform: translate3d(3.5%, -0.5%, 0) scale(1.06) rotate(2deg);
-  }
-}
-
-@keyframes ambientOrbit {
-  0% {
-    transform: translate3d(2%, -2%, 0) scale(1.05) rotate(0deg);
-  }
-
-  100% {
-    transform: translate3d(-2.5%, 2%, 0) scale(1.1) rotate(-3deg);
-  }
-}
-
-@keyframes ambientPulse {
-  0% {
-    opacity: 0.55;
-    transform: rotate(7deg) scale(1.04);
-  }
-
-  100% {
-    opacity: 0.9;
-    transform: rotate(2deg) scale(1.13);
+    transform: translate3d(-0.5%, 2.5%, 0) scale(1.06);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .container::before,
-  .ambient,
-  .ambient span:last-child {
+  .container::before {
     animation: none;
   }
 }

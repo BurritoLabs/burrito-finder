@@ -5,10 +5,6 @@ import FinderLogo from "../../components/FinderLogo";
 
 const Index = () => (
   <div className={s.container}>
-    <div className={s.ambient} aria-hidden="true">
-      <span />
-      <span />
-    </div>
     <div className={s.content}>
       <div className={s.logo}>
         <FinderLogo variant="hero" />
