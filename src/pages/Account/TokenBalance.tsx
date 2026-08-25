@@ -202,7 +202,6 @@ const TokenBalance = ({ address }: { address: string }) => {
                     icon={item.icon ?? cwFallbackIcon}
                     fallbackIcon={cwFallbackIcon}
                     name={item.name}
-                    assetId={item.address}
                     usdValue={item.usdValue}
                     showUsdValue
                     decimals={item.decimals}
