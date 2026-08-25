@@ -32,6 +32,7 @@ import { useGetQueryURL } from "../../queries/query";
 import TxAmount from "../Tx/TxAmount";
 import { toLogFinderTransaction, transformTx } from "../Tx/transform";
 import TaxRateAmount from "../Tx/TaxRateAmount";
+import { getTransactionDisplayState } from "../Tx/transactionDisplay";
 import CsvExport from "./CSVExport";
 import s from "./Txs.module.scss";
 import { useQuery } from "@tanstack/react-query";
@@ -417,11 +418,10 @@ const Txs = ({
   const txsRow = useMemo(() => {
     return visibleTxs.map((tx: any) => {
       const txData: TxResponse = transformTx(tx, chainID);
-      const matchedLogs = getTxAmounts(
-        toLogFinderTransaction(txData),
-        logMatcher,
-        address
-      );
+      const { balanceChangesApplied } = getTransactionDisplayState(txData.code);
+      const matchedLogs = balanceChangesApplied
+        ? getTxAmounts(toLogFinderTransaction(txData), logMatcher, address)
+        : undefined;
       return getRow(txData, chainID, address, matchedLogs, isClassic);
     });
   }, [visibleTxs, chainID, address, logMatcher, isClassic]);
@@ -447,12 +447,13 @@ const Txs = ({
 
   const head = [
     `Tx hash`,
+    `Status`,
     `Type`,
     `Block`,
     `Amount (Out)`,
     `Amount (In)`,
     `Timestamp`,
-    `Fee`,
+    `Network fee`,
     isClassic ? "Tax" : null
   ];
 
@@ -504,7 +505,8 @@ const getRow = (
 ) => {
   const { tx: txBody, txhash, height, timestamp, chainId, logs } = response;
   const resolvedChainId = chainId || network;
-  const isSuccess = !response.code;
+  const displayState = getTransactionDisplayState(response.code);
+  const isSuccess = displayState.balanceChangesApplied;
   const [amountIn, amountOut] = getAmount(address, matchedMsg, 3);
   const fee = getTxFee(txBody?.value?.fee?.amount?.[0], isClassic);
   const feeData = fee?.split(" ");
@@ -522,6 +524,9 @@ const getRow = (
         )}
       </div>
     </span>,
+    <span className={isSuccess ? s.statusSuccess : s.statusFailed}>
+      {displayState.label}
+    </span>,
     <span className="type">{sliceMsgType(txBody?.value?.msg[0].type)}</span>,
     <span>
       <Finder q="blocks" network={network} v={String(height)}>
@@ -530,26 +535,34 @@ const getRow = (
       <span>({resolvedChainId})</span>
     </span>,
     <span className={s.amount}>
-      {amountOut.length
-        ? amountOut.map((amount, index) => {
-            if (index >= 2) {
-              return <Finder q="tx" v={txhash} children="..." key={index} />;
-            } else {
-              return <span key={index}>-{amount}</span>;
-            }
-          })
-        : "-"}
+      {!isSuccess ? (
+        <span className={s.rolledBack}>Rolled back</span>
+      ) : amountOut.length ? (
+        amountOut.map((amount, index) => {
+          if (index >= 2) {
+            return <Finder q="tx" v={txhash} children="..." key={index} />;
+          } else {
+            return <span key={index}>-{amount}</span>;
+          }
+        })
+      ) : (
+        "-"
+      )}
     </span>,
     <span className={s.amount}>
-      {amountIn.length
-        ? amountIn.map((amount, index) => {
-            if (index >= 2) {
-              return <Finder q="tx" v={txhash} children="..." key={index} />;
-            } else {
-              return <span key={index}>+{amount}</span>;
-            }
-          })
-        : "-"}
+      {!isSuccess ? (
+        <span className={s.rolledBack}>Rolled back</span>
+      ) : amountIn.length ? (
+        amountIn.map((amount, index) => {
+          if (index >= 2) {
+            return <Finder q="tx" v={txhash} children="..." key={index} />;
+          } else {
+            return <span key={index}>+{amount}</span>;
+          }
+        })
+      ) : (
+        "-"
+      )}
     </span>,
     <span>{fromISOTime(timestamp.toString())}</span>,
     <span>
@@ -559,8 +572,6 @@ const getRow = (
         isFormatAmount={true}
       />
     </span>,
-    <span>
-      <TaxRateAmount logs={logs} />
-    </span>
+    <span>{isSuccess ? <TaxRateAmount logs={logs} /> : "-"}</span>
   ];
 };

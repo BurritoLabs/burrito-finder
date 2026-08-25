@@ -24,6 +24,34 @@
   color: variables.$red;
 }
 
+.statusSuccess,
+.statusFailed {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusSuccess {
+  background: color-mix(in srgb, variables.$green 18%, transparent);
+  color: variables.$green;
+}
+
+.statusFailed {
+  background: color-mix(in srgb, variables.$red 14%, transparent);
+  color: variables.$red;
+}
+
+.rolledBack {
+  color: variables.$red;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .amount {
   display: flex;
   white-space: pre;
