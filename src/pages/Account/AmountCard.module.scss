@@ -156,10 +156,20 @@
 
 .icon {
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
   border-radius: 50%;
   padding: 3px;
   margin-right: 5px;
+
+  img {
+    border-radius: 50%;
+    object-fit: cover;
+  }
 }
 
 @media (max-width: variables.$breakpoint - 1) {
