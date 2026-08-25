@@ -12,6 +12,7 @@ import { transformTx } from "../Tx/transform";
 import { useCurrentChain, useIsClassic } from "../../contexts/ChainsContext";
 import s from "./Txs.module.scss";
 import TaxRateAmount from "../Tx/TaxRateAmount";
+import { getTransactionDisplayState } from "../Tx/transactionDisplay";
 
 const getRow = (
   response: TxInfo | TxResponse,
@@ -21,6 +22,7 @@ const getRow = (
   const transformed = transformTx(response, chainID);
   const { txhash, tx, height, timestamp, logs } = transformed;
   const fee = get(tx, `value.fee.amount[0]`);
+  const displayState = getTransactionDisplayState(transformed.code);
 
   return [
     <span>
@@ -28,6 +30,7 @@ const getRow = (
         {txhash}
       </Finder>
     </span>,
+    <span>{displayState.label}</span>,
     <span className="type">{sliceMsgType(tx?.value?.msg[0].type)}</span>,
     <span>
       {isEmpty(fee) ? (
@@ -53,6 +56,7 @@ const Txs = ({ txs, emptyMessage = "No more transactions" }: Props) => {
   const isClassic = useIsClassic();
   const head = [
     `TxHash`,
+    `Status`,
     `Type`,
     `Fee`,
     isClassic ? `Tax` : null,

@@ -33,6 +33,7 @@ import {
   normalizeMintscanTx
 } from "../../queries/mintscan";
 import { fetchClassicTestnetTx } from "../../queries/classicTestnet";
+import { getTransactionDisplayState } from "./transactionDisplay";
 
 const TxComponent = ({ hash }: { hash: string }) => {
   const ruleSet = useLogfinderActionRuleSet();
@@ -54,6 +55,7 @@ const TxComponent = ({ hash }: { hash: string }) => {
   const matchedMsg = getTxCanonicalMsgs(toLogFinderTransaction(tx), logMatcher);
 
   const fee: Amount[] = get(tx, "tx.value.fee.amount");
+  const displayState = getTransactionDisplayState(tx.code);
 
   // status settings
   const status = isPending ? (
@@ -61,7 +63,7 @@ const TxComponent = ({ hash }: { hash: string }) => {
   ) : !tx.code ? (
     <span className={c(s.status, s.success)}>Success</span>
   ) : (
-    <span className={c(s.status, s.fail)}>Failed</span>
+    <span className={c(s.status, s.fail)}>{displayState.label}</span>
   );
 
   return (
@@ -83,7 +85,13 @@ const TxComponent = ({ hash }: { hash: string }) => {
       {tx.code ? (
         <div className={s.failedMsg}>
           <Icon name="error" size={18} className={s.icon} />
-          <p>{get(last(tx.logs), "log.message") || get(tx, "raw_log")}</p>
+          <div>
+            <p className={s.rollbackNotice}>
+              No token transfer or swap was applied. State changes were rolled
+              back; only the transaction signer may have paid the network fee.
+            </p>
+            <p>{get(last(tx.logs), "log.message") || get(tx, "raw_log")}</p>
+          </div>
         </div>
       ) : null}
 
